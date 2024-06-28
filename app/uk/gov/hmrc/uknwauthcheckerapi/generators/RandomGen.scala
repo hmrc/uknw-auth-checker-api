@@ -1,0 +1,37 @@
+/*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package uk.gov.hmrc.uknwauthcheckerapi.generators
+
+import org.scalacheck.Gen
+import wolfendale.scalacheck.regexp.RegexpGen
+
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import scala.util.Random
+
+trait RandomGen {
+
+  def localDateGen: String = {
+    val currentYear = LocalDate.now.getYear
+    val localDate = LocalDate.of(Random.between(currentYear - 10, currentYear), Random.between(1, 12), Random.between(1, 28))
+    localDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
+  }
+
+  val eoriGen: Gen[String] = RegexpGen.from("^(GB|XI)[0-9]{12}|(GB|XI)[0-9]{15}$")
+}
+
+object RandomGen extends RandomGen

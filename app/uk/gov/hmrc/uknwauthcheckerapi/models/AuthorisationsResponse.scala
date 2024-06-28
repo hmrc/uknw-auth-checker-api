@@ -18,14 +18,14 @@ package uk.gov.hmrc.uknwauthcheckerapi.models
 
 import play.api.libs.json.{Json, OFormat}
 
-case class AuthorisationsResponse(date: String, eoris: Array[EISResult])
+case class AuthorisationsResponse(date: String, eoris: Array[AuthorisationResponse])
 
 object AuthorisationsResponse {
   implicit val format: OFormat[AuthorisationsResponse] = Json.format[AuthorisationsResponse]
 }
 
-case class EISResult(eori: String, authorised: Boolean)
+case class AuthorisationResponse(eori: String, authorised: Boolean)
 
-object EISResult {
-  implicit val format: OFormat[EISResult] = Json.format[EISResult]
+object AuthorisationResponse {
+  implicit val format: OFormat[AuthorisationResponse] = Json.format[AuthorisationResponse]
 }

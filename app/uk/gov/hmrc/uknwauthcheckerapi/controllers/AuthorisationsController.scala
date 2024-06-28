@@ -19,7 +19,7 @@ package uk.gov.hmrc.uknwauthcheckerapi.controllers
 import play.api.libs.json.Json
 import play.api.mvc.{Action, ControllerComponents}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
-import uk.gov.hmrc.uknwauthcheckerapi.models.{AuthorisationRequest, AuthorisationsResponse, EISResult}
+import uk.gov.hmrc.uknwauthcheckerapi.models.{AuthorisationRequest, AuthorisationsResponse, AuthorisationResponse}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -33,7 +33,7 @@ class AuthorisationsController @Inject()(cc: ControllerComponents)
     implicit request =>
       Future {
         Ok (Json.toJson(AuthorisationsResponse(request.body.date,
-          request.body.eoris.map(r => EISResult(r, authorised = true)))))
+          request.body.eoris.map(r => AuthorisationResponse(r, authorised = true)))))
       }
   }
 }
