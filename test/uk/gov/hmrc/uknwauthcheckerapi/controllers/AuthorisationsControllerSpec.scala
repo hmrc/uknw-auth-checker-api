@@ -1,24 +1,25 @@
 package uk.gov.hmrc.uknwauthcheckerapi.controllers
 
-import org.apache.pekko.actor.setup.Setup
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.Json
 import play.api.mvc.Result
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
-import uk.gov.hmrc.uknwauthcheckerapi.models.{AuthorisationRequest, AuthorisationsResponse, AuthorisationResponse}
-import uk.gov.hmrc.uknwauthcheckerapi.generators.RandomGen.{eoriGen, localDateGen}
+import uk.gov.hmrc.uknwauthcheckerapi.models.{AuthorisationRequest, AuthorisationResponse, AuthorisationsResponse}
+import uk.gov.hmrc.uknwauthcheckerapi.generators.Generators.{arbLocalDate, eoriGen}
 
 import scala.concurrent.Future
 
 class AuthorisationsControllerSpec extends AnyWordSpec with Matchers {
 
-  private val controller = new AuthorisationsController(Helpers.stubControllerComponents())
+  trait Setup {
+    val controller = new AuthorisationsController(Helpers.stubControllerComponents())
+  }
 
   "AuthorisationsController" should {
 
-    val date = localDateGen
+    val date = arbLocalDate.arbitrary.sample.get
     val eori1 = eoriGen.sample.get
     val eori2 = eoriGen.sample.get
 

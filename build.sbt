@@ -7,15 +7,13 @@ lazy val microservice = Project("uknw-auth-checker-api", file("."))
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
   .settings(
     libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test,
-    libraryDependencies += "io.github.wolfendale" %% "scalacheck-gen-regexp" % "0.1.3",
-    libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.18.0" % "compile",
       // https://www.scala-lang.org/2021/01/12/configuring-and-suppressing-warnings.html
     // suppress warnings in generated routes files
     scalacOptions += "-Wconf:src=routes/.*:s",
     PlayKeys.devSettings := Seq("play.server.http.port" -> "9070"),
   )
   .settings(resolvers += Resolver.jcenterRepo)
-  .settings(CodeCoverageSettings.settings: _*)
+  .settings(CodeCoverageSettings.settings *)
   .settings(
     Compile / unmanagedResourceDirectories += baseDirectory.value / "resources",
   )
