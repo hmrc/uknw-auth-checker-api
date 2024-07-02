@@ -8,14 +8,14 @@ object AppDependencies {
 
   val compile: Seq[ModuleID] = Seq(
     "uk.gov.hmrc"             %% "bootstrap-backend-play-30"  % bootstrapVersion,
-    "org.scalatestplus"       %% "scalacheck-1-17"            % "3.2.18.0"                  ,
+    "org.scalatestplus"       %% "scalacheck-1-17"            % "3.2.18.0",
 
   )
 
   val test: Seq[ModuleID] = Seq(
     "uk.gov.hmrc"             %% "bootstrap-test-play-30"     % bootstrapVersion            % Test,
     "org.scalatestplus"       %% "scalacheck-1-17"            % "3.2.18.0"                  % Test,
-    "io.github.wolfendale"    %% "scalacheck-gen-regexp"      % "0.1.3"                     % Test,
+    "io.github.wolfendale"    %% "scalacheck-gen-regexp"      % "1.1.0"                     % Test,
     "org.scalacheck"          %% "scalacheck"                 % "1.18.0"                    % Test,
   )
 

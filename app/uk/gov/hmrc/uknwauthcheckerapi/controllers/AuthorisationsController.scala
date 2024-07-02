@@ -16,24 +16,26 @@
 
 package uk.gov.hmrc.uknwauthcheckerapi.controllers
 
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
-import uk.gov.hmrc.uknwauthcheckerapi.models.{AuthorisationRequest, AuthorisationsResponse, AuthorisationResponse}
+import uk.gov.hmrc.uknwauthcheckerapi.models.{AuthorisationRequest, AuthorisationResponse, AuthorisationsResponse}
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton()
-class AuthorisationsController @Inject()(cc: ControllerComponents)
-    extends BackendController(cc) {
+class AuthorisationsController @Inject() (cc: ControllerComponents) extends BackendController(cc) {
 
-  def authorisations: Action[AuthorisationRequest] = Action.async(parse.json[AuthorisationRequest]) {
-    implicit request =>
-      Future {
-        Ok (Json.toJson(AuthorisationsResponse(request.body.date,
-          request.body.eoris.map(r => AuthorisationResponse(r, authorised = true)))))
-      }
+  def authorisations: Action[JsValue] = Action.async(parse.json) { implicit request =>
+    withJsonBody[AuthorisationRequest] { authorisationRequest =>
+      Future.successful(
+        Ok(
+          Json.toJson(
+            AuthorisationsResponse(authorisationRequest.date, authorisationRequest.eoris.map(r => AuthorisationResponse(r, authorised = true)))
+          )
+        )
+      )
+    }
   }
 }

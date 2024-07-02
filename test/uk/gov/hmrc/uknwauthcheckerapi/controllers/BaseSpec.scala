@@ -16,31 +16,22 @@
 
 package uk.gov.hmrc.uknwauthcheckerapi.controllers
 
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{BeforeAndAfterEach, OptionValues, TryValues}
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.stream.Materializer
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import org.scalatestplus.mockito.MockitoSugar
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import play.api.http.{HeaderNames, Status}
-import play.api.mvc.Results
-import play.api.test.{DefaultAwaitTimeout, ResultExtractors}
+import play.api.libs.json.JsValue
+import play.api.mvc.AnyContentAsJson
+import play.api.test.{FakeHeaders, FakeRequest}
+import play.api.test.Helpers.POST
 import uk.gov.hmrc.uknwauthcheckerapi.generators.Generators
 
-class BaseSpec extends AnyWordSpec with Matchers
-                                  with TryValues
-                                  with OptionValues
-                                  with ScalaFutures
-                                  with Results
-                                  with DefaultAwaitTimeout
-                                  with ResultExtractors
-                                  with Status
-                                  with HeaderNames
-                                  with GuiceOneAppPerSuite
-                                  with MockitoSugar
-                                  with ScalaCheckPropertyChecks
-                                  with Generators
-                                  with BeforeAndAfterEach {
+class BaseSpec extends AnyWordSpec with Matchers with Generators {
 
+  private val headers: Seq[(String, String)] = Seq("Content-Type" -> "application/json")
+
+  implicit lazy val system:       ActorSystem  = ActorSystem()
+  implicit lazy val materializer: Materializer = Materializer(system)
+
+  def fakeRequestWithJsonBody(json: JsValue): FakeRequest[JsValue] = FakeRequest(POST, "/authorisations", FakeHeaders(headers), json)
 }
