@@ -21,7 +21,6 @@ import org.apache.pekko.stream.Materializer
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.JsValue
-import play.api.mvc.AnyContentAsJson
 import play.api.test.{FakeHeaders, FakeRequest}
 import play.api.test.Helpers.POST
 import uk.gov.hmrc.uknwauthcheckerapi.generators.Generators

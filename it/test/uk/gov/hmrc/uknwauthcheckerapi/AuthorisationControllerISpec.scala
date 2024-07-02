@@ -14,35 +14,23 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.uknwauthcheckerapi.controllers
+package uk.gov.hmrc.uknwauthcheckerapi
 
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
+import play.api.http.Status
 import play.api.libs.json.Json
-import play.api.test.Helpers
-import play.api.test.Helpers._
-import uk.gov.hmrc.uknwauthcheckerapi.models.{AuthorisationRequest, AuthorisationResponse, AuthorisationsResponse}
+import uk.gov.hmrc.uknwauthcheckerapi.models.AuthorisationRequest
 
-class AuthorisationsControllerSpec extends BaseSpec {
+class AuthorisationControllerISpec extends BaseISpec {
 
-  val controller = new AuthorisationsController(Helpers.stubControllerComponents())
-
-  "AuthorisationsController" should {
-
+  "POST /authorisations" should {
     "return OK (200) with authorised eoris when request has valid date and eoris" in {
-
       forAll { authorisationRequest: AuthorisationRequest =>
-        val expectedResponse = AuthorisationsResponse(
-          authorisationRequest.date,
-          authorisationRequest.eoris.map(r => AuthorisationResponse(r, authorised = true))
-        )
+        val authorisationRequestJson = Json.toJson(authorisationRequest)
 
-        val request = fakeRequestWithJsonBody(Json.toJson(authorisationRequest))
-
-        val result = controller.authorisations()(request)
-
-        status(result)        shouldBe OK
-        contentAsJson(result) shouldBe Json.toJson(expectedResponse)
+        postRequestWithoutHeader(authorisationsUrl, authorisationRequestJson).status mustBe Status.OK
       }
     }
   }
 }
+
