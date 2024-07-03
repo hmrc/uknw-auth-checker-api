@@ -37,8 +37,8 @@ class AuthorisationsController @Inject() (cc: ControllerComponents) extends Back
               AuthorisationsResponse(authorisationRequest.date, authorisationRequest.eoris.map(r => AuthorisationResponse(r, authorised = true)))
             )
           )
-        case JsError(errors) =>
-          BadRequest(JsError.toJson(errors))
+        case JsError(_) =>
+          BadRequest(Json.toJson(ErrorResponse("BAD_REQUEST", "Json is invalid")))
       }
     )
   }

@@ -46,6 +46,15 @@ class AuthorisationsControllerSpec extends BaseSpec {
       }
     }
 
+    "return BAD_REQUEST (400) when request json is invalid" in {
+      val request = fakeRequestWithJsonBody(emptyJson)
+
+      val result = controller.authorisations()(request)
+
+      status(result)        shouldBe BAD_REQUEST
+      contentAsJson(result) shouldBe Json.obj("code" -> "BAD_REQUEST", "message" -> "Json is invalid")
+    }
+
     "return a METHOD_NOT_ALLOWED (405) when request is not POST" in
       forAll(
         Table(
