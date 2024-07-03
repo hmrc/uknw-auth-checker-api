@@ -26,14 +26,14 @@ import uk.gov.hmrc.http.{BadRequestException, NotAcceptableException}
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class JsonErrorHandler @Inject()(
-) extends HttpErrorHandler
-{
+class JsonErrorHandler @Inject() (
+) extends HttpErrorHandler {
   def onClientError(request: RequestHeader, statusCode: Int, message: String): Future[Result] = {
     val jsonErrorResponse = statusCode match {
       case BAD_REQUEST => JsonErrorResponse(BAD_REQUEST, ErrorResponse("INVALID_FORMAT", message))
-      case FORBIDDEN => JsonErrorResponse(FORBIDDEN, ErrorResponse("FORBIDDEN", "You are not allowed to access this resource"))
-      case NOT_FOUND => JsonErrorResponse(NOT_FOUND, ErrorResponse("MATCHING_RESOURCE_NOT_FOUND", "No endpoint could be found in the API for the request path"))
+      case FORBIDDEN   => JsonErrorResponse(FORBIDDEN, ErrorResponse("FORBIDDEN", "You are not allowed to access this resource"))
+      case NOT_FOUND =>
+        JsonErrorResponse(NOT_FOUND, ErrorResponse("MATCHING_RESOURCE_NOT_FOUND", "No endpoint could be found in the API for the request path"))
       case _ => JsonErrorResponse(INTERNAL_SERVER_ERROR, ErrorResponse("INTERNAL_SERVER_ERROR", "Unexpected internal server error"))
     }
 
