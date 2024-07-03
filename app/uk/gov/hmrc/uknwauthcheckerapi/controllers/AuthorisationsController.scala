@@ -16,9 +16,10 @@
 
 package uk.gov.hmrc.uknwauthcheckerapi.controllers
 
-import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{Action, ControllerComponents}
+import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
+import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+import uk.gov.hmrc.uknwauthcheckerapi.errors.ErrorResponse
 import uk.gov.hmrc.uknwauthcheckerapi.models.{AuthorisationRequest, AuthorisationResponse, AuthorisationsResponse}
 
 import javax.inject.{Inject, Singleton}
@@ -28,14 +29,21 @@ import scala.concurrent.Future
 class AuthorisationsController @Inject() (cc: ControllerComponents) extends BackendController(cc) {
 
   def authorisations: Action[JsValue] = Action.async(parse.json) { implicit request =>
-    withJsonBody[AuthorisationRequest] { authorisationRequest =>
-      Future.successful(
-        Ok(
-          Json.toJson(
-            AuthorisationsResponse(authorisationRequest.date, authorisationRequest.eoris.map(r => AuthorisationResponse(r, authorised = true)))
+    Future.successful(
+      request.body.validate[AuthorisationRequest] match {
+        case JsSuccess(authorisationRequest: AuthorisationRequest, _) =>
+          Ok(
+            Json.toJson(
+              AuthorisationsResponse(authorisationRequest.date, authorisationRequest.eoris.map(r => AuthorisationResponse(r, authorised = true)))
+            )
           )
-        )
-      )
-    }
+        case JsError(errors) =>
+          BadRequest(JsError.toJson(errors))
+      }
+    )
+  }
+
+  def methodNotAllowed: Action[AnyContent] = Action {
+    MethodNotAllowed(Json.toJson(ErrorResponse("METHOD_NOT_ALLOWED", "This method is not supported")))
   }
 }

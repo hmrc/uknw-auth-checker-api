@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.uknwauthcheckerapi.controllers
 
+import org.scalatest.prop.Tables.Table
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 import play.api.libs.json.Json
 import play.api.test.Helpers
@@ -44,5 +45,26 @@ class AuthorisationsControllerSpec extends BaseSpec {
         contentAsJson(result) shouldBe Json.toJson(expectedResponse)
       }
     }
+
+    "return a METHOD_NOT_ALLOWED (405) when request is not POST" in
+      forAll(
+        Table(
+          "verb",
+          DELETE,
+          GET,
+          HEAD,
+          OPTIONS,
+          PATCH,
+          PUT
+        )
+      ) { verb: String =>
+        val authorisationRequest: AuthorisationRequest = randomAuthorisationRequest
+
+        val request = fakeRequestWithJsonBody(Json.toJson(authorisationRequest), verb)
+
+        val result = controller.methodNotAllowed()(request)
+
+        status(result) shouldBe METHOD_NOT_ALLOWED
+      }
   }
 }

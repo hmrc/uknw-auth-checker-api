@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.uknwauthcheckerapi.models
+package uk.gov.hmrc.uknwauthcheckerapi.errors
 
-import play.api.libs.json._
+import play.api.libs.json.{Json, OWrites}
 
-import java.time.LocalDate
+final case class JsonErrorResponse(statusCode: Int, errorResponse: ErrorResponse)
 
-case class AuthorisationRequest(date: LocalDate, eoris: Seq[String])
+object JsonErrorResponse {
+  implicit val writes: OWrites[JsonErrorResponse] = Json.writes[JsonErrorResponse]
+}
 
-object AuthorisationRequest {
-  implicit val format: OFormat[AuthorisationRequest] = Json.format[AuthorisationRequest]
+final case class ErrorResponse(code: String, message: String)
+
+object ErrorResponse {
+  implicit val writes: OWrites[ErrorResponse] = Json.writes[ErrorResponse]
 }

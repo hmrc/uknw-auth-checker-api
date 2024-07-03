@@ -24,6 +24,7 @@ import play.api.libs.json.JsValue
 import play.api.test.{FakeHeaders, FakeRequest}
 import play.api.test.Helpers.POST
 import uk.gov.hmrc.uknwauthcheckerapi.generators.Generators
+import uk.gov.hmrc.uknwauthcheckerapi.models.AuthorisationRequest
 
 class BaseSpec extends AnyWordSpec with Matchers with Generators {
 
@@ -32,5 +33,8 @@ class BaseSpec extends AnyWordSpec with Matchers with Generators {
   implicit lazy val system:       ActorSystem  = ActorSystem()
   implicit lazy val materializer: Materializer = Materializer(system)
 
-  def fakeRequestWithJsonBody(json: JsValue): FakeRequest[JsValue] = FakeRequest(POST, "/authorisations", FakeHeaders(headers), json)
+  def fakeRequestWithJsonBody(json: JsValue, verb: String = POST): FakeRequest[JsValue] =
+    FakeRequest(verb, "/authorisations", FakeHeaders(headers), json)
+
+  def randomAuthorisationRequest: AuthorisationRequest = arbAuthorisationRequest.arbitrary.sample.get
 }
