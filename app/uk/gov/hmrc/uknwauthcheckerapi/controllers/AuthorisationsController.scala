@@ -16,26 +16,46 @@
 
 package uk.gov.hmrc.uknwauthcheckerapi.controllers
 
+import cats.data.EitherT
 import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{Action, ControllerComponents}
+import play.api.mvc.{Action, ControllerComponents, Result}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
-import uk.gov.hmrc.uknwauthcheckerapi.models.{AuthorisationRequest, AuthorisationResponse, AuthorisationsResponse}
+import uk.gov.hmrc.uknwauthcheckerapi.models._
+import uk.gov.hmrc.uknwauthcheckerapi.models.eis.{EisAuthorisationRequest, EisAuthorisationsResponse}
+import uk.gov.hmrc.uknwauthcheckerapi.services.IntegrationFrameworkService
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton()
-class AuthorisationsController @Inject() (cc: ControllerComponents) extends BackendController(cc) {
+class AuthorisationsController @Inject() (cc: ControllerComponents,
+                                          integrationFrameworkService: IntegrationFrameworkService)
+                                         (implicit ec: ExecutionContext)
+  extends BackendController(cc)
+  with ErrorHandler {
 
-  def authorisations: Action[JsValue] = Action.async(parse.json) { implicit request =>
+  def authorisations: Action[JsValue] = Action.async(parse.json){ implicit request =>
     withJsonBody[AuthorisationRequest] { authorisationRequest =>
-      Future.successful(
-        Ok(
-          Json.toJson(
-            AuthorisationsResponse(authorisationRequest.date, authorisationRequest.eoris.map(r => AuthorisationResponse(r, authorised = true)))
-          )
-        )
-      )
+      val eisAuthorisationRequest = new EisAuthorisationRequest(authorisationRequest)
+      (for {
+        eisAuthorisationsResponse <- integrationFrameworkService.getEisAuthorisations(eisAuthorisationRequest).asResponseError
+      } yield eisAuthorisationsResponse).convertToResult(OK)
     }
   }
+
+  implicit class ResponseHandler[R](value: EitherT[Future, ResponseError, R]) {
+
+    def convertToResult(responseCode: Int)(implicit c: Converter[R], ec: ExecutionContext): Future[Result] =
+      value.fold(
+        err => Status(err.code.statusCode)(Json.toJson(err)),
+        response => c.getResponseWithCode(response, responseCode)
+      )
+  }
+
+  trait Converter[R] {
+    def getResponseWithCode(response: R, responseCode: Int): Result
+  }
+
+  implicit val eisAuthorisationsResponse: Converter[EisAuthorisationsResponse] =
+    (response: EisAuthorisationsResponse, responseCode: Int) => Status(responseCode)(Json.toJson(response))
 }
