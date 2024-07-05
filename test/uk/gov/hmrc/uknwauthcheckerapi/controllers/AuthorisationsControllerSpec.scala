@@ -16,32 +16,56 @@
 
 package uk.gov.hmrc.uknwauthcheckerapi.controllers
 
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
+import org.scalatest.prop.TableDrivenPropertyChecks.whenever
+import org.scalatestplus.mockito.MockitoSugar.mock
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 import play.api.libs.json.Json
-import play.api.test.Helpers
 import play.api.test.Helpers._
+import uk.gov.hmrc.uknwauthcheckerapi.models.eis.{EisAuthorisationRequest, EisAuthorisationResponse, EisAuthorisationsResponse}
 import uk.gov.hmrc.uknwauthcheckerapi.models.{AuthorisationRequest, AuthorisationResponse, AuthorisationsResponse}
+import uk.gov.hmrc.uknwauthcheckerapi.services.IntegrationFrameworkService
+
+import java.time.LocalDate
+import scala.concurrent.Future
 
 class AuthorisationsControllerSpec extends BaseSpec {
 
-  val controller = new AuthorisationsController(Helpers.stubControllerComponents())
+  val mockIntegrationFrameworkService: IntegrationFrameworkService       = mock[IntegrationFrameworkService]
+
+
+  val controller = new AuthorisationsController(
+    cc,
+    mockIntegrationFrameworkService
+  )
 
   "AuthorisationsController" should {
 
     "return OK (200) with authorised eoris when request has valid date and eoris" in {
 
       forAll { authorisationRequest: AuthorisationRequest =>
-        val expectedResponse = AuthorisationsResponse(
-          authorisationRequest.date,
-          authorisationRequest.eoris.map(r => AuthorisationResponse(r, authorised = true))
-        )
+        whenever (authorisationRequest.date.isDefined) {
+          val expectedResponse = AuthorisationsResponse(
+            authorisationRequest.date.getOrElse(LocalDate.now),
+            authorisationRequest.eoris.map(r => AuthorisationResponse(r, authorised = true))
+          )
+          val eisAuthorisationsResponse = EisAuthorisationsResponse(
+            authorisationRequest.date.getOrElse(LocalDate.now),
+            EisAuthorisationRequest.authType,
+            authorisationRequest.eoris.map(r => EisAuthorisationResponse(r, valid = true, 0))
+          )
 
-        val request = fakeRequestWithJsonBody(Json.toJson(authorisationRequest))
+          val request = fakeRequestWithJsonBody(Json.toJson(authorisationRequest))
+          when(mockIntegrationFrameworkService.getEisAuthorisations(any())(any()))
+            .thenReturn(Future.successful(eisAuthorisationsResponse))
 
-        val result = controller.authorisations()(request)
+          val result = controller.authorisations()(request)
 
-        status(result)        shouldBe OK
-        contentAsJson(result) shouldBe Json.toJson(expectedResponse)
+          status(result) shouldBe OK
+          contentAsJson(result) shouldBe Json.toJson(expectedResponse)
+          true
+        }
       }
     }
   }

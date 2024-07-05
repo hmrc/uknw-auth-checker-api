@@ -21,9 +21,12 @@ import org.apache.pekko.stream.Materializer
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.JsValue
+import play.api.mvc.ControllerComponents
 import play.api.test.{FakeHeaders, FakeRequest}
-import play.api.test.Helpers.POST
+import play.api.test.Helpers.{POST, stubControllerComponents}
 import uk.gov.hmrc.uknwauthcheckerapi.generators.Generators
+
+import scala.concurrent.ExecutionContext
 
 class BaseSpec extends AnyWordSpec with Matchers with Generators {
 
@@ -31,6 +34,9 @@ class BaseSpec extends AnyWordSpec with Matchers with Generators {
 
   implicit lazy val system:       ActorSystem  = ActorSystem()
   implicit lazy val materializer: Materializer = Materializer(system)
+
+  implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
+  val cc: ControllerComponents                         = stubControllerComponents()
 
   def fakeRequestWithJsonBody(json: JsValue): FakeRequest[JsValue] = FakeRequest(POST, "/authorisations", FakeHeaders(headers), json)
 }

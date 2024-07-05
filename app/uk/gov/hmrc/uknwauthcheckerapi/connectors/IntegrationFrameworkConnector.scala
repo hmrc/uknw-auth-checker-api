@@ -48,7 +48,6 @@ class IntegrationFrameworkConnector @Inject()(
         UUID.randomUUID().toString
     }
     Seq(
-      (HeaderNames.X_FORWARDED_HOST, appConfig.baseUrl("self")),
       (CustomHeaderNames.xCorrelationId, correlationId),
       (HeaderNames.DATE, RFC7231DateTime.now),
       (HeaderNames.CONTENT_TYPE, "application/json;charset=utf-8"),
@@ -61,7 +60,7 @@ class IntegrationFrameworkConnector @Inject()(
                                   (implicit hc: HeaderCarrier): Future[EisAuthorisationsResponse] =
     retryFor[EisAuthorisationsResponse]("Integration framework Response")(retryCondition) {
       httpClient
-        .get(url"${appConfig.baseUrl("integration-framework")}")
+        .post(url"${appConfig.baseUrl("integration-framework")}/authorisations")
         .setHeader(integrationFrameworkHeaders(appConfig.integrationFrameworkBearerToken): _*)
         .withBody(Json.toJson(eisAuthorisationRequest))
         .executeAndDeserialise[EisAuthorisationsResponse]

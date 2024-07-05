@@ -16,46 +16,27 @@
 
 package uk.gov.hmrc.uknwauthcheckerapi.controllers
 
-import cats.data.EitherT
 import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{Action, ControllerComponents, Result}
+import play.api.mvc.{Action, ControllerComponents}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.uknwauthcheckerapi.models._
-import uk.gov.hmrc.uknwauthcheckerapi.models.eis.{EisAuthorisationRequest, EisAuthorisationsResponse}
+import uk.gov.hmrc.uknwauthcheckerapi.models.eis.EisAuthorisationRequest
 import uk.gov.hmrc.uknwauthcheckerapi.services.IntegrationFrameworkService
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 @Singleton()
 class AuthorisationsController @Inject() (cc: ControllerComponents,
                                           integrationFrameworkService: IntegrationFrameworkService)
                                          (implicit ec: ExecutionContext)
-  extends BackendController(cc)
-  with ErrorHandler {
+  extends BackendController(cc) {
 
   def authorisations: Action[JsValue] = Action.async(parse.json){ implicit request =>
     withJsonBody[AuthorisationRequest] { authorisationRequest =>
-      val eisAuthorisationRequest = new EisAuthorisationRequest(authorisationRequest)
-      (for {
-        eisAuthorisationsResponse <- integrationFrameworkService.getEisAuthorisations(eisAuthorisationRequest).asResponseError
-      } yield eisAuthorisationsResponse).convertToResult(OK)
+      val eisAuthorisationRequest = EisAuthorisationRequest(authorisationRequest)
+      integrationFrameworkService.getEisAuthorisations(eisAuthorisationRequest).map(e => Status(OK)(Json.toJson(e)))
     }
   }
 
-  implicit class ResponseHandler[R](value: EitherT[Future, ResponseError, R]) {
-
-    def convertToResult(responseCode: Int)(implicit c: Converter[R], ec: ExecutionContext): Future[Result] =
-      value.fold(
-        err => Status(err.code.statusCode)(Json.toJson(err)),
-        response => c.getResponseWithCode(response, responseCode)
-      )
-  }
-
-  trait Converter[R] {
-    def getResponseWithCode(response: R, responseCode: Int): Result
-  }
-
-  implicit val eisAuthorisationsResponse: Converter[EisAuthorisationsResponse] =
-    (response: EisAuthorisationsResponse, responseCode: Int) => Status(responseCode)(Json.toJson(response))
 }

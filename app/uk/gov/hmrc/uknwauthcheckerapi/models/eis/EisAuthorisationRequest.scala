@@ -21,13 +21,13 @@ import uk.gov.hmrc.uknwauthcheckerapi.models.AuthorisationRequest
 
 import java.time.LocalDate
 
-case class EisAuthorisationRequest(validityDate: LocalDate, authType: String, eoris: Seq[String]) {
-  def this(authorisationRequest: AuthorisationRequest) = {
-    this(authorisationRequest.date, authType, authorisationRequest.eoris)
-  }
+case class EisAuthorisationRequest(validityDate: Option[LocalDate], authType: String, eoris: Seq[String]) {
 }
 
 object EisAuthorisationRequest {
   val authType = "EIR"
+  def apply(authorisationRequest: AuthorisationRequest): EisAuthorisationRequest = {
+    new EisAuthorisationRequest(authorisationRequest.date, authType, authorisationRequest.eoris)
+  }
   implicit val format: OFormat[EisAuthorisationRequest] = Json.format[EisAuthorisationRequest]
 }
