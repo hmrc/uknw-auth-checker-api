@@ -20,23 +20,21 @@ import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.stream.Materializer
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import play.api.libs.json.{JsValue, Json}
-import play.api.test.{FakeHeaders, FakeRequest}
-import play.api.test.Helpers.POST
-import uk.gov.hmrc.uknwauthcheckerapi.generators.Generators
-import uk.gov.hmrc.uknwauthcheckerapi.models.AuthorisationRequest
+import play.api.http.HttpVerbs
+import play.api.libs.json.JsValue
+import play.api.mvc.{AnyContentAsEmpty, ControllerComponents}
+import play.api.test.{FakeHeaders, FakeRequest, Helpers}
+import uk.gov.hmrc.http.HttpVerbs.POST
+import uk.gov.hmrc.uknwauthcheckerapi.generators.{TestData, TestHeaders}
 
-class BaseSpec extends AnyWordSpec with Matchers with Generators {
-
-  private val headers: Seq[(String, String)] = Seq("Content-Type" -> "application/json")
+class BaseSpec extends AnyWordSpec with Matchers with TestData with TestHeaders {
 
   implicit lazy val system:       ActorSystem  = ActorSystem()
   implicit lazy val materializer: Materializer = Materializer(system)
 
-  val emptyJson: JsValue = Json.parse("{}")
+  val fakePostRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(POST, "")
+  val stubComponents:  ControllerComponents                = Helpers.stubControllerComponents()
 
-  def fakeRequestWithJsonBody(json: JsValue, verb: String = POST): FakeRequest[JsValue] =
-    FakeRequest(verb, "/authorisations", FakeHeaders(headers), json)
-
-  def randomAuthorisationRequest: AuthorisationRequest = arbAuthorisationRequest.arbitrary.sample.get
+  def fakeRequestWithJsonBody(json: JsValue, verb: String = HttpVerbs.POST, headers: Seq[(String, String)] = defaultHeaders): FakeRequest[JsValue] =
+    FakeRequest(verb, authorisationEndpoint, FakeHeaders(headers), json)
 }

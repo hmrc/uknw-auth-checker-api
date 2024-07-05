@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.uknwauthcheckerapi.errors
+package uk.gov.hmrc.uknwauthcheckerapi.generators
 
-import play.api.libs.json.{Json, OWrites}
+import play.api.libs.json.{JsValue, Json}
+import uk.gov.hmrc.uknwauthcheckerapi.models.AuthorisationRequest
 
-final case class JsonErrorResponse(statusCode: Int, errorResponse: ErrorResponse)
+trait TestData extends Generators {
 
-object JsonErrorResponse {
-  implicit val writes: OWrites[JsonErrorResponse] = Json.writes[JsonErrorResponse]
-}
+  val authorisationEndpoint = "authorisation"
+  val emptyJson: JsValue = Json.parse("{}")
 
-final case class ErrorResponse(code: String, message: String)
-
-object ErrorResponse {
-  implicit val writes: OWrites[ErrorResponse] = Json.writes[ErrorResponse]
+  def randomAuthorisationRequest: AuthorisationRequest = arbAuthorisationRequest.arbitrary.sample.get
 }

@@ -16,16 +16,17 @@
 
 package uk.gov.hmrc.uknwauthcheckerapi.controllers
 
-import org.scalatest.prop.Tables.Table
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
-import play.api.libs.json.Json
-import play.api.test.Helpers
+import play.api.libs.json.{JsError, JsPath, Json, JsonValidationError}
 import play.api.test.Helpers._
+import uk.gov.hmrc.uknwauthcheckerapi.errors.{ApiErrorResponse, JsonValidationApiError, NotAcceptableApiError}
 import uk.gov.hmrc.uknwauthcheckerapi.models.{AuthorisationRequest, AuthorisationResponse, AuthorisationsResponse}
+
+import scala.concurrent.Future
 
 class AuthorisationsControllerSpec extends BaseSpec {
 
-  val controller = new AuthorisationsController(Helpers.stubControllerComponents())
+  val controller = new AuthorisationsController(stubComponents)
 
   "AuthorisationsController" should {
 
@@ -46,34 +47,51 @@ class AuthorisationsControllerSpec extends BaseSpec {
       }
     }
 
-    "return BAD_REQUEST (400) when request json is invalid" in {
+    "return BAD_REQUEST (400) error when request json is invalid" in {
       val request = fakeRequestWithJsonBody(emptyJson)
 
       val result = controller.authorisations()(request)
 
-      status(result)        shouldBe BAD_REQUEST
-      contentAsJson(result) shouldBe Json.obj("code" -> "BAD_REQUEST", "message" -> "Json is invalid")
-    }
-
-    "return a METHOD_NOT_ALLOWED (405) when request is not POST" in
-      forAll(
-        Table(
-          "verb",
-          DELETE,
-          GET,
-          HEAD,
-          OPTIONS,
-          PATCH,
-          PUT
+      val expectedResponse = Json.toJson(
+        JsonValidationApiError(
+          JsError(
+            Seq("date", "eoris").map { field =>
+              (JsPath \ field, Seq(JsonValidationError("error.path.missing")))
+            }
+          )
         )
-      ) { verb: String =>
-        val authorisationRequest: AuthorisationRequest = randomAuthorisationRequest
+      )(ApiErrorResponse.validationWrites)
 
-        val request = fakeRequestWithJsonBody(Json.toJson(authorisationRequest), verb)
+      status(result)        shouldBe BAD_REQUEST
+      contentAsJson(result) shouldBe expectedResponse
+    }
+  }
 
-        val result = controller.methodNotAllowed()(request)
+  "return NOT_ACCEPTABLE (406) error when accept header is not present" in {
 
-        status(result) shouldBe METHOD_NOT_ALLOWED
-      }
+    forAll { authorisationRequest: AuthorisationRequest =>
+      val headers = defaultHeaders.filterNot(_._1.equals(jsonAcceptHeader._1))
+
+      val request = fakeRequestWithJsonBody(Json.toJson(authorisationRequest), headers = headers)
+
+      val result = controller.authorisations()(request)
+
+      status(result)        shouldBe NOT_ACCEPTABLE
+      contentAsJson(result) shouldBe contentAsJson(Future.successful(NotAcceptableApiError.toResult))
+    }
+  }
+
+  "return NOT_ACCEPTABLE (406) error when content type header is not present" in {
+
+    forAll { authorisationRequest: AuthorisationRequest =>
+      val headers = defaultHeaders.filterNot(_._1.equals(jsonContentTypeHeader._1))
+
+      val request = fakeRequestWithJsonBody(Json.toJson(authorisationRequest), headers = headers)
+
+      val result = controller.authorisations()(request)
+
+      status(result)        shouldBe NOT_ACCEPTABLE
+      contentAsJson(result) shouldBe contentAsJson(Future.successful(NotAcceptableApiError.toResult))
+    }
   }
 }
