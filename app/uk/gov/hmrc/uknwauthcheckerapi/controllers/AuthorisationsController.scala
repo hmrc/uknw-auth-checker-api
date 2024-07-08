@@ -16,27 +16,31 @@
 
 package uk.gov.hmrc.uknwauthcheckerapi.controllers
 
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
-import uk.gov.hmrc.uknwauthcheckerapi.models._
+import uk.gov.hmrc.uknwauthcheckerapi.errors.JsonValidationApiError
 import uk.gov.hmrc.uknwauthcheckerapi.models.eis.EisAuthorisationRequest
+import uk.gov.hmrc.uknwauthcheckerapi.models.{AuthorisationRequest, AuthorisationsResponse}
 import uk.gov.hmrc.uknwauthcheckerapi.services.IntegrationFrameworkService
+import uk.gov.hmrc.uknwauthcheckerapi.utils.JsonResponses
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton()
-class AuthorisationsController @Inject() (cc: ControllerComponents,
-                                          integrationFrameworkService: IntegrationFrameworkService)
+class AuthorisationsController @Inject() (cc: ControllerComponents, integrationFrameworkService: IntegrationFrameworkService)
                                          (implicit ec: ExecutionContext)
-  extends BackendController(cc) {
+  extends BackendController(cc) with HeaderValidator with JsonResponses {
 
-  def authorisations: Action[JsValue] = Action.async(parse.json){ implicit request =>
-    withJsonBody[AuthorisationRequest] { authorisationRequest =>
-      val eisAuthorisationRequest = EisAuthorisationRequest(authorisationRequest)
-      integrationFrameworkService.getEisAuthorisations(eisAuthorisationRequest).map(AuthorisationsResponse(_)).map(e => Status(OK)(Json.toJson(e)))
-    }
+  def authorisations: Action[JsValue] = validateHeaders(cc).async(parse.json) { implicit request =>
+
+      request.body.validate[AuthorisationRequest] match {
+        case JsSuccess(authorisationRequest: AuthorisationRequest, _) =>
+          val eisAuthorisationRequest = EisAuthorisationRequest(authorisationRequest)
+          integrationFrameworkService.getEisAuthorisations(eisAuthorisationRequest).map(AuthorisationsResponse(_)).map(e => Status(OK)(Json.toJson(e)))
+        case errors: JsError =>
+          Future.successful(JsonValidationApiError(errors).toResult)
+      }
   }
-
 }

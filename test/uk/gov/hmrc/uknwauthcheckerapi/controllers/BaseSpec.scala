@@ -24,15 +24,16 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
-import play.api.http.HeaderNames
+import play.api.http.{HeaderNames, HttpVerbs}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.JsValue
-import play.api.mvc.ControllerComponents
-import play.api.test.{DefaultAwaitTimeout, FakeHeaders, FakeRequest}
-import play.api.test.Helpers.{POST, stubControllerComponents}
+import play.api.mvc.{AnyContentAsEmpty, ControllerComponents}
+import play.api.test.Helpers.stubControllerComponents
+import play.api.test.{DefaultAwaitTimeout, FakeHeaders, FakeRequest, Helpers}
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.HttpVerbs.POST
 import uk.gov.hmrc.uknwauthcheckerapi.config.AppConfig
-import uk.gov.hmrc.uknwauthcheckerapi.generators.Generators
+import uk.gov.hmrc.uknwauthcheckerapi.generators.{Generators, TestData, TestHeaders}
 
 import scala.concurrent.ExecutionContext
 
@@ -41,7 +42,9 @@ class BaseSpec extends AnyWordSpec with Matchers
   with GuiceOneAppPerSuite
   with BeforeAndAfterEach
   with DefaultAwaitTimeout
-  with HeaderNames {
+  with HeaderNames
+  with TestData
+  with TestHeaders {
 
   private val headers: Seq[(String, String)] = Seq("Content-Type" -> "application/json")
   def configOverrides: Map[String, Any] = Map()
@@ -61,8 +64,12 @@ class BaseSpec extends AnyWordSpec with Matchers
   implicit lazy val system:       ActorSystem  = ActorSystem()
   implicit lazy val materializer: Materializer = Materializer(system)
 
+  val fakePostRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(POST, "")
+  val stubComponents:  ControllerComponents                = Helpers.stubControllerComponents()
+
+  def fakeRequestWithJsonBody(json: JsValue, verb: String = HttpVerbs.POST, headers: Seq[(String, String)] = defaultHeaders): FakeRequest[JsValue] =
+    FakeRequest(verb, authorisationEndpoint, FakeHeaders(headers), json)
   implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
-  val cc: ControllerComponents      = stubControllerComponents()
   implicit val hc: HeaderCarrier    = HeaderCarrier()
   val config: Config                = app.injector.instanceOf[Config]
   val appConfig: AppConfig          = app.injector.instanceOf[AppConfig]
