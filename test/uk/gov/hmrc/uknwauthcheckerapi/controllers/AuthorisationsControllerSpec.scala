@@ -56,7 +56,7 @@ class AuthorisationsControllerSpec extends BaseSpec {
             authorisationRequest.eoris.map(r => EisAuthorisationResponse(r, valid = true, 0))
           )
 
-          val request = fakeRequestWithJsonBody(Json.toJson(authorisationRequest))
+          val request = fakeRequestWithJsonBody(Json.toJson(authorisationRequest), headers = defaultHeaders)
           when(mockIntegrationFrameworkService.getEisAuthorisations(any())(any()))
             .thenReturn(Future.successful(eisAuthorisationsResponse))
 
@@ -70,14 +70,14 @@ class AuthorisationsControllerSpec extends BaseSpec {
     }
 
     "return BAD_REQUEST (400) error when request json is invalid" in {
-      val request = fakeRequestWithJsonBody(emptyJson)
+      val request = fakeRequestWithJsonBody(emptyJson, headers = defaultHeaders)
 
       val result = controller.authorisations()(request)
 
       val expectedResponse = Json.toJson(
         JsonValidationApiError(
           JsError(
-            Seq("date", "eoris").map { field =>
+            Seq("eoris").map { field =>
               (JsPath \ field, Seq(JsonValidationError("error.path.missing")))
             }
           )
