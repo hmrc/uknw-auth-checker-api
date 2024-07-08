@@ -24,7 +24,6 @@ import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 import play.api.libs.json.{JsError, JsPath, Json, JsonValidationError}
 import play.api.test.Helpers._
 import uk.gov.hmrc.uknwauthcheckerapi.errors.{ApiErrorResponse, JsonValidationApiError, NotAcceptableApiError}
-import uk.gov.hmrc.uknwauthcheckerapi.models.eis.{EisAuthorisationRequest, EisAuthorisationResponse, EisAuthorisationsResponse}
 import uk.gov.hmrc.uknwauthcheckerapi.models.{AuthorisationRequest, AuthorisationResponse, AuthorisationsResponse}
 import uk.gov.hmrc.uknwauthcheckerapi.services.IntegrationFrameworkService
 
@@ -50,15 +49,10 @@ class AuthorisationsControllerSpec extends BaseSpec {
             authorisationRequest.date.getOrElse(LocalDate.now),
             authorisationRequest.eoris.map(r => AuthorisationResponse(r, authorised = true))
           )
-          val eisAuthorisationsResponse = EisAuthorisationsResponse(
-            authorisationRequest.date.getOrElse(LocalDate.now),
-            EisAuthorisationRequest.authType,
-            authorisationRequest.eoris.map(r => EisAuthorisationResponse(r, valid = true, 0))
-          )
 
           val request = fakeRequestWithJsonBody(Json.toJson(authorisationRequest), headers = defaultHeaders)
-          when(mockIntegrationFrameworkService.getEisAuthorisations(any())(any()))
-            .thenReturn(Future.successful(eisAuthorisationsResponse))
+          when(mockIntegrationFrameworkService.getAuthorisations(any())(any()))
+            .thenReturn(Future.successful(expectedResponse))
 
           val result = controller.authorisations()(request)
 

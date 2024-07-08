@@ -21,10 +21,11 @@ import org.mockito.Mockito.when
 import org.scalatest.prop.TableDrivenPropertyChecks.whenever
 import org.scalatestplus.mockito.MockitoSugar.mock
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
-import play.api.test.Helpers.{await, defaultAwaitTimeout}
+import play.api.test.Helpers.await
 import uk.gov.hmrc.uknwauthcheckerapi.connectors.IntegrationFrameworkConnector
 import uk.gov.hmrc.uknwauthcheckerapi.controllers.BaseSpec
-import uk.gov.hmrc.uknwauthcheckerapi.models.eis.{EisAuthorisationRequest, EisAuthorisationResponse, EisAuthorisationsResponse}
+import uk.gov.hmrc.uknwauthcheckerapi.models.{AuthorisationRequest, AuthorisationResponse, AuthorisationsResponse}
+import uk.gov.hmrc.uknwauthcheckerapi.models.eis.{EisAuthorisationResponse, EisAuthorisationsResponse}
 
 import java.time.LocalDate
 import scala.concurrent.Future
@@ -33,23 +34,27 @@ class IntegrationFrameworkServiceSpec extends BaseSpec {
 
   private val mockIntegrationFrameworkConnector = mock[IntegrationFrameworkConnector]
 
-  val service = new IntegrationFrameworkService(mockIntegrationFrameworkConnector)
+  val service = new IntegrationFrameworkService(appConfig, mockIntegrationFrameworkConnector)(ec)
 
   "getEisAuthorisations" should {
     "return successful Eis Authorisations response when call to the integration framework succeeds" in forAll {
-      eisAuthorisationRequest: EisAuthorisationRequest =>
-        whenever(eisAuthorisationRequest.validityDate.isDefined) {
+      authorisationRequest: AuthorisationRequest =>
+        whenever(authorisationRequest.date.isDefined) {
+          val expectedResponse = AuthorisationsResponse(
+            authorisationRequest.date.getOrElse(LocalDate.now),
+            authorisationRequest.eoris.map(r => AuthorisationResponse(r, authorised = true))
+          )
           val expectedEisAuthorisationsResponse = EisAuthorisationsResponse(
-            eisAuthorisationRequest.validityDate.getOrElse(LocalDate.now),
-            eisAuthorisationRequest.authType,
-            eisAuthorisationRequest.eoris.map(r => EisAuthorisationResponse(r, valid = true, 0))
+            authorisationRequest.date.getOrElse(LocalDate.now),
+            appConfig.authType,
+            authorisationRequest.eoris.map(r => EisAuthorisationResponse(r, valid = true, 0))
           )
           when(mockIntegrationFrameworkConnector.getEisAuthorisationsResponse(any())(any()))
             .thenReturn(Future.successful(expectedEisAuthorisationsResponse))
 
-          val result = await(service.getEisAuthorisations(eisAuthorisationRequest))
+          val result = await(service.getAuthorisations(authorisationRequest))
 
-          result shouldBe expectedEisAuthorisationsResponse
+          result shouldBe expectedResponse
         }
     }
   }

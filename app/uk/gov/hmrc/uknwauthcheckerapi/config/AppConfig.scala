@@ -23,6 +23,7 @@ import play.api.Configuration
 class AppConfig @Inject() (config: Configuration) {
 
   val appName: String = config.get[String]("appName")
+  val authType: String = config.get[String]("authType")
 
   val integrationFrameworkBearerToken: String =
     config.get[String]("microservice.services.integration-framework.bearerToken")

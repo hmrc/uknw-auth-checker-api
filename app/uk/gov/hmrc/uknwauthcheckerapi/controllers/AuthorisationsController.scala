@@ -37,8 +37,7 @@ class AuthorisationsController @Inject() (cc: ControllerComponents, integrationF
 
       request.body.validate[AuthorisationRequest] match {
         case JsSuccess(authorisationRequest: AuthorisationRequest, _) =>
-          val eisAuthorisationRequest = EisAuthorisationRequest(authorisationRequest)
-          integrationFrameworkService.getEisAuthorisations(eisAuthorisationRequest).map(AuthorisationsResponse(_)).map(e => Status(OK)(Json.toJson(e)))
+          integrationFrameworkService.getAuthorisations(authorisationRequest).map(e => Status(OK)(Json.toJson(e)))
         case errors: JsError =>
           Future.successful(JsonValidationApiError(errors).toResult)
       }

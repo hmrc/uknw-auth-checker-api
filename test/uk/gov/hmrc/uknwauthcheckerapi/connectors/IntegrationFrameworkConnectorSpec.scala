@@ -24,14 +24,13 @@ import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 import play.api.http.Status.OK
 import play.api.libs.json.Json
 import play.api.test.Helpers.await
+import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
-import uk.gov.hmrc.http.{HttpResponse, UpstreamErrorResponse}
 import uk.gov.hmrc.uknwauthcheckerapi.controllers.BaseSpec
 import uk.gov.hmrc.uknwauthcheckerapi.models.eis.{EisAuthorisationRequest, EisAuthorisationResponse, EisAuthorisationsResponse}
 
 import java.time.LocalDate
 import scala.concurrent.Future
-import scala.util.{Failure, Try}
 
 class IntegrationFrameworkConnectorSpec extends BaseSpec {
 
