@@ -28,7 +28,6 @@ import play.api.http.{HeaderNames, HttpVerbs}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.JsValue
 import play.api.mvc.{AnyContentAsEmpty, ControllerComponents}
-import play.api.test.Helpers.stubControllerComponents
 import play.api.test.{DefaultAwaitTimeout, FakeHeaders, FakeRequest, Helpers}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.HttpVerbs.POST
@@ -46,7 +45,6 @@ class BaseSpec extends AnyWordSpec with Matchers
   with TestData
   with TestHeaders {
 
-  private val headers: Seq[(String, String)] = Seq("Content-Type" -> "application/json")
   def configOverrides: Map[String, Any] = Map()
 
   val additionalAppConfig: Map[String, Any] = Map(
@@ -73,8 +71,5 @@ class BaseSpec extends AnyWordSpec with Matchers
   implicit val hc: HeaderCarrier    = HeaderCarrier()
   val config: Config                = app.injector.instanceOf[Config]
   val appConfig: AppConfig          = app.injector.instanceOf[AppConfig]
-  val actorSystem: ActorSystem                         = ActorSystem("actor")
-
-
-  def fakeRequestWithJsonBody(json: JsValue): FakeRequest[JsValue] = FakeRequest(POST, "/authorisations", FakeHeaders(headers), json)
+  val actorSystem: ActorSystem      = ActorSystem("actor")
 }

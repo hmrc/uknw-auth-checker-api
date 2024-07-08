@@ -58,7 +58,7 @@ class IntegrationFrameworkConnectorSpec extends BaseSpec {
           beforeEach()
           when(mockHttpClient.get(any())(any())).thenReturn(mockRequestBuilder)
           when(mockRequestBuilder.setHeader(any())).thenReturn(mockRequestBuilder)
-          when(mockRequestBuilder.withBody(any())(any(), any(), any())).thenReturn(mockRequestBuilder)
+          when(mockRequestBuilder.withBody(any())(any(),any(), any())).thenReturn(mockRequestBuilder)
           when(mockRequestBuilder.execute[HttpResponse](any(), any()))
             .thenReturn(
               Future.successful(
