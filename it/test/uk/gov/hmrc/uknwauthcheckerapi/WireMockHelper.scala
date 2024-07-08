@@ -17,7 +17,9 @@
 package uk.gov.hmrc.uknwauthcheckerapi
 
 import com.github.tomakehurst.wiremock.WireMockServer
+import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, removeStub, stubFor, urlMatching}
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
+import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, Suite}
 
 
@@ -47,4 +49,20 @@ trait WireMockHelper extends BeforeAndAfterAll with BeforeAndAfterEach {
     services.foldLeft(Map.empty[String, Any]) { case (map, service) =>
       map + (s"microservice.services.$service.port" -> wireMockPort)
     }
+
+  def stubPost(
+      url: String,
+      responseStatus: Int,
+      responseBody: String
+    ): StubMapping = {
+    server.removeStub(post(urlMatching(url)))
+    server.stubFor(
+      post(urlMatching(url))
+        .willReturn(
+          aResponse()
+            .withStatus(responseStatus)
+            .withBody(responseBody)
+        )
+    )
+  }
 }

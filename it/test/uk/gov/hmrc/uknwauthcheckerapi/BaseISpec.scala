@@ -46,7 +46,8 @@ class BaseISpec
     "metrics.enabled"                     -> false,
     "auditing.enabled"                    -> false,
   ) ++ setWireMockPort(
-    "integration-framework",
+    "auth",
+    "integration-framework"
   )
 
   override def fakeApplication(): Application =

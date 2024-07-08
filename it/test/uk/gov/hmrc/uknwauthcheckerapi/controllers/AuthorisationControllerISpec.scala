@@ -37,9 +37,7 @@ class AuthorisationControllerISpec extends BaseISpec {
           EisAuthorisationsResponse(LocalDate.now(), "UKNW", Seq.empty)
         )
 
-        stubFor(
-          post("/authorisations").willReturn(okJson(expectedResponse.toString()))
-        )
+        stubPost("/authorisations", OK, expectedResponse.toString())
 
         val result = postRequest(authorisationsUrl, authorisationRequestJson)
 
