@@ -30,6 +30,7 @@ import scala.reflect.ClassTag
 class BaseISpec
   extends PlaySpec
     with GuiceOneServerPerSuite
+    with WireMockHelper
     with TestData
     with TestHeaders {
 
@@ -40,6 +41,18 @@ class BaseISpec
 
   def injected[T](c: Class[T]): T                    = app.injector.instanceOf(c)
   def injected[T](implicit evidence: ClassTag[T]): T = app.injector.instanceOf[T]
+
+  val additionalAppConfig: Map[String, Any] = Map(
+    "metrics.enabled"                     -> false,
+    "auditing.enabled"                    -> false,
+  ) ++ setWireMockPort(
+    "integration-framework",
+  )
+
+  override def fakeApplication(): Application =
+    GuiceApplicationBuilder()
+      .configure(additionalAppConfig)
+      .build()
 
   def deleteRequest(url: String, headers: Seq[(String, String)] = defaultHeaders): WSResponse = {
     await(wsClient.url(url)

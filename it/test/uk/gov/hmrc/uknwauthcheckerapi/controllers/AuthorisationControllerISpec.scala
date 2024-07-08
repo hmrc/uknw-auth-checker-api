@@ -16,11 +16,15 @@
 
 package uk.gov.hmrc.uknwauthcheckerapi.controllers
 
+import com.github.tomakehurst.wiremock.client.WireMock._
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.uknwauthcheckerapi.BaseISpec
 import uk.gov.hmrc.uknwauthcheckerapi.models.AuthorisationRequest
+import uk.gov.hmrc.uknwauthcheckerapi.models.eis.EisAuthorisationsResponse
+
+import java.time.LocalDate
 
 class AuthorisationControllerISpec extends BaseISpec {
 
@@ -28,6 +32,14 @@ class AuthorisationControllerISpec extends BaseISpec {
     "return OK (200) with authorised eoris when request has valid date and eoris" in {
       forAll { authorisationRequest: AuthorisationRequest =>
         val authorisationRequestJson = Json.toJson(authorisationRequest)
+
+        val expectedResponse = Json.toJson(
+          EisAuthorisationsResponse(LocalDate.now(), "UKNW", Seq.empty)
+        )
+
+        stubFor(
+          post("/authorisations").willReturn(okJson(expectedResponse.toString()))
+        )
 
         val result = postRequest(authorisationsUrl, authorisationRequestJson)
 
