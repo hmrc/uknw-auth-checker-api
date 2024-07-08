@@ -14,29 +14,40 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.uknwauthcheckerapi.services
+package uk.gov.hmrc.uknwauthcheckerapi.connectors
 
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{reset, when}
 import org.scalatest.prop.TableDrivenPropertyChecks.whenever
 import org.scalatestplus.mockito.MockitoSugar.mock
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
-import play.api.test.Helpers.{await, defaultAwaitTimeout}
-import uk.gov.hmrc.uknwauthcheckerapi.connectors.IntegrationFrameworkConnector
+import play.api.http.Status.OK
+import play.api.libs.json.Json
+import play.api.test.Helpers.await
+import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
+import uk.gov.hmrc.http.{HttpResponse, UpstreamErrorResponse}
 import uk.gov.hmrc.uknwauthcheckerapi.controllers.BaseSpec
 import uk.gov.hmrc.uknwauthcheckerapi.models.eis.{EisAuthorisationRequest, EisAuthorisationResponse, EisAuthorisationsResponse}
 
 import java.time.LocalDate
 import scala.concurrent.Future
+import scala.util.{Failure, Try}
 
-class IntegrationFrameworkServiceSpec extends BaseSpec {
+class IntegrationFrameworkConnectorSpec extends BaseSpec {
 
-  private val mockIntegrationFrameworkConnector = mock[IntegrationFrameworkConnector]
+  val retryAmount                        = 4
+  val mockHttpClient: HttpClientV2       = mock[HttpClientV2]
+  val mockRequestBuilder: RequestBuilder = mock[RequestBuilder]
 
-  val service = new IntegrationFrameworkService(mockIntegrationFrameworkConnector)
+  val connector = new IntegrationFrameworkConnector(appConfig, mockHttpClient, config, actorSystem)
 
-  "getEisAuthorisations" should {
-    "return successful Eis Authorisations response when call to the integration framework succeeds" in forAll {
+  override def beforeEach(): Unit = {
+    reset(mockHttpClient)
+    reset(mockRequestBuilder)
+  }
+
+  "getEisAuthorisationsResponse" should {
+    "return response when call to integration framework succeeds" in forAll {
       eisAuthorisationRequest: EisAuthorisationRequest =>
         whenever(eisAuthorisationRequest.validityDate.isDefined) {
           val expectedEisAuthorisationsResponse = EisAuthorisationsResponse(
@@ -44,10 +55,18 @@ class IntegrationFrameworkServiceSpec extends BaseSpec {
             eisAuthorisationRequest.authType,
             eisAuthorisationRequest.eoris.map(r => EisAuthorisationResponse(r, valid = true, 0))
           )
-          when(mockIntegrationFrameworkConnector.getEisAuthorisationsResponse(any())(any()))
-            .thenReturn(Future.successful(expectedEisAuthorisationsResponse))
+          beforeEach()
+          when(mockHttpClient.get(any())(any())).thenReturn(mockRequestBuilder)
+          when(mockRequestBuilder.setHeader(any())).thenReturn(mockRequestBuilder)
+          when(mockRequestBuilder.withBody(any())(any(), any(), any())).thenReturn(mockRequestBuilder)
+          when(mockRequestBuilder.execute[HttpResponse](any(), any()))
+            .thenReturn(
+              Future.successful(
+                HttpResponse.apply(OK, Json.stringify(Json.toJson(expectedEisAuthorisationsResponse)))
+              )
+            )
 
-          val result = await(service.getEisAuthorisations(eisAuthorisationRequest))
+          val result = await(connector.getEisAuthorisationsResponse(eisAuthorisationRequest))
 
           result shouldBe expectedEisAuthorisationsResponse
         }

@@ -17,6 +17,7 @@
 package uk.gov.hmrc.uknwauthcheckerapi.models
 
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.uknwauthcheckerapi.models.eis.{EisAuthorisationResponse, EisAuthorisationsResponse}
 
 import java.time.LocalDate
 
@@ -24,10 +25,16 @@ case class AuthorisationsResponse(date: LocalDate, eoris: Seq[AuthorisationRespo
 
 object AuthorisationsResponse {
   implicit val format: OFormat[AuthorisationsResponse] = Json.format[AuthorisationsResponse]
+  def apply(eisAuthorisationsResponse: EisAuthorisationsResponse): AuthorisationsResponse = {
+    new AuthorisationsResponse(eisAuthorisationsResponse.processingDate, eisAuthorisationsResponse.results.map(AuthorisationResponse(_)))
+  }
 }
 
 case class AuthorisationResponse(eori: String, authorised: Boolean)
 
 object AuthorisationResponse {
   implicit val format: OFormat[AuthorisationResponse] = Json.format[AuthorisationResponse]
+  def apply(eisAuthorisationResponse: EisAuthorisationResponse): AuthorisationResponse = {
+    new AuthorisationResponse(eisAuthorisationResponse.eori, eisAuthorisationResponse.valid)
+  }
 }

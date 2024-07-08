@@ -16,27 +16,58 @@
 
 package uk.gov.hmrc.uknwauthcheckerapi.controllers
 
+import com.typesafe.config.Config
 import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.stream.Materializer
+import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.Application
+import play.api.http.HeaderNames
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.JsValue
 import play.api.mvc.ControllerComponents
-import play.api.test.{FakeHeaders, FakeRequest}
+import play.api.test.{DefaultAwaitTimeout, FakeHeaders, FakeRequest}
 import play.api.test.Helpers.{POST, stubControllerComponents}
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.uknwauthcheckerapi.config.AppConfig
 import uk.gov.hmrc.uknwauthcheckerapi.generators.Generators
 
 import scala.concurrent.ExecutionContext
 
-class BaseSpec extends AnyWordSpec with Matchers with Generators {
+class BaseSpec extends AnyWordSpec with Matchers
+  with Generators
+  with GuiceOneAppPerSuite
+  with BeforeAndAfterEach
+  with DefaultAwaitTimeout
+  with HeaderNames {
 
   private val headers: Seq[(String, String)] = Seq("Content-Type" -> "application/json")
+  def configOverrides: Map[String, Any] = Map()
+
+  val additionalAppConfig: Map[String, Any] = Map(
+    "create-internal-auth-token-on-start" -> false,
+    "metrics.enabled"                     -> false,
+    "auditing.enabled"                    -> false,
+    "http-verbs.retries.intervals"        -> List("1ms", "1ms", "1ms")
+  ) ++ configOverrides
+
+  override def fakeApplication(): Application =
+    GuiceApplicationBuilder()
+      .configure(additionalAppConfig)
+      .build()
 
   implicit lazy val system:       ActorSystem  = ActorSystem()
   implicit lazy val materializer: Materializer = Materializer(system)
 
   implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
-  val cc: ControllerComponents                         = stubControllerComponents()
+  val cc: ControllerComponents      = stubControllerComponents()
+  implicit val hc: HeaderCarrier    = HeaderCarrier()
+  val config: Config                = app.injector.instanceOf[Config]
+  val appConfig: AppConfig          = app.injector.instanceOf[AppConfig]
+  val actorSystem: ActorSystem                         = ActorSystem("actor")
+
 
   def fakeRequestWithJsonBody(json: JsValue): FakeRequest[JsValue] = FakeRequest(POST, "/authorisations", FakeHeaders(headers), json)
 }

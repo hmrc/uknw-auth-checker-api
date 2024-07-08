@@ -35,7 +35,7 @@ class AuthorisationsController @Inject() (cc: ControllerComponents,
   def authorisations: Action[JsValue] = Action.async(parse.json){ implicit request =>
     withJsonBody[AuthorisationRequest] { authorisationRequest =>
       val eisAuthorisationRequest = EisAuthorisationRequest(authorisationRequest)
-      integrationFrameworkService.getEisAuthorisations(eisAuthorisationRequest).map(e => Status(OK)(Json.toJson(e)))
+      integrationFrameworkService.getEisAuthorisations(eisAuthorisationRequest).map(AuthorisationsResponse(_)).map(e => Status(OK)(Json.toJson(e)))
     }
   }
 

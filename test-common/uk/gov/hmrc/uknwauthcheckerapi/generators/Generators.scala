@@ -38,9 +38,8 @@ trait Generators {
   implicit val arbEisAuthorisationRequest: Arbitrary[EisAuthorisationRequest] = Arbitrary {
     for {
       date  <- Gen.option(LocalDate.now())
-      authType <- Gen.alphaStr
       eoris <- eorisGen
-    } yield EisAuthorisationRequest(date, authType, eoris)
+    } yield EisAuthorisationRequest(date, "EIR", eoris)
   }
 
 }
