@@ -39,7 +39,7 @@ trait Generators {
     for {
       date  <- Gen.option(LocalDate.now())
       eoris <- eorisGen
-    } yield EisAuthorisationRequest(date, "EIR", eoris)
+    } yield EisAuthorisationRequest(date, "UKNW", eoris)
   }
 
 }

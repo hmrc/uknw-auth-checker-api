@@ -55,7 +55,7 @@ trait BaseConnector extends Retries {
         .execute[HttpResponse]
         .flatMap { response =>
           response.status match {
-            case OK | CREATED | ACCEPTED => response.as[T]
+            case OK => response.as[T]
             case _ =>
               response.error
           }

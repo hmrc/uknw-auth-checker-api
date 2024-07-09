@@ -36,7 +36,7 @@ trait TestData extends Generators {
     } yield ValidGetAuthorisationsResponse(
       EisAuthorisationsResponse(
         date.getOrElse(LocalDate.now()),
-        "EIR",
+        "UKNW",
         eoris.map(e => EisAuthorisationResponse(e, valid = true, 0))
       )
     )
