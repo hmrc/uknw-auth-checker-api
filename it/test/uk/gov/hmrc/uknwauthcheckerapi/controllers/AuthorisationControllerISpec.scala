@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.uknwauthcheckerapi.controllers
 
-import com.github.tomakehurst.wiremock.client.WireMock._
 import org.scalatest.prop.TableDrivenPropertyChecks.whenever
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 import play.api.http.Status._
@@ -32,7 +31,7 @@ class AuthorisationControllerISpec extends BaseISpec {
   "POST /authorisations" should {
     "return OK (200) with authorised eoris when request has valid date and eoris" in {
       forAll { authorisationRequest: AuthorisationRequest =>
-        whenever (authorisationRequest.date.isDefined) {
+        whenever (authorisationRequest.date.isDefined && authorisationRequest.eoris.nonEmpty) {
           val authorisationRequestJson = Json.toJson(authorisationRequest)
 
           val expectedResponse = Json.toJson(
