@@ -78,7 +78,8 @@ class ValidationServiceSpec extends BaseSpec {
 
         val expectedResponse = JsError(
           Seq("eoris").map { field =>
-            (JsPath \ field,
+            (
+              JsPath \ field,
               Seq(
                 JsonValidationError(s"ABCD is not a supported EORI number"),
                 JsonValidationError(s"EFGH is not a supported EORI number")
@@ -105,9 +106,9 @@ class ValidationServiceSpec extends BaseSpec {
           Seq("eoris").map { field =>
             (JsPath \ field, Seq(JsonValidationError(s"$invalidEori is not a supported EORI number")))
           } ++
-          Seq("date").map { field =>
-            (JsPath \ field, Seq(JsonValidationError(s"$invalidDate is not a valid date in the format YYYY-MM-DD")))
-          }
+            Seq("date").map { field =>
+              (JsPath \ field, Seq(JsonValidationError(s"$invalidDate is not a valid date in the format YYYY-MM-DD")))
+            }
         )
 
         val request = fakeRequestWithJsonBody(json)

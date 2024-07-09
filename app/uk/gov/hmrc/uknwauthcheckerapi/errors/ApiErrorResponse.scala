@@ -96,17 +96,17 @@ final case class JsonValidationApiError(jsErrors: JsError) extends ApiErrorRespo
 
   val getErrors: JsValue = Json.toJson(jsErrors.errors.flatMap { case (jsPath, pathErrors) =>
     val dropObjDot = 4
-    val path = jsPath.toJsonString.drop(dropObjDot)
+    val path       = jsPath.toJsonString.drop(dropObjDot)
     pathErrors.map(validationError =>
       Json.obj(
-        "code"    -> "INVALID_FORMAT",
+        "code" -> "INVALID_FORMAT",
         "message" -> (validationError.message match {
-          case message if (message == "error.expected.jsobject") => "JSON is malformed"
-          case message if (message == "error.path.missing" && path == "date") => "date field missing from JSON"
-          case message if (message == "error.path.missing" && path == "eoris") => "eoris field missing from JSON"
-          case message => message
+          case message if message == "error.expected.jsobject"               => "JSON is malformed"
+          case message if message == "error.path.missing" && path == "date"  => "date field missing from JSON"
+          case message if message == "error.path.missing" && path == "eoris" => "eoris field missing from JSON"
+          case message                                                       => message
         }),
-        "path"    -> path
+        "path" -> path
       )
     )
   })
