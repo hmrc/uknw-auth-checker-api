@@ -35,7 +35,7 @@ class AuthorisationControllerISpec extends BaseISpec {
           val authorisationRequestJson = Json.toJson(authorisationRequest)
 
           val expectedResponse = Json.toJson(
-            EisAuthorisationsResponse(LocalDate.now(), "EIR", Seq.empty)
+            EisAuthorisationsResponse(LocalDate.now(), "UKNW", Seq.empty)
           )
 
           stubPost("/cau/validatecustomsauth/v1", OK, expectedResponse.toString())
