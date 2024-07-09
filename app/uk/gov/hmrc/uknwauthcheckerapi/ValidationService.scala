@@ -27,26 +27,27 @@ import scala.collection.Seq
 class ValidationService {
   private val eoriPattern = "^(GB|XI)[0-9]{12}|(GB|XI)[0-9]{15}$"
 
-  def validateRequest(request: Request[JsValue]): Either[JsError, AuthorisationRequest] = {
+  def validateRequest(request: Request[JsValue]): Either[JsError, AuthorisationRequest] =
     request.body.validate[AuthorisationRequest] match {
       case JsSuccess(authorisationRequest: AuthorisationRequest, _) =>
         validateAuthorisationRequest(authorisationRequest) match {
           case Left(errors) => Left(errors)
-          case Right(r) => Right(r)
+          case Right(r)     => Right(r)
         }
       case errors: JsError => Left(errors)
     }
-  }
 
   private def validateAuthorisationRequest(request: AuthorisationRequest): Either[JsError, AuthorisationRequest] = {
-    val eoriErrors: Seq[JsonValidationError] = request
-      .eoris
+    val date  = request.date
+    val eoris = request.eoris
+
+    val eoriErrors: Seq[JsonValidationError] = eoris
       .filterNot(e => e matches eoriPattern)
       .map(e => JsonValidationError(s"$e is not a supported EORI number"))
 
-    val dateError = Seq(JsonValidationError(s"${request.date} is not a valid date in the format YYYY-MM-DD"))
+    val dateError = Seq(JsonValidationError(s"$date is not a valid date in the format YYYY-MM-DD"))
 
-    (eoriErrors.nonEmpty, !request.date.isValidLocalDate) match {
+    (eoriErrors.nonEmpty, !date.isValidLocalDate) match {
       case (false, false) => Right(request)
       case (true, true) =>
         Left(
@@ -79,14 +80,12 @@ class ValidationService {
   }
 
   private implicit class StringExtensions(text: String) {
-    def isValidLocalDate: Boolean = {
+    def isValidLocalDate: Boolean =
       try {
         LocalDate.parse(text)
         true
-      }
-      catch {
+      } catch {
         case _: DateTimeParseException => false
       }
-    }
   }
 }

@@ -30,15 +30,17 @@ import scala.concurrent.Future
 
 @Singleton()
 class AuthorisationsController @Inject() (
-  cc: ControllerComponents,
+  cc:                ControllerComponents,
   validationService: ValidationService
-) extends BackendController(cc) with HeaderValidator with JsonResponses {
+) extends BackendController(cc)
+    with HeaderValidator
+    with JsonResponses {
 
   def authorisations: Action[JsValue] = validateHeaders(cc).async(parse.json) { implicit request =>
     Future.successful(
       validationService.validateRequest(request) match {
         case Left(errors) => JsonValidationApiError(errors).toResult
-        case Right(r) => Ok(AuthorisationsResponse(LocalDate.parse(r.date), r.eoris.map(r => AuthorisationResponse(r, authorised = true))))
+        case Right(r)     => Ok(AuthorisationsResponse(LocalDate.parse(r.date), r.eoris.map(r => AuthorisationResponse(r, authorised = true))))
       }
     )
   }
