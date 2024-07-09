@@ -16,7 +16,8 @@
 
 package uk.gov.hmrc.uknwauthcheckerapi
 
-import play.api.libs.json.{JsError, JsPath, JsonValidationError}
+import play.api.libs.json._
+import play.api.mvc.Request
 import uk.gov.hmrc.uknwauthcheckerapi.models.AuthorisationRequest
 
 import java.time.LocalDate
@@ -26,8 +27,18 @@ import scala.collection.Seq
 class ValidationService {
   private val eoriPattern = "^(GB|XI)[0-9]{12}|(GB|XI)[0-9]{15}$"
 
-  def validateAuthorisationRequest(request: AuthorisationRequest): Either[JsError, AuthorisationRequest] = {
+  def validateRequest(request: Request[JsValue]): Either[JsError, AuthorisationRequest] = {
+    request.body.validate[AuthorisationRequest] match {
+      case JsSuccess(authorisationRequest: AuthorisationRequest, _) =>
+        validateAuthorisationRequest(authorisationRequest) match {
+          case Left(errors) => Left(errors)
+          case Right(r) => Right(r)
+        }
+      case errors: JsError => Left(errors)
+    }
+  }
 
+  private def validateAuthorisationRequest(request: AuthorisationRequest): Either[JsError, AuthorisationRequest] = {
     val eoriErrors: Seq[JsonValidationError] = request
       .eoris
       .filterNot(e => e matches eoriPattern)

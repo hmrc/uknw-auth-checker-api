@@ -36,14 +36,9 @@ class AuthorisationsController @Inject() (
 
   def authorisations: Action[JsValue] = validateHeaders(cc).async(parse.json) { implicit request =>
     Future.successful(
-      request.body.validate[AuthorisationRequest] match {
-        case JsSuccess(authorisationRequest: AuthorisationRequest, _) =>
-          validationService.validateAuthorisationRequest(authorisationRequest) match {
-            case Left(errors) => JsonValidationApiError(errors).toResult
-            case Right(r) => Ok(AuthorisationsResponse(LocalDate.parse(r.date), r.eoris.map(r => AuthorisationResponse(r, authorised = true))))
-          }
-        case errors: JsError =>
-          JsonValidationApiError(errors).toResult
+      validationService.validateRequest(request) match {
+        case Left(errors) => JsonValidationApiError(errors).toResult
+        case Right(r) => Ok(AuthorisationsResponse(LocalDate.parse(r.date), r.eoris.map(r => AuthorisationResponse(r, authorised = true))))
       }
     )
   }
