@@ -59,7 +59,7 @@ class IntegrationFrameworkConnector @Inject() (
   def getEisAuthorisationsResponse(eisAuthorisationRequest: EisAuthorisationRequest)(implicit hc: HeaderCarrier): Future[EisAuthorisationsResponse] =
     retryFor[EisAuthorisationsResponse]("Integration framework Response")(retryCondition) {
       httpClient
-        .post(url"${appConfig.baseUrl("integration-framework")}/authorisations")
+        .post(url"${appConfig.baseUrl("integration-framework")}/cau/validatecustomsauth/v1")
         .setHeader(integrationFrameworkHeaders(appConfig.integrationFrameworkBearerToken): _*)
         .withBody(Json.toJson(eisAuthorisationRequest))
         .executeAndDeserialise[EisAuthorisationsResponse]
