@@ -22,14 +22,10 @@ import play.api.Configuration
 @Singleton
 class AppConfig @Inject() (config: Configuration) {
 
-  val appName: String = config.get[String]("appName")
   val authType: String = config.get[String]("authType")
 
   val integrationFrameworkBearerToken: String =
     config.get[String]("microservice.services.integration-framework.bearerToken")
-
-  val integrationFrameworkEnvironment: String =
-    config.get[String]("microservice.services.integration-framework.environment")
 
   def baseUrl(serviceName: String): String = {
     val protocol = getConfString(s"$serviceName.protocol", defaultProtocol)

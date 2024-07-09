@@ -17,8 +17,5 @@
 package uk.gov.hmrc.uknwauthcheckerapi.models
 
 object CustomHeaderNames {
-  val environment    = "Environment"
-  val correlationId  = "CorrelationId"
-  val xApiKey        = "X-API-Key"
   val xCorrelationId = "X-Correlation-Id"
 }

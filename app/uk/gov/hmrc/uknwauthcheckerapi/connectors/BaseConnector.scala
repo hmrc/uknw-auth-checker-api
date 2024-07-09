@@ -60,15 +60,5 @@ trait BaseConnector extends Retries {
               response.error
           }
         }
-
-    def executeAndExpect(expected: Int)(implicit ec: ExecutionContext): Future[Unit] =
-      requestBuilder
-        .execute[HttpResponse]
-        .flatMap { response =>
-          response.status match {
-            case `expected` => Future.successful(())
-            case _          => response.error
-          }
-        }
   }
 }
