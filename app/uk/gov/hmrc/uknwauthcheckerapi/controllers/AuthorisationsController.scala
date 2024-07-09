@@ -16,12 +16,12 @@
 
 package uk.gov.hmrc.uknwauthcheckerapi.controllers
 
-import play.api.libs.json.{JsError, JsSuccess, JsValue}
+import play.api.libs.json.JsValue
 import play.api.mvc.{Action, ControllerComponents}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
-import uk.gov.hmrc.uknwauthcheckerapi.ValidationService
 import uk.gov.hmrc.uknwauthcheckerapi.errors.JsonValidationApiError
-import uk.gov.hmrc.uknwauthcheckerapi.models.{AuthorisationRequest, AuthorisationResponse, AuthorisationsResponse}
+import uk.gov.hmrc.uknwauthcheckerapi.models.{AuthorisationResponse, AuthorisationsResponse}
+import uk.gov.hmrc.uknwauthcheckerapi.services.ValidationService
 import uk.gov.hmrc.uknwauthcheckerapi.utils.JsonResponses
 
 import java.time.LocalDate

@@ -66,6 +66,19 @@ paths:
           content:
             application/json:
               examples:
+                single_error_json_malformed:
+                  value:
+                    {
+                      "code": "BAD_REQUEST",
+                      "message": "Bad request",
+                      "errors": [
+                        {
+                          "code": "INVALID_FORMAT",
+                          "message": "JSON is malformed",
+                          "path": ""
+                        }
+                      ]
+                    }
                 single_error_date:
                   value:
                     {

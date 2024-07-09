@@ -16,25 +16,35 @@
 
 package uk.gov.hmrc.uknwauthcheckerapi.controllers
 
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar.mock
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 import play.api.libs.json.{JsError, JsPath, Json, JsonValidationError}
 import play.api.test.Helpers._
 import uk.gov.hmrc.uknwauthcheckerapi.errors.{ApiErrorResponse, JsonValidationApiError, NotAcceptableApiError}
 import uk.gov.hmrc.uknwauthcheckerapi.models.{AuthorisationRequest, AuthorisationResponse, AuthorisationsResponse}
+import uk.gov.hmrc.uknwauthcheckerapi.services.ValidationService
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class AuthorisationsControllerSpec extends BaseSpec {
 
-  val controller = new AuthorisationsController(stubComponents)
+  private val mockValidationService: ValidationService = mock[ValidationService]
+  private val controller = new AuthorisationsController(stubComponents, mockValidationService)
 
   "AuthorisationsController" should {
 
     "return OK (200) with authorised eoris when request has valid date and eoris" in {
 
       forAll { authorisationRequest: AuthorisationRequest =>
+        when(mockValidationService.validateRequest(any())).thenReturn(
+          Right(authorisationRequest)
+        )
+
         val expectedResponse = AuthorisationsResponse(
-          authorisationRequest.date,
+          LocalDate.parse(authorisationRequest.date),
           authorisationRequest.eoris.map(r => AuthorisationResponse(r, authorised = true))
         )
 
@@ -50,17 +60,21 @@ class AuthorisationsControllerSpec extends BaseSpec {
     "return BAD_REQUEST (400) error when request json is invalid" in {
       val request = fakeRequestWithJsonBody(emptyJson)
 
-      val result = controller.authorisations()(request)
+      val jsError = JsError(
+        Seq("date", "eoris").map { field =>
+          (JsPath \ field, Seq(JsonValidationError("error.path.missing")))
+        }
+      )
 
       val expectedResponse = Json.toJson(
-        JsonValidationApiError(
-          JsError(
-            Seq("date", "eoris").map { field =>
-              (JsPath \ field, Seq(JsonValidationError("error.path.missing")))
-            }
-          )
-        )
+        JsonValidationApiError(jsError)
       )(ApiErrorResponse.validationWrites)
+
+      when(mockValidationService.validateRequest(any())).thenReturn(
+        Left(jsError)
+      )
+
+      val result = controller.authorisations()(request)
 
       status(result)        shouldBe BAD_REQUEST
       contentAsJson(result) shouldBe expectedResponse

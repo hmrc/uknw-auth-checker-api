@@ -21,6 +21,7 @@ import uk.gov.hmrc.uknwauthcheckerapi.models.AuthorisationRequest
 import wolfendale.scalacheck.regexp.RegexpGen
 
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 trait Generators {
 
@@ -35,7 +36,7 @@ trait Generators {
     for {
       date  <- arbLocalDate.arbitrary
       eoris <- eorisGen
-    } yield AuthorisationRequest(date = date, eoris = eoris)
+    } yield AuthorisationRequest(date = date.format(DateTimeFormatter.ISO_DATE), eoris = eoris)
   }
 
 }

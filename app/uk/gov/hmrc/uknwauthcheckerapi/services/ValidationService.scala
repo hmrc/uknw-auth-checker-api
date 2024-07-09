@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.uknwauthcheckerapi
+package uk.gov.hmrc.uknwauthcheckerapi.services
 
 import play.api.libs.json._
 import play.api.mvc.Request

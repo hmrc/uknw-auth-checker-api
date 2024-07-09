@@ -18,8 +18,6 @@ package uk.gov.hmrc.uknwauthcheckerapi.models
 
 import play.api.libs.json._
 
-import java.time.LocalDate
-
 case class AuthorisationRequest(date: String, eoris: Seq[String])
 
 object AuthorisationRequest {
