@@ -30,7 +30,7 @@ import uk.gov.hmrc.http.HttpReads.Implicits._
 
 trait BaseConnector extends Retries {
 
-  override def actorSystem: ActorSystem
+  override def actorSystem:   ActorSystem
   override def configuration: Config
 
   def retryCondition: PartialFunction[Exception, Boolean] = {
@@ -56,7 +56,7 @@ trait BaseConnector extends Retries {
         .flatMap { response =>
           response.status match {
             case OK | CREATED | ACCEPTED => response.as[T]
-            case _                       =>
+            case _ =>
               response.error
           }
         }

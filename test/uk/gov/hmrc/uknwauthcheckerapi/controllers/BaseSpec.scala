@@ -36,14 +36,16 @@ import uk.gov.hmrc.uknwauthcheckerapi.generators.{Generators, TestData, TestHead
 
 import scala.concurrent.ExecutionContext
 
-class BaseSpec extends AnyWordSpec with Matchers
-  with Generators
-  with GuiceOneAppPerSuite
-  with BeforeAndAfterEach
-  with DefaultAwaitTimeout
-  with HeaderNames
-  with TestData
-  with TestHeaders {
+class BaseSpec
+    extends AnyWordSpec
+    with Matchers
+    with Generators
+    with GuiceOneAppPerSuite
+    with BeforeAndAfterEach
+    with DefaultAwaitTimeout
+    with HeaderNames
+    with TestData
+    with TestHeaders {
 
   def configOverrides: Map[String, Any] = Map()
 
@@ -69,7 +71,7 @@ class BaseSpec extends AnyWordSpec with Matchers
     FakeRequest(verb, authorisationEndpoint, FakeHeaders(headers), json)
   implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
   implicit val hc: HeaderCarrier    = HeaderCarrier()
-  val config: Config                = app.injector.instanceOf[Config]
-  val appConfig: AppConfig          = app.injector.instanceOf[AppConfig]
+  val config:      Config           = app.injector.instanceOf[Config]
+  val appConfig:   AppConfig        = app.injector.instanceOf[AppConfig]
   val actorSystem: ActorSystem      = ActorSystem("actor")
 }

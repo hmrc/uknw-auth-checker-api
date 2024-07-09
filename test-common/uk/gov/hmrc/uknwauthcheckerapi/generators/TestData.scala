@@ -35,9 +35,9 @@ trait TestData extends Generators {
       eoris <- eorisGen
     } yield ValidGetAuthorisationsResponse(
       EisAuthorisationsResponse(
-        date.getOrElse(LocalDate.now()), "EIR", eoris.map(e => {
-          EisAuthorisationResponse(e, valid = true, 0)
-        })
+        date.getOrElse(LocalDate.now()),
+        "EIR",
+        eoris.map(e => EisAuthorisationResponse(e, valid = true, 0))
       )
     )
 
@@ -47,4 +47,3 @@ trait TestData extends Generators {
 final case class ValidGetAuthorisationsResponse(
   response: EisAuthorisationsResponse
 )
-

@@ -32,7 +32,7 @@ import scala.concurrent.Future
 
 class AuthorisationsControllerSpec extends BaseSpec {
 
-  val mockIntegrationFrameworkService: IntegrationFrameworkService       = mock[IntegrationFrameworkService]
+  val mockIntegrationFrameworkService: IntegrationFrameworkService = mock[IntegrationFrameworkService]
 
   val controller = new AuthorisationsController(
     stubComponents,
@@ -44,7 +44,7 @@ class AuthorisationsControllerSpec extends BaseSpec {
     "return OK (200) with authorised eoris when request has valid date and eoris" in {
 
       forAll { authorisationRequest: AuthorisationRequest =>
-        whenever (authorisationRequest.date.isDefined) {
+        whenever(authorisationRequest.date.isDefined) {
           val expectedResponse = AuthorisationsResponse(
             authorisationRequest.date.getOrElse(LocalDate.now),
             authorisationRequest.eoris.map(r => AuthorisationResponse(r, authorised = true))
@@ -56,7 +56,7 @@ class AuthorisationsControllerSpec extends BaseSpec {
 
           val result = controller.authorisations()(request)
 
-          status(result) shouldBe OK
+          status(result)        shouldBe OK
           contentAsJson(result) shouldBe Json.toJson(expectedResponse)
           true
         }

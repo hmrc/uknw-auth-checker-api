@@ -29,17 +29,18 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton()
-class AuthorisationsController @Inject() (cc: ControllerComponents, integrationFrameworkService: IntegrationFrameworkService)
-                                         (implicit ec: ExecutionContext)
-  extends BackendController(cc) with HeaderValidator with JsonResponses {
+class AuthorisationsController @Inject() (cc: ControllerComponents, integrationFrameworkService: IntegrationFrameworkService)(implicit
+  ec: ExecutionContext
+) extends BackendController(cc)
+    with HeaderValidator
+    with JsonResponses {
 
   def authorisations: Action[JsValue] = validateHeaders(cc).async(parse.json) { implicit request =>
-
-      request.body.validate[AuthorisationRequest] match {
-        case JsSuccess(authorisationRequest: AuthorisationRequest, _) =>
-          integrationFrameworkService.getAuthorisations(authorisationRequest).map(e => Status(OK)(Json.toJson(e)))
-        case errors: JsError =>
-          Future.successful(JsonValidationApiError(errors).toResult)
-      }
+    request.body.validate[AuthorisationRequest] match {
+      case JsSuccess(authorisationRequest: AuthorisationRequest, _) =>
+        integrationFrameworkService.getAuthorisations(authorisationRequest).map(e => Status(OK)(Json.toJson(e)))
+      case errors: JsError =>
+        Future.successful(JsonValidationApiError(errors).toResult)
+    }
   }
 }

@@ -34,8 +34,8 @@ import scala.concurrent.Future
 
 class IntegrationFrameworkConnectorSpec extends BaseSpec {
 
-  val retryAmount                        = 4
-  val mockHttpClient: HttpClientV2       = mock[HttpClientV2]
+  val retryAmount = 4
+  val mockHttpClient:     HttpClientV2   = mock[HttpClientV2]
   val mockRequestBuilder: RequestBuilder = mock[RequestBuilder]
 
   val connector = new IntegrationFrameworkConnector(appConfig, mockHttpClient, config, actorSystem)
@@ -47,16 +47,17 @@ class IntegrationFrameworkConnectorSpec extends BaseSpec {
 
   "getEisAuthorisationsResponse" should {
     "return response when call to integration framework succeeds" in forAll {
-      (eisAuthorisationRequest: EisAuthorisationRequest,
-       validGetAuthorisationsResponse: ValidGetAuthorisationsResponse) =>
+      (eisAuthorisationRequest: EisAuthorisationRequest, validGetAuthorisationsResponse: ValidGetAuthorisationsResponse) =>
         whenever(eisAuthorisationRequest.validityDate.isDefined) {
           beforeEach()
           when(mockHttpClient.post(any())(any())).thenReturn(mockRequestBuilder)
           when(mockRequestBuilder.setHeader(any())).thenReturn(mockRequestBuilder)
-          when(mockRequestBuilder.withBody(any())(any(),any(), any())).thenReturn(mockRequestBuilder)
-          doReturn(Future.successful(
-            HttpResponse.apply(OK, Json.stringify(Json.toJson(validGetAuthorisationsResponse.response)))
-          )).when(mockRequestBuilder).execute[HttpResponse](any(), any())
+          when(mockRequestBuilder.withBody(any())(any(), any(), any())).thenReturn(mockRequestBuilder)
+          doReturn(
+            Future.successful(
+              HttpResponse.apply(OK, Json.stringify(Json.toJson(validGetAuthorisationsResponse.response)))
+            )
+          ).when(mockRequestBuilder).execute[HttpResponse](any(), any())
 
           val result = await(connector.getEisAuthorisationsResponse(eisAuthorisationRequest))
 

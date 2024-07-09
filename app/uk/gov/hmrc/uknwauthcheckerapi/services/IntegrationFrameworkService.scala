@@ -25,15 +25,14 @@ import uk.gov.hmrc.uknwauthcheckerapi.models.eis.{EisAuthorisationRequest, EisAu
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class IntegrationFrameworkService @Inject() (appConfig: AppConfig,
-                                             integrationFrameworkConnector: IntegrationFrameworkConnector)
-                                            (implicit ec: ExecutionContext){
+class IntegrationFrameworkService @Inject() (appConfig: AppConfig, integrationFrameworkConnector: IntegrationFrameworkConnector)(implicit
+  ec: ExecutionContext
+) {
 
-  def getAuthorisations(authorisationRequest: AuthorisationRequest)
-                       (implicit hc: HeaderCarrier): Future[AuthorisationsResponse] = {
+  def getAuthorisations(authorisationRequest: AuthorisationRequest)(implicit hc: HeaderCarrier): Future[AuthorisationsResponse] = {
     val eisAuthorisationRequest = EisAuthorisationRequest(authorisationRequest.date, appConfig.authType, authorisationRequest.eoris)
-    integrationFrameworkConnector.getEisAuthorisationsResponse(eisAuthorisationRequest).map(ears => {
+    integrationFrameworkConnector.getEisAuthorisationsResponse(eisAuthorisationRequest).map { ears =>
       AuthorisationsResponse(ears.processingDate, ears.results.map(ear => AuthorisationResponse(ear.eori, ear.valid)))
-    })
+    }
   }
 }

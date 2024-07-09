@@ -31,13 +31,13 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class IntegrationFrameworkConnector @Inject()(
-                                               appConfig: AppConfig,
-                                               httpClient: HttpClientV2,
-                                               override val configuration: Config,
-                                               override val actorSystem: ActorSystem
-                                             )(implicit ec: ExecutionContext)
-  extends Retries
+class IntegrationFrameworkConnector @Inject() (
+  appConfig:                  AppConfig,
+  httpClient:                 HttpClientV2,
+  override val configuration: Config,
+  override val actorSystem:   ActorSystem
+)(implicit ec: ExecutionContext)
+    extends Retries
     with BaseConnector {
 
   private def integrationFrameworkHeaders(bearerToken: String)(implicit hc: HeaderCarrier): Seq[(String, String)] = {
@@ -56,8 +56,7 @@ class IntegrationFrameworkConnector @Inject()(
     )
   }
 
-  def getEisAuthorisationsResponse(eisAuthorisationRequest: EisAuthorisationRequest)
-                                  (implicit hc: HeaderCarrier): Future[EisAuthorisationsResponse] =
+  def getEisAuthorisationsResponse(eisAuthorisationRequest: EisAuthorisationRequest)(implicit hc: HeaderCarrier): Future[EisAuthorisationsResponse] =
     retryFor[EisAuthorisationsResponse]("Integration framework Response")(retryCondition) {
       httpClient
         .post(url"${appConfig.baseUrl("integration-framework")}/authorisations")
