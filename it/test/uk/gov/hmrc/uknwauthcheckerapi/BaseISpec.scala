@@ -36,7 +36,9 @@ class BaseISpec
 
   lazy val hostUrl: String = s"http://localhost:$port"
   lazy val authorisationsUrl = s"$hostUrl/authorisations"
-  override lazy val app: Application = GuiceApplicationBuilder().build()
+  override lazy val app: Application = GuiceApplicationBuilder()
+    .configure(additionalAppConfig)
+    .build()
   private lazy val wsClient: WSClient = injected[WSClient]
 
   def injected[T](c: Class[T]): T                    = app.injector.instanceOf(c)
@@ -49,11 +51,6 @@ class BaseISpec
     "auth",
     "integration-framework"
   )
-
-  override def fakeApplication(): Application =
-    GuiceApplicationBuilder()
-      .configure(additionalAppConfig)
-      .build()
 
   def deleteRequest(url: String, headers: Seq[(String, String)] = defaultHeaders): WSResponse = {
     await(wsClient.url(url)
