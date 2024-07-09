@@ -17,7 +17,7 @@
 package uk.gov.hmrc.uknwauthcheckerapi.connectors
 
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{reset, when}
+import org.mockito.Mockito.{doReturn, reset, when}
 import org.scalatest.prop.TableDrivenPropertyChecks.whenever
 import org.scalatestplus.mockito.MockitoSugar.mock
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
@@ -27,9 +27,9 @@ import play.api.test.Helpers.await
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import uk.gov.hmrc.uknwauthcheckerapi.controllers.BaseSpec
-import uk.gov.hmrc.uknwauthcheckerapi.models.eis.{EisAuthorisationRequest, EisAuthorisationResponse, EisAuthorisationsResponse}
+import uk.gov.hmrc.uknwauthcheckerapi.generators.ValidGetAuthorisationsResponse
+import uk.gov.hmrc.uknwauthcheckerapi.models.eis.EisAuthorisationRequest
 
-import java.time.LocalDate
 import scala.concurrent.Future
 
 class IntegrationFrameworkConnectorSpec extends BaseSpec {
@@ -47,27 +47,20 @@ class IntegrationFrameworkConnectorSpec extends BaseSpec {
 
   "getEisAuthorisationsResponse" should {
     "return response when call to integration framework succeeds" in forAll {
-      eisAuthorisationRequest: EisAuthorisationRequest =>
+      (eisAuthorisationRequest: EisAuthorisationRequest,
+       validGetAuthorisationsResponse: ValidGetAuthorisationsResponse) =>
         whenever(eisAuthorisationRequest.validityDate.isDefined) {
-          val expectedEisAuthorisationsResponse = EisAuthorisationsResponse(
-            eisAuthorisationRequest.validityDate.getOrElse(LocalDate.now),
-            eisAuthorisationRequest.authType,
-            eisAuthorisationRequest.eoris.map(r => EisAuthorisationResponse(r, valid = true, 0))
-          )
           beforeEach()
-          when(mockHttpClient.get(any())(any())).thenReturn(mockRequestBuilder)
+          when(mockHttpClient.post(any())(any())).thenReturn(mockRequestBuilder)
           when(mockRequestBuilder.setHeader(any())).thenReturn(mockRequestBuilder)
           when(mockRequestBuilder.withBody(any())(any(),any(), any())).thenReturn(mockRequestBuilder)
-          when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-            .thenReturn(
-              Future.successful(
-                HttpResponse.apply(OK, Json.stringify(Json.toJson(expectedEisAuthorisationsResponse)))
-              )
-            )
+          doReturn(Future.successful(
+            HttpResponse.apply(OK, Json.stringify(Json.toJson(validGetAuthorisationsResponse.response)))
+          )).when(mockRequestBuilder).execute[HttpResponse](any(), any())
 
           val result = await(connector.getEisAuthorisationsResponse(eisAuthorisationRequest))
 
-          result shouldBe expectedEisAuthorisationsResponse
+          result shouldBe validGetAuthorisationsResponse.response
         }
     }
   }
