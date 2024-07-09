@@ -91,8 +91,8 @@ object MethodNotAllowedApiError extends ApiErrorResponse {
 
 final case class JsonValidationApiError(jsErrors: JsError) extends ApiErrorResponse {
   val statusCode: Int    = BAD_REQUEST
-  val code:       String = "JSON_ERROR"
-  val message:    String = "The provided JSON was invalid."
+  val code:       String = "BAD_REQUEST"
+  val message:    String = "Bad request"
 
   val getErrors: JsValue = Json.toJson(jsErrors.errors.flatMap { case (path, pathErrors) =>
     val dropObjDot = 4
