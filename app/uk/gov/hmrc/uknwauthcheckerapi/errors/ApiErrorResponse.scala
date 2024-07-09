@@ -80,7 +80,7 @@ object ForbiddenApiError extends ApiErrorResponse {
 object NotAcceptableApiError extends ApiErrorResponse {
   val statusCode: Int    = NOT_ACCEPTABLE
   val code:       String = "NOT_ACCEPTABLE"
-  val message:    String = "Cannot produce an acceptable response"
+  val message:    String = "Cannot produce an acceptable response. The Accept or Content-Type header is missing or invalid"
 }
 
 object MethodNotAllowedApiError extends ApiErrorResponse {
