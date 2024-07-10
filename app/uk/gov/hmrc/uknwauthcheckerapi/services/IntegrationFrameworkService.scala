@@ -19,9 +19,10 @@ package uk.gov.hmrc.uknwauthcheckerapi.services
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.uknwauthcheckerapi.config.AppConfig
 import uk.gov.hmrc.uknwauthcheckerapi.connectors.IntegrationFrameworkConnector
+import uk.gov.hmrc.uknwauthcheckerapi.models.eis.EisAuthorisationRequest
 import uk.gov.hmrc.uknwauthcheckerapi.models.{AuthorisationRequest, AuthorisationResponse, AuthorisationsResponse}
-import uk.gov.hmrc.uknwauthcheckerapi.models.eis.{EisAuthorisationRequest, EisAuthorisationsResponse}
 
+import java.time.LocalDate
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -30,7 +31,11 @@ class IntegrationFrameworkService @Inject() (appConfig: AppConfig, integrationFr
 ) {
 
   def getAuthorisations(authorisationRequest: AuthorisationRequest)(implicit hc: HeaderCarrier): Future[AuthorisationsResponse] = {
-    val eisAuthorisationRequest = EisAuthorisationRequest(authorisationRequest.date, appConfig.authType, authorisationRequest.eoris)
+    val eisAuthorisationRequest = EisAuthorisationRequest(
+      Some(LocalDate.parse(authorisationRequest.date)),
+      appConfig.authType,
+      authorisationRequest.eoris
+    )
     integrationFrameworkConnector.getEisAuthorisationsResponse(eisAuthorisationRequest).map { ears =>
       AuthorisationsResponse(ears.processingDate, ears.results.map(ear => AuthorisationResponse(ear.eori, ear.valid)))
     }

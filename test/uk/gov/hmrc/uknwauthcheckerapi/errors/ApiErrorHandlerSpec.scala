@@ -18,7 +18,7 @@ package uk.gov.hmrc.uknwauthcheckerapi.errors
 
 import play.api.http.Status._
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{contentAsJson, defaultAwaitTimeout, status}
+import play.api.test.Helpers.{contentAsJson, status}
 import uk.gov.hmrc.auth.core.AuthorisationException
 import uk.gov.hmrc.http.HttpVerbs.POST
 import uk.gov.hmrc.http.{JsValidationException, NotFoundException}

@@ -20,6 +20,8 @@ import org.scalacheck.{Arbitrary, Gen}
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.uknwauthcheckerapi.models.AuthorisationRequest
 import uk.gov.hmrc.uknwauthcheckerapi.models.eis.{EisAuthorisationResponse, EisAuthorisationsResponse}
+import uk.gov.hmrc.uknwauthcheckerapi.utils.EisAuthTypes
+
 import java.time.LocalDate
 
 trait TestData extends Generators {
@@ -36,7 +38,7 @@ trait TestData extends Generators {
     } yield ValidGetAuthorisationsResponse(
       EisAuthorisationsResponse(
         date.getOrElse(LocalDate.now()),
-        "UKNW",
+        EisAuthTypes.NopWaiver,
         eoris.map(e => EisAuthorisationResponse(e, valid = true, 0))
       )
     )

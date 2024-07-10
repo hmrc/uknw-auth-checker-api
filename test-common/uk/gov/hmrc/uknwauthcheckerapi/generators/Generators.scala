@@ -19,27 +19,38 @@ package uk.gov.hmrc.uknwauthcheckerapi.generators
 import org.scalacheck.{Arbitrary, Gen}
 import uk.gov.hmrc.uknwauthcheckerapi.models.AuthorisationRequest
 import uk.gov.hmrc.uknwauthcheckerapi.models.eis.EisAuthorisationRequest
+import uk.gov.hmrc.uknwauthcheckerapi.utils.EisAuthTypes
 import wolfendale.scalacheck.regexp.RegexpGen
 
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 trait Generators {
 
   val eoriGen:  Gen[String]      = RegexpGen.from("^(GB|XI)[0-9]{12}|(GB|XI)[0-9]{15}$")
   val eorisGen: Gen[Seq[String]] = Gen.chooseNum(1, 3000).flatMap(n => Gen.listOfN(n, eoriGen))
 
+  implicit val arbLocalDate: Arbitrary[LocalDate] = Arbitrary(
+    Gen
+      .choose(
+        min = LocalDate.MIN.toEpochDay,
+        max = LocalDate.MAX.toEpochDay
+      )
+      .map(LocalDate.ofEpochDay)
+  )
+
   implicit val arbAuthorisationRequest: Arbitrary[AuthorisationRequest] = Arbitrary {
     for {
-      date  <- Gen.option(LocalDate.now())
+      date  <- Arbitrary.arbitrary[LocalDate]
       eoris <- eorisGen
-    } yield AuthorisationRequest(date, eoris)
+    } yield AuthorisationRequest(date.format(DateTimeFormatter.ISO_LOCAL_DATE), eoris)
   }
 
   implicit val arbEisAuthorisationRequest: Arbitrary[EisAuthorisationRequest] = Arbitrary {
     for {
       date  <- Gen.option(LocalDate.now())
       eoris <- eorisGen
-    } yield EisAuthorisationRequest(date, "UKNW", eoris)
+    } yield EisAuthorisationRequest(date, EisAuthTypes.NopWaiver, eoris)
   }
 
 }
