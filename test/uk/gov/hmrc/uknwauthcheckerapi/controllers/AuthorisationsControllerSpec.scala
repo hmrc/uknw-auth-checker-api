@@ -57,13 +57,55 @@ class AuthorisationsControllerSpec extends BaseSpec {
       }
     }
 
-    "return BAD_REQUEST (400) error when request json is invalid" in {
+    "return BAD_REQUEST (400) error when request json field is missing" in {
       val request = fakeRequestWithJsonBody(emptyJson)
 
       val jsError = JsError(
         Seq("date", "eoris").map { field =>
           (JsPath \ field, Seq(JsonValidationError("error.path.missing")))
         }
+      )
+
+      val expectedResponse = Json.toJson(
+        JsonValidationApiError(jsError)
+      )(ApiErrorResponse.validationWrites)
+
+      when(mockValidationService.validateRequest(any())).thenReturn(
+        Left(jsError)
+      )
+
+      val result = controller.authorisations()(request)
+
+      status(result)        shouldBe BAD_REQUEST
+      contentAsJson(result) shouldBe expectedResponse
+    }
+
+    "return BAD_REQUEST (400) error when request json is malformed" in {
+      val request = fakeRequestWithJsonBody(emptyJson)
+
+      val jsError = JsError(
+        Seq((JsPath \ "", Seq(JsonValidationError("error.expected.jsobject"))))
+      )
+
+      val expectedResponse = Json.toJson(
+        JsonValidationApiError(jsError)
+      )(ApiErrorResponse.validationWrites)
+
+      when(mockValidationService.validateRequest(any())).thenReturn(
+        Left(jsError)
+      )
+
+      val result = controller.authorisations()(request)
+
+      status(result)        shouldBe BAD_REQUEST
+      contentAsJson(result) shouldBe expectedResponse
+    }
+
+    "return BAD_REQUEST (400) error when request error is custom" in {
+      val request = fakeRequestWithJsonBody(emptyJson)
+
+      val jsError = JsError(
+        Seq((JsPath \ "", Seq(JsonValidationError("test error"))))
       )
 
       val expectedResponse = Json.toJson(

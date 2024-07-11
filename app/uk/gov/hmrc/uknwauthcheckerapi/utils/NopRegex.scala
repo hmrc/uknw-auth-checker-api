@@ -16,6 +16,6 @@
 
 package uk.gov.hmrc.uknwauthcheckerapi.utils
 
-object EisAuthTypes {
-  val NopWaiver = "UKNW"
+object NopRegex {
+  val eoriPattern = "^(GB|XI)[0-9]{12}|(GB|XI)[0-9]{15}$"
 }

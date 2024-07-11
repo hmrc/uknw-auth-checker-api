@@ -19,14 +19,13 @@ package uk.gov.hmrc.uknwauthcheckerapi.services
 import play.api.libs.json._
 import play.api.mvc.Request
 import uk.gov.hmrc.uknwauthcheckerapi.models.AuthorisationRequest
+import uk.gov.hmrc.uknwauthcheckerapi.utils.NopRegex
 
 import java.time.LocalDate
 import java.time.format.DateTimeParseException
 import scala.collection.Seq
 
 class ValidationService {
-  private val eoriPattern = "^(GB|XI)[0-9]{12}|(GB|XI)[0-9]{15}$"
-
   def validateRequest(request: Request[JsValue]): Either[JsError, AuthorisationRequest] =
     request.body.validate[AuthorisationRequest] match {
       case JsSuccess(authorisationRequest: AuthorisationRequest, _) =>
@@ -42,7 +41,7 @@ class ValidationService {
     val eoris = request.eoris
 
     val eoriErrors: Seq[JsonValidationError] = eoris
-      .filterNot(e => e matches eoriPattern)
+      .filterNot(e => e matches NopRegex.eoriPattern)
       .map(e => JsonValidationError(s"$e is not a supported EORI number"))
 
     val dateError = Seq(JsonValidationError(s"$date is not a valid date in the format YYYY-MM-DD"))
