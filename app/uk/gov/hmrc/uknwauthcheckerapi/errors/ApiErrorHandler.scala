@@ -37,15 +37,16 @@ class ApiErrorHandler @Inject() extends HttpErrorHandler with Logging {
 
     Future.successful(
       statusCode match {
-        case BAD_REQUEST => BadRequestApiError.toResult
+        case BAD_REQUEST        => BadRequestApiError.toResult
+        case FORBIDDEN          => ForbiddenApiError.toResult
+        case METHOD_NOT_ALLOWED => MethodNotAllowedApiError.toResult
         case NOT_FOUND =>
           request.path match {
             case "/authorisations" => MethodNotAllowedApiError.toResult
             case _                 => NotFoundApiError.toResult
           }
-        case FORBIDDEN          => ForbiddenApiError.toResult
-        case METHOD_NOT_ALLOWED => MethodNotAllowedApiError.toResult
-        case UNAUTHORIZED       => UnauthorisedApiError.toResult
+        case SERVICE_UNAVAILABLE => ServiceUnavailableApiError.toResult
+        case UNAUTHORIZED        => UnauthorisedApiError.toResult
         case _ =>
           logger.warn(s"[ApiErrorHandler][onClientError] Unexpected client error type")
           InternalServerApiError.toResult

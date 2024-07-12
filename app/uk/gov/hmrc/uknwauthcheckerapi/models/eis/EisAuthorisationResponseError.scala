@@ -27,10 +27,8 @@ object EisAuthorisationResponseError {
 }
 
 final case class EisAuthorisationResponseErrorDetail(
-  timestamp: String,
-  errorCode: Int,
-  errorMessage: String,
-  sourcePDSFaultDetails: String
+  errorCode:    Int,
+  errorMessage: String
 )
 
 object EisAuthorisationResponseErrorDetail {

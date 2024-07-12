@@ -18,7 +18,7 @@ package uk.gov.hmrc.uknwauthcheckerapi.generators
 
 import org.scalacheck.{Arbitrary, Gen}
 import uk.gov.hmrc.uknwauthcheckerapi.models.AuthorisationRequest
-import uk.gov.hmrc.uknwauthcheckerapi.models.eis.EisAuthorisationRequest
+import uk.gov.hmrc.uknwauthcheckerapi.models.eis.{EisAuthorisationRequest, EisAuthorisationResponseError, EisAuthorisationResponseErrorDetail}
 import uk.gov.hmrc.uknwauthcheckerapi.utils.{EisAuthTypes, NopRegex}
 import wolfendale.scalacheck.regexp.RegexpGen
 
@@ -51,6 +51,19 @@ trait Generators extends ExtensionHelpers {
       dateOption <- Gen.option(localDate)
       eoris      <- eorisGen
     } yield EisAuthorisationRequest(dateOption, EisAuthTypes.NopWaiver, eoris)
+  }
+
+  implicit val arbEisAuthorisationResponseError: Arbitrary[EisAuthorisationResponseError] = Arbitrary {
+    for {
+      errorCode             <- Arbitrary.arbitrary[Int]
+      errorMessage          <- Arbitrary.arbitrary[String]
+      sourcePDSFaultDetails <- Arbitrary.arbitrary[String]
+    } yield EisAuthorisationResponseError(
+      errorDetail = EisAuthorisationResponseErrorDetail(
+        errorCode = errorCode,
+        errorMessage = errorMessage
+      )
+    )
   }
 
 }

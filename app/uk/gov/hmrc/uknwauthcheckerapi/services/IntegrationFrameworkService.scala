@@ -64,16 +64,16 @@ class IntegrationFrameworkService @Inject() (appConfig: AppConfig, integrationFr
           )
         }
         .recover {
-          case _ @UpstreamErrorResponse(body, _, _, _) => handleUpstreamErrorResponse(body)
           case _: BadGatewayException => Left(BadGatewayDataRetrievalError())
-          case NonFatal(thr) => Left(InternalUnexpectedDataRetrievalError(thr.getMessage, thr))
+          case _ @UpstreamErrorResponse(body, _, _, _) => handleUpstreamErrorResponse(body)
+          case NonFatal(thr)                           => Left(InternalUnexpectedDataRetrievalError(thr.getMessage, thr))
         }
     }
   }
 
   private def handleUpstreamErrorResponse(body: String): Either[DataRetrievalError, AuthorisationsResponse] =
     Json
-      .toJson(body)
+      .parse(body)
       .validate[EisAuthorisationResponseError] match {
       case JsSuccess(error, _) =>
         val errorCode    = error.errorDetail.errorCode

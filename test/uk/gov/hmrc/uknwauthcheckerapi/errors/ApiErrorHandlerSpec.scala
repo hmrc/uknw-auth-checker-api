@@ -74,6 +74,13 @@ class ApiErrorHandlerSpec extends BaseSpec {
       contentAsJson(result) shouldEqual contentAsJson(Future.successful(MethodNotAllowedApiError.toResult))
     }
 
+    "convert a SERVICE_UNAVAILABLE to Service Unavailable (503) response" in {
+      val result = apiErrorHandler.onClientError(fakePostRequest, SERVICE_UNAVAILABLE, errorMessage)
+
+      status(result) shouldEqual SERVICE_UNAVAILABLE
+      contentAsJson(result) shouldEqual contentAsJson(Future.successful(ServiceUnavailableApiError.toResult))
+    }
+
     "convert a UNAUTHORIZED to Unauthorized (401) response" in {
       val result = apiErrorHandler.onClientError(fakePostRequest, UNAUTHORIZED, errorMessage)
 
