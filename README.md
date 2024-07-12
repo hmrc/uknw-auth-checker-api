@@ -43,4 +43,4 @@ This code is open source software licensed under the [Apache 2.0 License]("http:
 To request data from the stub API please use the `.bru` files that can be found in `.bruno` and do not change any of those files as the stub API returns an error `500` on any unexpected requests.
 
 To add a new expected request please refer to the [uknw-auth-checker-api-stub
-/README.md](https://github.com/hmrc/uknw-auth-checker-api-stub/blob/main/README.md)
+/README.md](https://github.com/hmrc/uknw-auth-checker-api-stub?tab=readme-ov-file#add-new-expected-requests)
