@@ -23,7 +23,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
-import uk.gov.hmrc.uknwauthcheckerapi.generators.{TestData, TestHeaders}
+import uk.gov.hmrc.uknwauthcheckerapi.generators.{ExtensionHelpers, TestData, TestHeaders}
 
 import scala.reflect.ClassTag
 
@@ -32,7 +32,8 @@ class BaseISpec
     with GuiceOneServerPerSuite
     with WireMockHelper
     with TestData
-    with TestHeaders {
+    with TestHeaders
+    with ExtensionHelpers {
 
   lazy val hostUrl: String = s"http://localhost:$port"
   lazy val authorisationsUrl = s"$hostUrl/authorisations"
@@ -41,12 +42,13 @@ class BaseISpec
     .build()
   private lazy val wsClient: WSClient = injected[WSClient]
 
-  def injected[T](c: Class[T]): T                    = app.injector.instanceOf(c)
+  def injected[T](c: Class[T]): T = app.injector.instanceOf(c)
+
   def injected[T](implicit evidence: ClassTag[T]): T = app.injector.instanceOf[T]
 
   val additionalAppConfig: Map[String, Any] = Map(
-    "metrics.enabled"                     -> false,
-    "auditing.enabled"                    -> false,
+    "metrics.enabled" -> false,
+    "auditing.enabled" -> false,
   ) ++ setWireMockPort(
     "auth",
     "integration-framework"
@@ -107,5 +109,4 @@ class BaseISpec
       ).put(Json.toJson(body))
     )
   }
-
 }

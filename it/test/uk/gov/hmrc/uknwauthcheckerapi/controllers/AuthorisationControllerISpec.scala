@@ -26,7 +26,6 @@ import uk.gov.hmrc.uknwauthcheckerapi.models.eis.EisAuthorisationsResponse
 import uk.gov.hmrc.uknwauthcheckerapi.utils.EisAuthTypes
 
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 class AuthorisationControllerISpec extends BaseISpec {
 
@@ -34,7 +33,7 @@ class AuthorisationControllerISpec extends BaseISpec {
     "return OK (200) with authorised eoris when request has valid date and eoris" in {
       forAll { (authorisationRequest: AuthorisationRequest, date: LocalDate) =>
         whenever (authorisationRequest.eoris.nonEmpty) {
-          val request = authorisationRequest.copy(date = date.format(DateTimeFormatter.ISO_LOCAL_DATE))
+          val request = authorisationRequest.copy(date = date.toLocalDateFormatted)
 
           val authorisationRequestJson = Json.toJson(request)
 

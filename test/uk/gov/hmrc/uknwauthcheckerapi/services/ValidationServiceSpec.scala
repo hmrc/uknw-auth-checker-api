@@ -19,6 +19,7 @@ package uk.gov.hmrc.uknwauthcheckerapi.services
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 import play.api.libs.json.{JsError, JsPath, Json, JsonValidationError}
 import uk.gov.hmrc.uknwauthcheckerapi.controllers.BaseSpec
+import uk.gov.hmrc.uknwauthcheckerapi.errors.DataRetrievalError.ValidationDataRetrievalError
 import uk.gov.hmrc.uknwauthcheckerapi.models.AuthorisationRequest
 
 class ValidationServiceSpec extends BaseSpec {
@@ -42,9 +43,12 @@ class ValidationServiceSpec extends BaseSpec {
       forAll { (invalidJson: String) =>
         val json = Json.toJson(invalidJson)
 
-        val expectedResponse = JsError(
-          Seq((JsPath, Seq(JsonValidationError("error.expected.jsobject"))))
-        )
+        val expectedResponse =
+          ValidationDataRetrievalError(
+            JsError(
+              Seq((JsPath, Seq(JsonValidationError("error.expected.jsobject"))))
+            )
+          )
 
         val request = fakeRequestWithJsonBody(json)
 
@@ -58,11 +62,14 @@ class ValidationServiceSpec extends BaseSpec {
       forAll { (authorisationRequest: AuthorisationRequest, invalidDate: String) =>
         val json = Json.toJson(authorisationRequest.copy(date = invalidDate))
 
-        val expectedResponse = JsError(
-          Seq("date").map { field =>
-            (JsPath \ field, Seq(JsonValidationError(s"$invalidDate is not a valid date in the format YYYY-MM-DD")))
-          }
-        )
+        val expectedResponse =
+          ValidationDataRetrievalError(
+            JsError(
+              Seq("date").map { field =>
+                (JsPath \ field, Seq(JsonValidationError(s"$invalidDate is not a valid date in the format YYYY-MM-DD")))
+              }
+            )
+          )
 
         val request = fakeRequestWithJsonBody(json)
 
@@ -76,17 +83,20 @@ class ValidationServiceSpec extends BaseSpec {
       forAll { authorisationRequest: AuthorisationRequest =>
         val json = Json.toJson(authorisationRequest.copy(eoris = Seq("ABCD", "EFGH")))
 
-        val expectedResponse = JsError(
-          Seq("eoris").map { field =>
-            (
-              JsPath \ field,
-              Seq(
-                JsonValidationError(s"ABCD is not a supported EORI number"),
-                JsonValidationError(s"EFGH is not a supported EORI number")
-              )
+        val expectedResponse =
+          ValidationDataRetrievalError(
+            JsError(
+              Seq("eoris").map { field =>
+                (
+                  JsPath \ field,
+                  Seq(
+                    JsonValidationError(s"ABCD is not a supported EORI number"),
+                    JsonValidationError(s"EFGH is not a supported EORI number")
+                  )
+                )
+              }
             )
-          }
-        )
+          )
 
         val request = fakeRequestWithJsonBody(json)
 
@@ -102,14 +112,17 @@ class ValidationServiceSpec extends BaseSpec {
           AuthorisationRequest(invalidDate, Seq(invalidEori))
         )
 
-        val expectedResponse = JsError(
-          Seq("eoris").map { field =>
-            (JsPath \ field, Seq(JsonValidationError(s"$invalidEori is not a supported EORI number")))
-          } ++
-            Seq("date").map { field =>
-              (JsPath \ field, Seq(JsonValidationError(s"$invalidDate is not a valid date in the format YYYY-MM-DD")))
-            }
-        )
+        val expectedResponse =
+          ValidationDataRetrievalError(
+            JsError(
+              Seq("eoris").map { field =>
+                (JsPath \ field, Seq(JsonValidationError(s"$invalidEori is not a supported EORI number")))
+              } ++
+                Seq("date").map { field =>
+                  (JsPath \ field, Seq(JsonValidationError(s"$invalidDate is not a valid date in the format YYYY-MM-DD")))
+                }
+            )
+          )
 
         val request = fakeRequestWithJsonBody(json)
 

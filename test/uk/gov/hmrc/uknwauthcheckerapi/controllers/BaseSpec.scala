@@ -32,7 +32,7 @@ import play.api.test.{DefaultAwaitTimeout, FakeHeaders, FakeRequest, Helpers}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.HttpVerbs.POST
 import uk.gov.hmrc.uknwauthcheckerapi.config.AppConfig
-import uk.gov.hmrc.uknwauthcheckerapi.generators.{Generators, TestData, TestHeaders}
+import uk.gov.hmrc.uknwauthcheckerapi.generators.{ExtensionHelpers, Generators, TestData, TestHeaders}
 
 import scala.concurrent.ExecutionContext
 
@@ -45,7 +45,8 @@ class BaseSpec
     with DefaultAwaitTimeout
     with HeaderNames
     with TestData
-    with TestHeaders {
+    with TestHeaders
+    with ExtensionHelpers {
 
   def configOverrides: Map[String, Any] = Map()
 

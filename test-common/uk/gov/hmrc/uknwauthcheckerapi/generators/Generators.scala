@@ -23,9 +23,8 @@ import uk.gov.hmrc.uknwauthcheckerapi.utils.{EisAuthTypes, NopRegex}
 import wolfendale.scalacheck.regexp.RegexpGen
 
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
-trait Generators {
+trait Generators extends ExtensionHelpers {
 
   val eoriGen:  Gen[String]      = RegexpGen.from(NopRegex.eoriPattern)
   val eorisGen: Gen[Seq[String]] = Gen.chooseNum(1, 3000).flatMap(n => Gen.listOfN(n, eoriGen))
@@ -43,7 +42,7 @@ trait Generators {
     for {
       date  <- Arbitrary.arbitrary[LocalDate]
       eoris <- eorisGen
-    } yield AuthorisationRequest(date.format(DateTimeFormatter.ISO_LOCAL_DATE), eoris)
+    } yield AuthorisationRequest(date.toLocalDateFormatted, eoris)
   }
 
   implicit val arbEisAuthorisationRequest: Arbitrary[EisAuthorisationRequest] = Arbitrary {

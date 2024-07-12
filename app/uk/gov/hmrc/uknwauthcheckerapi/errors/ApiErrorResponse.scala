@@ -47,6 +47,18 @@ object ApiErrorResponse {
   implicit val writes: Writes[ApiErrorResponse] = (o: ApiErrorResponse) => JsObject(Seq("code" -> JsString(o.code), "message" -> JsString(o.message)))
 }
 
+object BadRequestApiError extends ApiErrorResponse {
+  val statusCode: Int    = BAD_REQUEST
+  val code:       String = "BAD_REQUEST"
+  val message:    String = "Invalid request"
+}
+
+object ForbiddenApiError extends ApiErrorResponse {
+  val statusCode: Int    = FORBIDDEN
+  val code:       String = "FORBIDDEN"
+  val message:    String = "You are not allowed to access this resource"
+}
+
 object InternalServerApiError extends ApiErrorResponse {
   val statusCode: Int    = INTERNAL_SERVER_ERROR
   val code:       String = "INTERNAL_SERVER_ERROR"
@@ -59,22 +71,10 @@ object NotFoundApiError extends ApiErrorResponse {
   val message:    String = "Matching resource not found"
 }
 
-object BadRequestApiError extends ApiErrorResponse {
-  val statusCode: Int    = BAD_REQUEST
-  val code:       String = "BAD_REQUEST"
-  val message:    String = "Invalid request"
-}
-
-object UnauthorisedApiError extends ApiErrorResponse {
-  val statusCode: Int    = UNAUTHORIZED
-  val code:       String = "MISSING_CREDENTIALS"
-  val message:    String = "Authentication information is not provided"
-}
-
-object ForbiddenApiError extends ApiErrorResponse {
-  val statusCode: Int    = FORBIDDEN
-  val code:       String = "FORBIDDEN"
-  val message:    String = "You are not allowed to access this resource"
+object MethodNotAllowedApiError extends ApiErrorResponse {
+  val statusCode: Int    = METHOD_NOT_ALLOWED
+  val code:       String = "METHOD_NOT_ALLOWED"
+  val message:    String = "This method is not supported"
 }
 
 object NotAcceptableApiError extends ApiErrorResponse {
@@ -83,10 +83,16 @@ object NotAcceptableApiError extends ApiErrorResponse {
   val message:    String = "Cannot produce an acceptable response. The Accept or Content-Type header is missing or invalid"
 }
 
-object MethodNotAllowedApiError extends ApiErrorResponse {
-  val statusCode: Int    = METHOD_NOT_ALLOWED
-  val code:       String = "METHOD_NOT_ALLOWED"
-  val message:    String = "This method is not supported"
+object ServiceUnavailableApiError extends ApiErrorResponse {
+  val statusCode: Int    = SERVICE_UNAVAILABLE
+  val code:       String = "SERVICE_UNAVAILABLE"
+  val message:    String = "Server is currently unable to handle the incoming requests"
+}
+
+object UnauthorisedApiError extends ApiErrorResponse {
+  val statusCode: Int    = UNAUTHORIZED
+  val code:       String = "MISSING_CREDENTIALS"
+  val message:    String = "Authentication information is not provided"
 }
 
 final case class JsonValidationApiError(jsErrors: JsError) extends ApiErrorResponse {

@@ -16,32 +16,43 @@
 
 package uk.gov.hmrc.uknwauthcheckerapi.controllers
 
+import cats.data.EitherT
 import play.api.libs.json.JsValue
 import play.api.mvc.{Action, ControllerComponents}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
-import uk.gov.hmrc.uknwauthcheckerapi.errors.JsonValidationApiError
-import uk.gov.hmrc.uknwauthcheckerapi.models.{AuthorisationResponse, AuthorisationsResponse}
-import uk.gov.hmrc.uknwauthcheckerapi.services.ValidationService
+import uk.gov.hmrc.uknwauthcheckerapi.errors.DataRetrievalError._
+import uk.gov.hmrc.uknwauthcheckerapi.errors._
+import uk.gov.hmrc.uknwauthcheckerapi.services.{IntegrationFrameworkService, ValidationService}
 import uk.gov.hmrc.uknwauthcheckerapi.utils.JsonResponses
 
-import java.time.LocalDate
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton()
 class AuthorisationsController @Inject() (
-  cc:                ControllerComponents,
-  validationService: ValidationService
-) extends BackendController(cc)
+  cc:                          ControllerComponents,
+  integrationFrameworkService: IntegrationFrameworkService,
+  validationService:           ValidationService
+)(implicit ec: ExecutionContext)
+    extends BackendController(cc)
     with HeaderValidator
     with JsonResponses {
 
   def authorisations: Action[JsValue] = validateHeaders(cc).async(parse.json) { implicit request =>
-    Future.successful(
-      validationService.validateRequest(request) match {
-        case Left(errors) => JsonValidationApiError(errors).toResult
-        case Right(r)     => Ok(AuthorisationsResponse(LocalDate.parse(r.date), r.eoris.map(r => AuthorisationResponse(r, authorised = true))))
-      }
-    )
+    (for {
+      authorisationsRequest <- EitherT.fromEither[Future](validationService.validateRequest(request))
+      response              <- integrationFrameworkService.getAuthorisations(authorisationsRequest)
+    } yield response)
+      .fold(
+        {
+          case BadGatewayDataRetrievalError()        => ServiceUnavailableApiError.toResult
+          case BadRequestDataRetrievalError(_)       => BadRequestApiError.toResult
+          case ForbiddenDataRetrievalError(_)        => ForbiddenApiError.toResult
+          case MethodNotAllowedDataRetrievalError(_) => MethodNotAllowedApiError.toResult
+          case ValidationDataRetrievalError(errors)  => JsonValidationApiError(errors).toResult
+          case _                                     => InternalServerApiError.toResult
+        },
+        authorisationsResponse => Ok(authorisationsResponse)
+      )
   }
 }

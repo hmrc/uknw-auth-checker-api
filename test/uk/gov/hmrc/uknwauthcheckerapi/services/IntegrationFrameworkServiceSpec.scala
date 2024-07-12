@@ -27,7 +27,6 @@ import uk.gov.hmrc.uknwauthcheckerapi.models.eis.{EisAuthorisationResponse, EisA
 import uk.gov.hmrc.uknwauthcheckerapi.models.{AuthorisationRequest, AuthorisationResponse, AuthorisationsResponse}
 
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import scala.concurrent.Future
 
 class IntegrationFrameworkServiceSpec extends BaseSpec {
@@ -39,7 +38,7 @@ class IntegrationFrameworkServiceSpec extends BaseSpec {
   "getEisAuthorisations" should {
     "return successful Eis Authorisations response when call to the integration framework succeeds" in forAll {
       (authorisationRequest: AuthorisationRequest, date: LocalDate) =>
-        val request = authorisationRequest.copy(date = date.format(DateTimeFormatter.ISO_LOCAL_DATE))
+        val request = authorisationRequest.copy(date = date.toLocalDateFormatted)
 
         val expectedResponse = AuthorisationsResponse(
           date,
@@ -53,9 +52,9 @@ class IntegrationFrameworkServiceSpec extends BaseSpec {
         when(mockIntegrationFrameworkConnector.getEisAuthorisationsResponse(any())(any()))
           .thenReturn(Future.successful(expectedEisAuthorisationsResponse))
 
-        val result = await(service.getAuthorisations(authorisationRequest))
+        val result = await(service.getAuthorisations(authorisationRequest).value)
 
-        result shouldBe expectedResponse
+        result shouldBe Right(expectedResponse)
     }
   }
 }

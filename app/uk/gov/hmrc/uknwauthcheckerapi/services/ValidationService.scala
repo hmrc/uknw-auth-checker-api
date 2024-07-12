@@ -18,6 +18,8 @@ package uk.gov.hmrc.uknwauthcheckerapi.services
 
 import play.api.libs.json._
 import play.api.mvc.Request
+import uk.gov.hmrc.uknwauthcheckerapi.errors.DataRetrievalError
+import uk.gov.hmrc.uknwauthcheckerapi.errors.DataRetrievalError.ValidationDataRetrievalError
 import uk.gov.hmrc.uknwauthcheckerapi.models.AuthorisationRequest
 import uk.gov.hmrc.uknwauthcheckerapi.utils.NopRegex
 
@@ -26,14 +28,14 @@ import java.time.format.DateTimeParseException
 import scala.collection.Seq
 
 class ValidationService {
-  def validateRequest(request: Request[JsValue]): Either[JsError, AuthorisationRequest] =
+  def validateRequest(request: Request[JsValue]): Either[DataRetrievalError, AuthorisationRequest] =
     request.body.validate[AuthorisationRequest] match {
       case JsSuccess(authorisationRequest: AuthorisationRequest, _) =>
         validateAuthorisationRequest(authorisationRequest) match {
-          case Left(errors) => Left(errors)
+          case Left(errors) => Left(ValidationDataRetrievalError(errors))
           case Right(r)     => Right(r)
         }
-      case errors: JsError => Left(errors)
+      case errors: JsError => Left(ValidationDataRetrievalError(errors))
     }
 
   private def validateAuthorisationRequest(request: AuthorisationRequest): Either[JsError, AuthorisationRequest] = {

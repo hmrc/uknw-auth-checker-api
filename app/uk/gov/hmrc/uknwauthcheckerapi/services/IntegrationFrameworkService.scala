@@ -16,28 +16,78 @@
 
 package uk.gov.hmrc.uknwauthcheckerapi.services
 
-import uk.gov.hmrc.http.HeaderCarrier
+import cats.data.EitherT
+import play.api.http.Status._
+import play.api.libs.json.{JsError, JsSuccess, Json}
+import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
+import uk.gov.hmrc.http.BadGatewayException
 import uk.gov.hmrc.uknwauthcheckerapi.config.AppConfig
 import uk.gov.hmrc.uknwauthcheckerapi.connectors.IntegrationFrameworkConnector
-import uk.gov.hmrc.uknwauthcheckerapi.models.eis.EisAuthorisationRequest
+import uk.gov.hmrc.uknwauthcheckerapi.errors.DataRetrievalError
+import uk.gov.hmrc.uknwauthcheckerapi.errors.DataRetrievalError._
+import uk.gov.hmrc.uknwauthcheckerapi.models.eis.{EisAuthorisationRequest, EisAuthorisationResponseError}
 import uk.gov.hmrc.uknwauthcheckerapi.models.{AuthorisationRequest, AuthorisationResponse, AuthorisationsResponse}
 
 import java.time.LocalDate
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 class IntegrationFrameworkService @Inject() (appConfig: AppConfig, integrationFrameworkConnector: IntegrationFrameworkConnector)(implicit
   ec: ExecutionContext
 ) {
 
-  def getAuthorisations(authorisationRequest: AuthorisationRequest)(implicit hc: HeaderCarrier): Future[AuthorisationsResponse] = {
+  def getAuthorisations(
+    authorisationRequest: AuthorisationRequest
+  )(implicit hc: HeaderCarrier): EitherT[Future, DataRetrievalError, AuthorisationsResponse] = {
     val eisAuthorisationRequest = EisAuthorisationRequest(
       Some(LocalDate.parse(authorisationRequest.date)),
       appConfig.authType,
       authorisationRequest.eoris
     )
-    integrationFrameworkConnector.getEisAuthorisationsResponse(eisAuthorisationRequest).map { ears =>
-      AuthorisationsResponse(ears.processingDate, ears.results.map(ear => AuthorisationResponse(ear.eori, ear.valid)))
+
+    EitherT {
+      integrationFrameworkConnector
+        .getEisAuthorisationsResponse(eisAuthorisationRequest)
+        .map { authorisationsResponse =>
+          Right(
+            AuthorisationsResponse(
+              authorisationsResponse.processingDate,
+              authorisationsResponse.results
+                .map(authorisationResponse =>
+                  AuthorisationResponse(
+                    authorisationResponse.eori,
+                    authorisationResponse.valid
+                  )
+                )
+            )
+          )
+        }
+        .recover {
+          case _ @UpstreamErrorResponse(body, _, _, _) => handleUpstreamErrorResponse(body)
+          case _: BadGatewayException => Left(BadGatewayDataRetrievalError())
+          case NonFatal(thr) => Left(InternalUnexpectedDataRetrievalError(thr.getMessage, thr))
+        }
     }
   }
+
+  private def handleUpstreamErrorResponse(body: String): Either[DataRetrievalError, AuthorisationsResponse] =
+    Json
+      .toJson(body)
+      .validate[EisAuthorisationResponseError] match {
+      case JsSuccess(error, _) =>
+        val errorCode    = error.errorDetail.errorCode
+        val errorMessage = error.errorDetail.errorMessage
+
+        Left(
+          errorCode match {
+            case BAD_REQUEST           => BadRequestDataRetrievalError(errorMessage)
+            case FORBIDDEN             => ForbiddenDataRetrievalError(errorMessage)
+            case INTERNAL_SERVER_ERROR => InternalServerDataRetrievalError(errorMessage)
+            case METHOD_NOT_ALLOWED    => MethodNotAllowedDataRetrievalError(errorMessage)
+            case _                     => InternalServerDataRetrievalError(errorMessage)
+          }
+        )
+      case jsError: JsError => Left(UnableToDeserialiseDataRetrievalError(jsError))
+    }
 }
