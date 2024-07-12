@@ -21,6 +21,7 @@ import play.api.libs.json.{JsError, JsPath, Json, JsonValidationError}
 import uk.gov.hmrc.uknwauthcheckerapi.controllers.BaseSpec
 import uk.gov.hmrc.uknwauthcheckerapi.errors.DataRetrievalError.ValidationDataRetrievalError
 import uk.gov.hmrc.uknwauthcheckerapi.models.AuthorisationRequest
+import uk.gov.hmrc.uknwauthcheckerapi.utils.JsonErrors
 
 class ValidationServiceSpec extends BaseSpec {
 
@@ -46,7 +47,7 @@ class ValidationServiceSpec extends BaseSpec {
         val expectedResponse =
           ValidationDataRetrievalError(
             JsError(
-              Seq((JsPath, Seq(JsonValidationError("error.expected.jsobject"))))
+              Seq((JsPath, Seq(JsonValidationError(JsonErrors.expectedJsObject))))
             )
           )
 

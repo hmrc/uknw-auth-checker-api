@@ -29,6 +29,7 @@ import uk.gov.hmrc.uknwauthcheckerapi.controllers.BaseSpec
 import uk.gov.hmrc.uknwauthcheckerapi.errors.DataRetrievalError._
 import uk.gov.hmrc.uknwauthcheckerapi.models.eis._
 import uk.gov.hmrc.uknwauthcheckerapi.models.{AuthorisationRequest, AuthorisationResponse, AuthorisationsResponse}
+import uk.gov.hmrc.uknwauthcheckerapi.utils.JsonErrors
 
 import java.time.LocalDate
 import scala.concurrent.Future
@@ -191,7 +192,7 @@ class IntegrationFrameworkServiceSpec extends BaseSpec {
         val request = authorisationRequest.copy(date = date.toLocalDateFormatted)
 
         val jsError = JsError(
-          Seq((JsPath \ "errorDetail", Seq(JsonValidationError("error.path.missing"))))
+          Seq((JsPath \ "errorDetail", Seq(JsonValidationError(JsonErrors.pathMissing))))
         )
 
         val expectedResponse = UpstreamErrorResponse("{}", BAD_REQUEST)

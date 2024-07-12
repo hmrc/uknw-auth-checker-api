@@ -20,6 +20,7 @@ import play.api.http.Status._
 import play.api.libs.json.{JsError, JsObject, JsString, JsValue, Json, Writes}
 import play.api.mvc.Result
 import play.api.mvc.Results.Status
+import uk.gov.hmrc.uknwauthcheckerapi.utils.JsonErrors
 
 sealed trait ApiErrorResponse {
   def statusCode: Int
@@ -107,10 +108,10 @@ final case class JsonValidationApiError(jsErrors: JsError) extends ApiErrorRespo
       Json.obj(
         "code" -> "INVALID_FORMAT",
         "message" -> (validationError.message match {
-          case message if message == "error.expected.jsobject"               => "JSON is malformed"
-          case message if message == "error.path.missing" && path == "date"  => "date field missing from JSON"
-          case message if message == "error.path.missing" && path == "eoris" => "eoris field missing from JSON"
-          case message                                                       => message
+          case message if message == JsonErrors.expectedJsObject               => "JSON is malformed"
+          case message if message == JsonErrors.pathMissing && path == "date"  => "date field missing from JSON"
+          case message if message == JsonErrors.pathMissing && path == "eoris" => "eoris field missing from JSON"
+          case message                                                         => message
         }),
         "path" -> path
       )

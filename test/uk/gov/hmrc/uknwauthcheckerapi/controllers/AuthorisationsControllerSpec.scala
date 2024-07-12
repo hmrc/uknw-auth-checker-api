@@ -27,6 +27,7 @@ import uk.gov.hmrc.uknwauthcheckerapi.errors.DataRetrievalError.ValidationDataRe
 import uk.gov.hmrc.uknwauthcheckerapi.errors.{ApiErrorResponse, JsonValidationApiError, NotAcceptableApiError}
 import uk.gov.hmrc.uknwauthcheckerapi.models.{AuthorisationRequest, AuthorisationResponse, AuthorisationsResponse}
 import uk.gov.hmrc.uknwauthcheckerapi.services.{IntegrationFrameworkService, ValidationService}
+import uk.gov.hmrc.uknwauthcheckerapi.utils.JsonErrors
 
 import java.time.LocalDate
 import scala.concurrent.Future
@@ -69,7 +70,7 @@ class AuthorisationsControllerSpec extends BaseSpec {
 
       val jsError = JsError(
         Seq("date", "eoris").map { field =>
-          (JsPath \ field, Seq(JsonValidationError("error.path.missing")))
+          (JsPath \ field, Seq(JsonValidationError(JsonErrors.pathMissing)))
         }
       )
 
@@ -91,7 +92,7 @@ class AuthorisationsControllerSpec extends BaseSpec {
       val request = fakeRequestWithJsonBody(emptyJson)
 
       val jsError = JsError(
-        Seq((JsPath \ "", Seq(JsonValidationError("error.expected.jsobject"))))
+        Seq((JsPath \ "", Seq(JsonValidationError(JsonErrors.expectedJsObject))))
       )
 
       val expectedResponse = Json.toJson(

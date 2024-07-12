@@ -23,7 +23,7 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.uknwauthcheckerapi.errors.DataRetrievalError._
 import uk.gov.hmrc.uknwauthcheckerapi.errors._
 import uk.gov.hmrc.uknwauthcheckerapi.services.{IntegrationFrameworkService, ValidationService}
-import uk.gov.hmrc.uknwauthcheckerapi.utils.JsonResponses
+import uk.gov.hmrc.uknwauthcheckerapi.utils.ExtensionHelpers
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -36,7 +36,7 @@ class AuthorisationsController @Inject() (
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
     with HeaderValidator
-    with JsonResponses {
+    with ExtensionHelpers {
 
   def authorisations: Action[JsValue] = validateHeaders(cc).async(parse.json) { implicit request =>
     (for {
