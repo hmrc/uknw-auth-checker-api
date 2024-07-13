@@ -18,11 +18,12 @@ package uk.gov.hmrc.uknwauthcheckerapi.utils
 
 import scala.util.matching.Regex
 
-object NopRegexes {
+object CustomRegexes {
   val eoriPattern:                 String = "^(GB|XI)[0-9]{12}|(GB|XI)[0-9]{15}$"
   val invalidAuthTypePattern:      String = "^.*(Invalid authorisation type).*$"
   val invalidFormatOfDatePattern:  String = "^.*(supplied date).*$"
   val invalidFormatOfEorisPattern: String = "^.*(format of EORI).*$"
+  val uuid:                        String = "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
 
   val invalidAuthTypePatternRegex: Regex = invalidAuthTypePattern.r
 }

@@ -21,7 +21,7 @@ import play.api.mvc.Request
 import uk.gov.hmrc.uknwauthcheckerapi.errors.DataRetrievalError
 import uk.gov.hmrc.uknwauthcheckerapi.errors.DataRetrievalError.ValidationDataRetrievalError
 import uk.gov.hmrc.uknwauthcheckerapi.models.AuthorisationRequest
-import uk.gov.hmrc.uknwauthcheckerapi.utils.NopRegexes
+import uk.gov.hmrc.uknwauthcheckerapi.utils.CustomRegexes
 
 import java.time.LocalDate
 import java.time.format.DateTimeParseException
@@ -43,7 +43,7 @@ class ValidationService {
     val eoris = request.eoris
 
     val eoriErrors: Seq[JsonValidationError] = eoris
-      .filterNot(e => e matches NopRegexes.eoriPattern)
+      .filterNot(e => e matches CustomRegexes.eoriPattern)
       .map(e => JsonValidationError(s"$e is not a supported EORI number"))
 
     val dateError = Seq(JsonValidationError(s"$date is not a valid date in the format YYYY-MM-DD"))

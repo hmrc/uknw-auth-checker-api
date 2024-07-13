@@ -17,12 +17,12 @@
 package uk.gov.hmrc.uknwauthcheckerapi.errors.transformers
 
 import play.api.libs.json.{JsObject, JsValue, Json}
-import uk.gov.hmrc.uknwauthcheckerapi.utils.NopRegexes.{invalidFormatOfDatePattern, invalidFormatOfEorisPattern}
+import uk.gov.hmrc.uknwauthcheckerapi.utils.CustomRegexes.{invalidFormatOfDatePattern, invalidFormatOfEorisPattern}
 
 trait BadRequestErrorTransformer {
 
-  private val eoriSeparator         = ","
-  private val errorMessagePrefix    = "Invalid"
+  private val eoriSeparator              = ","
+  private val errorMessagePrefix         = "Invalid"
   private val errorMessageValueSeparator = ":"
 
   def transformBadRequest(errorMessages: String): JsValue = {

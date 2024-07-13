@@ -26,7 +26,7 @@ import uk.gov.hmrc.uknwauthcheckerapi.errors.DataRetrievalError
 import uk.gov.hmrc.uknwauthcheckerapi.errors.DataRetrievalError._
 import uk.gov.hmrc.uknwauthcheckerapi.models.eis.{EisAuthorisationRequest, EisAuthorisationResponseError}
 import uk.gov.hmrc.uknwauthcheckerapi.models.{AuthorisationRequest, AuthorisationResponse, AuthorisationsResponse}
-import uk.gov.hmrc.uknwauthcheckerapi.utils.NopRegexes._
+import uk.gov.hmrc.uknwauthcheckerapi.utils.CustomRegexes._
 
 import java.time.LocalDate
 import javax.inject.Inject
@@ -65,8 +65,9 @@ class IntegrationFrameworkService @Inject() (appConfig: AppConfig, integrationFr
         }
         .recover {
           case _: BadGatewayException => Left(BadGatewayDataRetrievalError())
-          case _ @UpstreamErrorResponse(body, _, _, _) => handleUpstreamErrorResponse(body)
-          case NonFatal(thr)                           => Left(InternalUnexpectedDataRetrievalError(thr.getMessage, thr))
+          case _ @UpstreamErrorResponse(_, BAD_GATEWAY, _, _) => Left(BadGatewayDataRetrievalError())
+          case _ @UpstreamErrorResponse(body, _, _, _)        => handleUpstreamErrorResponse(body)
+          case NonFatal(thr)                                  => Left(InternalUnexpectedDataRetrievalError(thr.getMessage, thr))
         }
     }
   }

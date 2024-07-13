@@ -17,9 +17,10 @@
 package uk.gov.hmrc.uknwauthcheckerapi.generators
 
 import org.scalacheck.Arbitrary
+import play.api.http.Status._
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.uknwauthcheckerapi.models.AuthorisationRequest
-import uk.gov.hmrc.uknwauthcheckerapi.models.eis.{EisAuthorisationResponse, EisAuthorisationsResponse}
+import uk.gov.hmrc.uknwauthcheckerapi.models.eis._
 import uk.gov.hmrc.uknwauthcheckerapi.utils.EisAuthTypes
 
 import java.time.LocalDate
@@ -34,8 +35,6 @@ trait TestData extends Generators {
   val invalidDateEisErrorMessage:     String = """Invalid supplied date(Date format should be - YYYY-MM-DD) : 202-01-01""".stripMargin
   val invalidMixedEisErrorMessage: String =
     """Invalid format of EORI(s): 0000000001,0000000003,Invalid supplied date(Date format should be - YYYY-MM-DD) : 202-01-01""".stripMargin
-
-  def randomAuthorisationRequest: AuthorisationRequest = arbAuthorisationRequest.arbitrary.sample.get
 
   implicit val arbValidAuthorisationRequest: Arbitrary[ValidAuthorisationRequest] = Arbitrary {
     for {
@@ -61,6 +60,46 @@ trait TestData extends Generators {
       )
     )
   }
+
+  protected val badRequestEisAuthorisationResponseError: EisAuthorisationResponseError =
+    EisAuthorisationResponseError(
+      errorDetail = EisAuthorisationResponseErrorDetail(
+        errorCode = BAD_REQUEST,
+        errorMessage = invalidMixedEisErrorMessage
+      )
+    )
+
+  protected val forbiddenEisAuthorisationResponseError: EisAuthorisationResponseError =
+    EisAuthorisationResponseError(
+      errorDetail = EisAuthorisationResponseErrorDetail(
+        errorCode = FORBIDDEN,
+        errorMessage = ""
+      )
+    )
+
+  protected val imATeapotEisAuthorisationResponseError: EisAuthorisationResponseError =
+    EisAuthorisationResponseError(
+      errorDetail = EisAuthorisationResponseErrorDetail(
+        errorCode = IM_A_TEAPOT,
+        errorMessage = ""
+      )
+    )
+
+  protected val internalServerErrorEisAuthorisationResponseError: EisAuthorisationResponseError =
+    EisAuthorisationResponseError(
+      errorDetail = EisAuthorisationResponseErrorDetail(
+        errorCode = INTERNAL_SERVER_ERROR,
+        errorMessage = ""
+      )
+    )
+
+  protected val methodNotAllowedEisAuthorisationResponseError: EisAuthorisationResponseError =
+    EisAuthorisationResponseError(
+      errorDetail = EisAuthorisationResponseErrorDetail(
+        errorCode = METHOD_NOT_ALLOWED,
+        errorMessage = ""
+      )
+    )
 }
 
 final case class ValidAuthorisationRequest(
