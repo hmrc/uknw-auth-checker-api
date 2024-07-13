@@ -320,6 +320,29 @@ class AuthorisationsControllerSpec extends BaseSpec {
     }
   }
 
+  "return INTERNAL_SERVER_ERROR (500) when integration framework service returns InternalUnexpectedDataRetrievalError" in {
+    forAll { (authorisationRequest: AuthorisationRequest, errorMessage: String) =>
+      val expectedResponse = Json.toJson(
+        InternalServerApiError
+      )(ApiErrorResponse.writes.writes)
+
+      when(mockValidationService.validateRequest(any()))
+        .thenReturn(
+          Right(authorisationRequest)
+        )
+
+      when(mockIntegrationFrameworkService.getAuthorisations(any())(any()))
+        .thenReturn(EitherT.leftT(InternalUnexpectedDataRetrievalError(errorMessage, new Exception())))
+
+      val request = fakeRequestWithJsonBody(Json.toJson(authorisationRequest))
+
+      val result = controller.authorisations()(request)
+
+      status(result)        shouldBe INTERNAL_SERVER_ERROR
+      contentAsJson(result) shouldBe Json.toJson(expectedResponse)
+    }
+  }
+
   "return NOT_ACCEPTABLE (406) error when accept header is not present" in {
     forAll { authorisationRequest: AuthorisationRequest =>
       val headers = defaultHeaders.filterNot(_._1.equals(jsonAcceptHeader._1))

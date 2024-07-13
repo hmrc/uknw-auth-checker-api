@@ -20,22 +20,21 @@ import play.api.http.Status._
 import play.api.libs.json._
 import play.api.mvc.Result
 import play.api.mvc.Results.Status
-import uk.gov.hmrc.uknwauthcheckerapi.utils.JsonErrors
-import uk.gov.hmrc.uknwauthcheckerapi.utils.NopRegexes.{invalidFormatOfDatePattern, invalidFormatOfEorisPattern}
+import uk.gov.hmrc.uknwauthcheckerapi.errors.transformers.{BadRequestErrorTransformer, JsErrorTransformer}
 
 sealed trait ApiErrorResponse {
   def statusCode: Int
   def code:       String
   def message:    String
 
-  private def convertJsErrorsToReadableFormat: JsValue =
+  private def convertErrorsToReadableFormat: JsValue =
     this match {
       case badRequestError: BadRequestApiError     => Json.toJson(badRequestError)(ApiErrorResponse.badRequestApiErrorWrites)
       case validationError: JsonValidationApiError => Json.toJson(validationError)(ApiErrorResponse.jsonValidationApiErrorWrites)
       case _ => Json.toJson(this)
     }
 
-  def toResult: Result = Status(statusCode)(Json.toJson(convertJsErrorsToReadableFormat))
+  def toResult: Result = Status(statusCode)(Json.toJson(convertErrorsToReadableFormat))
 }
 
 object ApiErrorResponse {
@@ -100,78 +99,18 @@ case object UnauthorisedApiError extends ApiErrorResponse {
   val message:    String = "Authentication information is not provided"
 }
 
-final case class BadRequestApiError(errorMessages: String) extends ApiErrorResponse {
-  private val eoriSeparator         = ","
-  private val errorMessagePrefix    = "Invalid"
-  private val errorMessageSeparator = ":"
-
+final case class BadRequestApiError(errorMessages: String) extends ApiErrorResponse with BadRequestErrorTransformer {
   val statusCode: Int    = BAD_REQUEST
   val code:       String = "BAD_REQUEST"
   val message:    String = "Invalid request"
 
-  val getErrors: JsValue = {
-    val dateErrors: Option[Array[JsObject]] = errorMessages
-      .split(errorMessagePrefix)
-      .filter(_ matches invalidFormatOfDatePattern)
-      .map(_.trim)
-      .headOption
-      .map { errorMessage =>
-        val date = errorMessage.split(errorMessageSeparator).last.trim
-        Array(
-          Json.obj(
-            "code"    -> "INVALID_FORMAT",
-            "message" -> s"$date is not a valid date in the format YYYY-MM-DD",
-            "path"    -> "date"
-          )
-        )
-      }
-
-    val eoriErrors: Option[Array[JsObject]] = errorMessages
-      .split(errorMessagePrefix)
-      .filter(_ matches invalidFormatOfEorisPattern)
-      .map(_.trim)
-      .headOption
-      .map { errorMessage =>
-        errorMessage
-          .split(errorMessageSeparator)
-          .last
-          .split(eoriSeparator)
-          .map(_.trim) map { eori =>
-          Json.obj(
-            "code"    -> "INVALID_FORMAT",
-            "message" -> s"$eori is not a supported EORI number",
-            "path"    -> "eoris"
-          )
-        }
-      }
-
-    val errors: Iterable[JsObject] = (dateErrors ++ eoriErrors).flatten
-
-    Json.toJson(
-      errors
-    )
-  }
+  val getErrors: JsValue = transformBadRequest(errorMessages)
 }
 
-final case class JsonValidationApiError(jsErrors: JsError) extends ApiErrorResponse {
+final case class JsonValidationApiError(jsErrors: JsError) extends ApiErrorResponse with JsErrorTransformer {
   val statusCode: Int    = BAD_REQUEST
   val code:       String = "BAD_REQUEST"
   val message:    String = "Bad request"
 
-  val getErrors: JsValue = Json.toJson(jsErrors.errors.flatMap { case (jsPath, pathErrors) =>
-    val dropObjDot = 4
-    val path       = jsPath.toJsonString.drop(dropObjDot)
-    pathErrors.map(validationError =>
-      Json.obj(
-        "code" -> "INVALID_FORMAT",
-        "message" -> (validationError.message match {
-          case message if message == JsonErrors.expectedJsObject               => "JSON is malformed"
-          case message if message == JsonErrors.pathMissing && path == "date"  => "date field missing from JSON"
-          case message if message == JsonErrors.pathMissing && path == "eoris" => "eoris field missing from JSON"
-          case message                                                         => message
-        }),
-        "path" -> path
-      )
-    )
-  })
+  val getErrors: JsValue = transformJsErrors(jsErrors)
 }
