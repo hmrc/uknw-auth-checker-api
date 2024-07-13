@@ -25,6 +25,7 @@ import play.api.libs.json.{JsError, JsPath, Json, JsonValidationError}
 import play.api.test.Helpers._
 import uk.gov.hmrc.uknwauthcheckerapi.errors.DataRetrievalError._
 import uk.gov.hmrc.uknwauthcheckerapi.errors._
+import uk.gov.hmrc.uknwauthcheckerapi.generators.ValidAuthorisationRequest
 import uk.gov.hmrc.uknwauthcheckerapi.models.{AuthorisationRequest, AuthorisationResponse, AuthorisationsResponse}
 import uk.gov.hmrc.uknwauthcheckerapi.services.{IntegrationFrameworkService, ValidationService}
 import uk.gov.hmrc.uknwauthcheckerapi.utils.JsonErrors
@@ -39,9 +40,7 @@ class AuthorisationsControllerSpec extends BaseSpec {
   private val controller = new AuthorisationsController(stubComponents, mockIntegrationFrameworkService, mockValidationService)
 
   "AuthorisationsController" should {
-
     "return OK (200) with authorised eoris when request has valid date and eoris" in {
-
       forAll { authorisationRequest: AuthorisationRequest =>
         val expectedResponse = AuthorisationsResponse(
           LocalDate.parse(authorisationRequest.date),
@@ -131,6 +130,81 @@ class AuthorisationsControllerSpec extends BaseSpec {
     }
   }
 
+  "return BAD_REQUEST (400) error when getAuthorisations call has date error" in forAll { (validRequest: ValidAuthorisationRequest) =>
+    val authorisationRequest: AuthorisationRequest = validRequest.request
+
+    val error = BadRequestDataRetrievalError(invalidDateEisErrorMessage)
+
+    val expectedResponse = Json.toJson(
+      BadRequestApiError(invalidDateEisErrorMessage)
+    )(ApiErrorResponse.badRequestApiErrorWrites)
+
+    when(mockValidationService.validateRequest(any()))
+      .thenReturn(
+        Right(authorisationRequest)
+      )
+
+    when(mockIntegrationFrameworkService.getAuthorisations(any())(any()))
+      .thenReturn(EitherT.leftT(error))
+
+    val request = fakeRequestWithJsonBody(Json.toJson(authorisationRequest))
+
+    val result = controller.authorisations()(request)
+
+    status(result)        shouldBe BAD_REQUEST
+    contentAsJson(result) shouldBe expectedResponse
+  }
+
+  "return BAD_REQUEST (400) error when getAuthorisations call has eori errors" in forAll { (validRequest: ValidAuthorisationRequest) =>
+    val authorisationRequest: AuthorisationRequest = validRequest.request
+
+    val error = BadRequestDataRetrievalError(invalidEorisEisErrorMessage)
+
+    val expectedResponse = Json.toJson(
+      BadRequestApiError(invalidEorisEisErrorMessage)
+    )(ApiErrorResponse.badRequestApiErrorWrites)
+
+    when(mockValidationService.validateRequest(any()))
+      .thenReturn(
+        Right(authorisationRequest)
+      )
+
+    when(mockIntegrationFrameworkService.getAuthorisations(any())(any()))
+      .thenReturn(EitherT.leftT(error))
+
+    val request = fakeRequestWithJsonBody(Json.toJson(authorisationRequest))
+
+    val result = controller.authorisations()(request)
+
+    status(result)        shouldBe BAD_REQUEST
+    contentAsJson(result) shouldBe expectedResponse
+  }
+
+  "return BAD_REQUEST (400) error when getAuthorisations call has eori and dateerrors" in forAll { (validRequest: ValidAuthorisationRequest) =>
+    val authorisationRequest: AuthorisationRequest = validRequest.request
+
+    val error = BadRequestDataRetrievalError(invalidMixedEisErrorMessage)
+
+    val expectedResponse = Json.toJson(
+      BadRequestApiError(invalidMixedEisErrorMessage)
+    )(ApiErrorResponse.badRequestApiErrorWrites)
+
+    when(mockValidationService.validateRequest(any()))
+      .thenReturn(
+        Right(authorisationRequest)
+      )
+
+    when(mockIntegrationFrameworkService.getAuthorisations(any())(any()))
+      .thenReturn(EitherT.leftT(error))
+
+    val request = fakeRequestWithJsonBody(Json.toJson(authorisationRequest))
+
+    val result = controller.authorisations()(request)
+
+    status(result)        shouldBe BAD_REQUEST
+    contentAsJson(result) shouldBe expectedResponse
+  }
+
   "return SERVICE_UNAVAILABLE (503) when integration framework service returns BadGatewayDataRetrievalError" in {
     forAll { (authorisationRequest: AuthorisationRequest) =>
       val expectedResponse = Json.toJson(
@@ -154,11 +228,11 @@ class AuthorisationsControllerSpec extends BaseSpec {
     }
   }
 
-  "return BAD_REQUEST (400) when integration framework service returns BadRequestDataRetrievalError" in {
-    forAll { (authorisationRequest: AuthorisationRequest, errorMessage: String) =>
+  "return BAD_REQUEST (400) when integration framework service returns BadRequestDataRetrievalError with a date error" in {
+    forAll { (authorisationRequest: AuthorisationRequest) =>
       val expectedResponse = Json.toJson(
-        BadRequestApiError
-      )(ApiErrorResponse.writes.writes)
+        BadRequestApiError(invalidDateEisErrorMessage)
+      )(ApiErrorResponse.badRequestApiErrorWrites)
 
       when(mockValidationService.validateRequest(any()))
         .thenReturn(
@@ -166,7 +240,7 @@ class AuthorisationsControllerSpec extends BaseSpec {
         )
 
       when(mockIntegrationFrameworkService.getAuthorisations(any())(any()))
-        .thenReturn(EitherT.leftT(BadRequestDataRetrievalError(errorMessage)))
+        .thenReturn(EitherT.leftT(BadRequestDataRetrievalError(invalidDateEisErrorMessage)))
 
       val request = fakeRequestWithJsonBody(Json.toJson(authorisationRequest))
 
@@ -247,7 +321,6 @@ class AuthorisationsControllerSpec extends BaseSpec {
   }
 
   "return NOT_ACCEPTABLE (406) error when accept header is not present" in {
-
     forAll { authorisationRequest: AuthorisationRequest =>
       val headers = defaultHeaders.filterNot(_._1.equals(jsonAcceptHeader._1))
 
@@ -261,7 +334,6 @@ class AuthorisationsControllerSpec extends BaseSpec {
   }
 
   "return NOT_ACCEPTABLE (406) error when content type header is not present" in {
-
     forAll { authorisationRequest: AuthorisationRequest =>
       val headers = defaultHeaders.filterNot(_._1.equals(jsonContentTypeHeader._1))
 

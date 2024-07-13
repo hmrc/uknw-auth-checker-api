@@ -27,8 +27,9 @@ import uk.gov.hmrc.http.{BadGatewayException, UpstreamErrorResponse}
 import uk.gov.hmrc.uknwauthcheckerapi.connectors.IntegrationFrameworkConnector
 import uk.gov.hmrc.uknwauthcheckerapi.controllers.BaseSpec
 import uk.gov.hmrc.uknwauthcheckerapi.errors.DataRetrievalError._
+import uk.gov.hmrc.uknwauthcheckerapi.generators.ValidAuthorisationRequest
 import uk.gov.hmrc.uknwauthcheckerapi.models.eis._
-import uk.gov.hmrc.uknwauthcheckerapi.models.{AuthorisationRequest, AuthorisationResponse, AuthorisationsResponse}
+import uk.gov.hmrc.uknwauthcheckerapi.models._
 import uk.gov.hmrc.uknwauthcheckerapi.utils.JsonErrors
 
 import java.time.LocalDate
@@ -42,8 +43,8 @@ class IntegrationFrameworkServiceSpec extends BaseSpec {
 
   "getEisAuthorisations" should {
     "return EisAuthorisationsResponse when call to the integration framework succeeds" in forAll {
-      (authorisationRequest: AuthorisationRequest, date: LocalDate) =>
-        val request = authorisationRequest.copy(date = date.toLocalDateFormatted)
+      (validRequest: ValidAuthorisationRequest, date: LocalDate) =>
+        val request = validRequest.request
 
         val expectedResponse = AuthorisationsResponse(
           date,
@@ -65,8 +66,8 @@ class IntegrationFrameworkServiceSpec extends BaseSpec {
     }
 
     "return BadGatewayRetrievalError error when call to the integration framework fails with BAD_GATEWAY" in forAll {
-      (authorisationRequest: AuthorisationRequest, date: LocalDate, errorMessage: String) =>
-        val request = authorisationRequest.copy(date = date.toLocalDateFormatted)
+      (validRequest: ValidAuthorisationRequest, errorMessage: String) =>
+        val request = validRequest.request
 
         val expectedResponse = new BadGatewayException(errorMessage)
 
@@ -79,8 +80,8 @@ class IntegrationFrameworkServiceSpec extends BaseSpec {
     }
 
     "return InternalUnexpectedDataRetrievalError error when call to the integration framework fails with a non fatal error" in forAll {
-      (authorisationRequest: AuthorisationRequest, date: LocalDate, errorMessage: String) =>
-        val request = authorisationRequest.copy(date = date.toLocalDateFormatted)
+      (validRequest: ValidAuthorisationRequest, errorMessage: String) =>
+        val request = validRequest.request
 
         val expectedResponse = new Exception(errorMessage)
 
@@ -93,12 +94,17 @@ class IntegrationFrameworkServiceSpec extends BaseSpec {
     }
 
     "return BadRequestDataRetrievalError error when call to the integration framework fails with a BAD_REQUEST" in forAll {
-      (authorisationRequest: AuthorisationRequest, date: LocalDate, eisErrorResponse: EisAuthorisationResponseError) =>
-        val request = authorisationRequest.copy(date = date.toLocalDateFormatted)
+      (validRequest: ValidAuthorisationRequest, eisErrorResponse: EisAuthorisationResponseError) =>
+        val request = validRequest.request
+
+        val errorMessage = """Invalid supplied date(Date format should be - YYYY-MM-DD) : 202-01-01""".stripMargin
 
         val eisError = eisErrorResponse.copy(errorDetail =
           eisErrorResponse.errorDetail
-            .copy(errorCode = BAD_REQUEST)
+            .copy(
+              errorCode = BAD_REQUEST,
+              errorMessage = errorMessage
+            )
         )
 
         val expectedResponse = UpstreamErrorResponse(Json.stringify(Json.toJson(eisError)), BAD_REQUEST)
@@ -108,12 +114,12 @@ class IntegrationFrameworkServiceSpec extends BaseSpec {
 
         val result = await(service.getAuthorisations(request).value)
 
-        result shouldBe Left(BadRequestDataRetrievalError(eisError.errorDetail.errorMessage))
+        result shouldBe Left(BadRequestDataRetrievalError(errorMessage))
     }
 
     "return ForbiddenDataRetrievalError error when call to the integration framework fails with a FORBIDDEN" in forAll {
-      (authorisationRequest: AuthorisationRequest, date: LocalDate, eisErrorResponse: EisAuthorisationResponseError) =>
-        val request = authorisationRequest.copy(date = date.toLocalDateFormatted)
+      (validRequest: ValidAuthorisationRequest, eisErrorResponse: EisAuthorisationResponseError) =>
+        val request = validRequest.request
 
         val eisError = eisErrorResponse.copy(errorDetail =
           eisErrorResponse.errorDetail
@@ -131,8 +137,8 @@ class IntegrationFrameworkServiceSpec extends BaseSpec {
     }
 
     "return InternalServerDataRetrievalError error when call to the integration framework fails with a INTERNAL_SERVER_ERROR" in forAll {
-      (authorisationRequest: AuthorisationRequest, date: LocalDate, eisErrorResponse: EisAuthorisationResponseError) =>
-        val request = authorisationRequest.copy(date = date.toLocalDateFormatted)
+      (validRequest: ValidAuthorisationRequest, eisErrorResponse: EisAuthorisationResponseError) =>
+        val request = validRequest.request
 
         val eisError = eisErrorResponse.copy(errorDetail =
           eisErrorResponse.errorDetail
@@ -150,8 +156,8 @@ class IntegrationFrameworkServiceSpec extends BaseSpec {
     }
 
     "return MethodNotAllowedDataRetrievalError error when call to the integration framework fails with a METHOD_NOT_ALLOWED" in forAll {
-      (authorisationRequest: AuthorisationRequest, date: LocalDate, eisErrorResponse: EisAuthorisationResponseError) =>
-        val request = authorisationRequest.copy(date = date.toLocalDateFormatted)
+      (validRequest: ValidAuthorisationRequest, eisErrorResponse: EisAuthorisationResponseError) =>
+        val request = validRequest.request
 
         val eisError = eisErrorResponse.copy(errorDetail =
           eisErrorResponse.errorDetail
@@ -168,9 +174,31 @@ class IntegrationFrameworkServiceSpec extends BaseSpec {
         result shouldBe Left(MethodNotAllowedDataRetrievalError(eisError.errorDetail.errorMessage))
     }
 
+    "return InternalServerDataRetrievalError error when call to the integration framework fails with invalid auth type error" in forAll {
+      (validRequest: ValidAuthorisationRequest, eisErrorResponse: EisAuthorisationResponseError) =>
+        val request = validRequest.request
+
+        val eisError = eisErrorResponse.copy(errorDetail =
+          eisErrorResponse.errorDetail
+            .copy(
+              errorCode = BAD_REQUEST,
+              errorMessage = invalidAuthTypeEisErrorMessage
+            )
+        )
+
+        val expectedResponse = UpstreamErrorResponse(Json.stringify(Json.toJson(eisError)), BAD_REQUEST)
+
+        when(mockIntegrationFrameworkConnector.getEisAuthorisationsResponse(any())(any()))
+          .thenReturn(Future.failed(expectedResponse))
+
+        val result = await(service.getAuthorisations(request).value)
+
+        result shouldBe Left(InternalServerDataRetrievalError("Invalid auth type UKNW"))
+    }
+
     "return InternalServerDataRetrievalError error when call to the integration framework fails with a unmanaged status code" in forAll {
-      (authorisationRequest: AuthorisationRequest, date: LocalDate, eisErrorResponse: EisAuthorisationResponseError) =>
-        val request = authorisationRequest.copy(date = date.toLocalDateFormatted)
+      (validRequest: ValidAuthorisationRequest, eisErrorResponse: EisAuthorisationResponseError) =>
+        val request = validRequest.request
 
         val eisError = eisErrorResponse.copy(errorDetail =
           eisErrorResponse.errorDetail
@@ -188,8 +216,8 @@ class IntegrationFrameworkServiceSpec extends BaseSpec {
     }
 
     "return UnableToDeserialiseDataRetrievalError error when call to the integration framework fails with unvalidated json" in forAll {
-      (authorisationRequest: AuthorisationRequest, date: LocalDate) =>
-        val request = authorisationRequest.copy(date = date.toLocalDateFormatted)
+      (validRequest: ValidAuthorisationRequest) =>
+        val request = validRequest.request
 
         val jsError = JsError(
           Seq((JsPath \ "errorDetail", Seq(JsonValidationError(JsonErrors.pathMissing))))

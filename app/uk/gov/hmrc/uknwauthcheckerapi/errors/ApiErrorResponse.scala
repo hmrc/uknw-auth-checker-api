@@ -17,10 +17,11 @@
 package uk.gov.hmrc.uknwauthcheckerapi.errors
 
 import play.api.http.Status._
-import play.api.libs.json.{JsError, JsObject, JsString, JsValue, Json, Writes}
+import play.api.libs.json._
 import play.api.mvc.Result
 import play.api.mvc.Results.Status
 import uk.gov.hmrc.uknwauthcheckerapi.utils.JsonErrors
+import uk.gov.hmrc.uknwauthcheckerapi.utils.NopRegexes.{invalidFormatOfDatePattern, invalidFormatOfEorisPattern}
 
 sealed trait ApiErrorResponse {
   def statusCode: Int
@@ -29,6 +30,7 @@ sealed trait ApiErrorResponse {
 
   private def convertJsErrorsToReadableFormat: JsValue =
     this match {
+      case badRequestError: BadRequestApiError     => Json.toJson(badRequestError)(ApiErrorResponse.badRequestApiErrorWrites)
       case validationError: JsonValidationApiError => Json.toJson(validationError)(ApiErrorResponse.jsonValidationApiErrorWrites)
       case _ => Json.toJson(this)
     }
@@ -45,13 +47,15 @@ object ApiErrorResponse {
     )
   }
 
-  implicit val writes: Writes[ApiErrorResponse] = (o: ApiErrorResponse) => JsObject(Seq("code" -> JsString(o.code), "message" -> JsString(o.message)))
-}
+  implicit val badRequestApiErrorWrites: Writes[BadRequestApiError] = Writes { model =>
+    Json.obj(
+      "code"    -> model.code,
+      "message" -> model.message,
+      "errors"  -> model.getErrors
+    )
+  }
 
-case object BadRequestApiError extends ApiErrorResponse {
-  val statusCode: Int    = BAD_REQUEST
-  val code:       String = "BAD_REQUEST"
-  val message:    String = "Invalid request"
+  implicit val writes: Writes[ApiErrorResponse] = (o: ApiErrorResponse) => JsObject(Seq("code" -> JsString(o.code), "message" -> JsString(o.message)))
 }
 
 case object ForbiddenApiError extends ApiErrorResponse {
@@ -94,6 +98,59 @@ case object UnauthorisedApiError extends ApiErrorResponse {
   val statusCode: Int    = UNAUTHORIZED
   val code:       String = "MISSING_CREDENTIALS"
   val message:    String = "Authentication information is not provided"
+}
+
+final case class BadRequestApiError(errorMessages: String) extends ApiErrorResponse {
+  private val eoriSeparator         = ","
+  private val errorMessagePrefix    = "Invalid"
+  private val errorMessageSeparator = ":"
+
+  val statusCode: Int    = BAD_REQUEST
+  val code:       String = "BAD_REQUEST"
+  val message:    String = "Invalid request"
+
+  val getErrors: JsValue = {
+    val dateErrors: Option[Array[JsObject]] = errorMessages
+      .split(errorMessagePrefix)
+      .filter(_ matches invalidFormatOfDatePattern)
+      .map(_.trim)
+      .headOption
+      .map { errorMessage =>
+        val date = errorMessage.split(errorMessageSeparator).last.trim
+        Array(
+          Json.obj(
+            "code"    -> "INVALID_FORMAT",
+            "message" -> s"$date is not a valid date in the format YYYY-MM-DD",
+            "path"    -> "date"
+          )
+        )
+      }
+
+    val eoriErrors: Option[Array[JsObject]] = errorMessages
+      .split(errorMessagePrefix)
+      .filter(_ matches invalidFormatOfEorisPattern)
+      .map(_.trim)
+      .headOption
+      .map { errorMessage =>
+        errorMessage
+          .split(errorMessageSeparator)
+          .last
+          .split(eoriSeparator)
+          .map(_.trim) map { eori =>
+          Json.obj(
+            "code"    -> "INVALID_FORMAT",
+            "message" -> s"$eori is not a supported EORI number",
+            "path"    -> "eoris"
+          )
+        }
+      }
+
+    val errors: Iterable[JsObject] = (dateErrors ++ eoriErrors).flatten
+
+    Json.toJson(
+      errors
+    )
+  }
 }
 
 final case class JsonValidationApiError(jsErrors: JsError) extends ApiErrorResponse {

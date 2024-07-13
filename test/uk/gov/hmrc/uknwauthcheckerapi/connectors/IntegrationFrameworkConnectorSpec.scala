@@ -27,7 +27,7 @@ import play.api.test.Helpers.await
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import uk.gov.hmrc.http.{HttpResponse, UpstreamErrorResponse}
 import uk.gov.hmrc.uknwauthcheckerapi.controllers.BaseSpec
-import uk.gov.hmrc.uknwauthcheckerapi.generators.ValidGetAuthorisationsResponse
+import uk.gov.hmrc.uknwauthcheckerapi.generators.ValidEisAuthorisationsResponse
 import uk.gov.hmrc.uknwauthcheckerapi.models.eis.EisAuthorisationRequest
 import uk.gov.hmrc.uknwauthcheckerapi.utils.JsonErrors
 
@@ -49,7 +49,7 @@ class IntegrationFrameworkConnectorSpec extends BaseSpec {
 
   "getEisAuthorisationsResponse" should {
     "return EisAuthorisationsResponse when call to integration framework succeeds" in forAll {
-      (eisAuthorisationRequest: EisAuthorisationRequest, validGetAuthorisationsResponse: ValidGetAuthorisationsResponse) =>
+      (eisAuthorisationRequest: EisAuthorisationRequest, validGetAuthorisationsResponse: ValidEisAuthorisationsResponse) =>
         whenever(eisAuthorisationRequest.validityDate.isDefined) {
           beforeEach()
 

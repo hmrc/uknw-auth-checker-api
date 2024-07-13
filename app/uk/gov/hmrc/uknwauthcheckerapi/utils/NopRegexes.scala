@@ -16,6 +16,13 @@
 
 package uk.gov.hmrc.uknwauthcheckerapi.utils
 
-object NopRegex {
-  val eoriPattern = "^(GB|XI)[0-9]{12}|(GB|XI)[0-9]{15}$"
+import scala.util.matching.Regex
+
+object NopRegexes {
+  val eoriPattern:                 String = "^(GB|XI)[0-9]{12}|(GB|XI)[0-9]{15}$"
+  val invalidAuthTypePattern:      String = "^.*(Invalid authorisation type).*$"
+  val invalidFormatOfDatePattern:  String = "^.*(supplied date).*$"
+  val invalidFormatOfEorisPattern: String = "^.*(format of EORI).*$"
+
+  val invalidAuthTypePatternRegex: Regex = invalidAuthTypePattern.r
 }

@@ -19,14 +19,14 @@ package uk.gov.hmrc.uknwauthcheckerapi.services
 import cats.data.EitherT
 import play.api.http.Status._
 import play.api.libs.json.{JsError, JsSuccess, Json}
-import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
-import uk.gov.hmrc.http.BadGatewayException
+import uk.gov.hmrc.http.{BadGatewayException, HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.uknwauthcheckerapi.config.AppConfig
 import uk.gov.hmrc.uknwauthcheckerapi.connectors.IntegrationFrameworkConnector
 import uk.gov.hmrc.uknwauthcheckerapi.errors.DataRetrievalError
 import uk.gov.hmrc.uknwauthcheckerapi.errors.DataRetrievalError._
 import uk.gov.hmrc.uknwauthcheckerapi.models.eis.{EisAuthorisationRequest, EisAuthorisationResponseError}
 import uk.gov.hmrc.uknwauthcheckerapi.models.{AuthorisationRequest, AuthorisationResponse, AuthorisationsResponse}
+import uk.gov.hmrc.uknwauthcheckerapi.utils.NopRegexes._
 
 import java.time.LocalDate
 import javax.inject.Inject
@@ -81,7 +81,7 @@ class IntegrationFrameworkService @Inject() (appConfig: AppConfig, integrationFr
 
         Left(
           errorCode match {
-            case BAD_REQUEST           => BadRequestDataRetrievalError(errorMessage)
+            case BAD_REQUEST           => handleBadRequest(errorMessage)
             case FORBIDDEN             => ForbiddenDataRetrievalError(errorMessage)
             case INTERNAL_SERVER_ERROR => InternalServerDataRetrievalError(errorMessage)
             case METHOD_NOT_ALLOWED    => MethodNotAllowedDataRetrievalError(errorMessage)
@@ -89,5 +89,11 @@ class IntegrationFrameworkService @Inject() (appConfig: AppConfig, integrationFr
           }
         )
       case jsError: JsError => Left(UnableToDeserialiseDataRetrievalError(jsError))
+    }
+
+  private def handleBadRequest(errorMessage: String): DataRetrievalError =
+    errorMessage match {
+      case invalidAuthTypePatternRegex(_) => InternalServerDataRetrievalError(s"Invalid auth type ${appConfig.authType}")
+      case message                        => BadRequestDataRetrievalError(message)
     }
 }
