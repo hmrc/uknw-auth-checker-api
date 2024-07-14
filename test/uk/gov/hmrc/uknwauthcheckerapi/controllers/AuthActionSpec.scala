@@ -27,7 +27,7 @@ import scala.concurrent.Future
 
 class AuthActionSpec extends BaseSpec {
 
-  private val authAction = injected[AuthAction]
+  private lazy val authAction = injected[AuthAction]
 
   "AuthAction" should {
     "allow a request through if authorized" in {

@@ -17,15 +17,18 @@
 package uk.gov.hmrc.uknwauthcheckerapi.controllers
 
 import cats.data.EitherT
+import com.google.inject.AbstractModule
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 import play.api.libs.json.{JsError, JsPath, Json, JsonValidationError}
 import play.api.test.Helpers._
+import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.uknwauthcheckerapi.errors.DataRetrievalError._
 import uk.gov.hmrc.uknwauthcheckerapi.errors._
 import uk.gov.hmrc.uknwauthcheckerapi.generators.ValidAuthorisationRequest
 import uk.gov.hmrc.uknwauthcheckerapi.models.{AuthorisationRequest, AuthorisationResponse, AuthorisationsResponse}
+import uk.gov.hmrc.uknwauthcheckerapi.services.{IntegrationFrameworkService, ValidationService}
 import uk.gov.hmrc.uknwauthcheckerapi.utils.JsonErrors
 
 import java.time.LocalDate
@@ -33,7 +36,15 @@ import scala.concurrent.Future
 
 class AuthorisationsControllerSpec extends BaseSpec {
 
-  private val controller = injected[AuthorisationsController]
+  private lazy val controller = injected[AuthorisationsController]
+
+  override def moduleOverrides: AbstractModule = new AbstractModule {
+    override def configure(): Unit = {
+      bind(classOf[AuthConnector]).toInstance(mockAuthConnector)
+      bind(classOf[IntegrationFrameworkService]).toInstance(mockIntegrationFrameworkService)
+      bind(classOf[ValidationService]).toInstance(mockValidationService)
+    }
+  }
 
   override protected def beforeEach(): Unit = {
     stubAuthorization()

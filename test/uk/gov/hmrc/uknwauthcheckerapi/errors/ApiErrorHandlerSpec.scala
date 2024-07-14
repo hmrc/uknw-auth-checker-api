@@ -28,8 +28,8 @@ import scala.concurrent.Future
 
 class ApiErrorHandlerSpec extends BaseSpec {
 
-  private val apiErrorHandler = new ApiErrorHandler()
-  private val errorMessage    = "ErrorMessage"
+  private lazy val apiErrorHandler = injected[ApiErrorHandler]
+  private val errorMessage         = "ErrorMessage"
 
   "onClientError" should {
     "convert a FORBIDDEN to Forbidden (403) response" in {
