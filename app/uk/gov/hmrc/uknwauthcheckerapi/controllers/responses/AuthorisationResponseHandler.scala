@@ -34,37 +34,37 @@ trait AuthorisationResponseHandler extends Logging {
 
     def toResult(implicit ec: ExecutionContext, request: Request[JsValue]): Future[Result] =
       response.fold(
-      {
-        case BadGatewayDataRetrievalError() =>
-          logger.error(toLogMessage(BAD_GATEWAY))
-          ServiceUnavailableApiError.toResult
+        {
+          case BadGatewayDataRetrievalError() =>
+            logger.error(toLogMessage(BAD_GATEWAY))
+            ServiceUnavailableApiError.toResult
 
-        case BadRequestDataRetrievalError(errorMessages) =>
-          logger.warn(toLogMessage(BAD_REQUEST, Some(errorMessages)))
-          BadRequestApiError(errorMessages).toResult
+          case BadRequestDataRetrievalError(errorMessages) =>
+            logger.warn(toLogMessage(BAD_REQUEST, Some(errorMessages)))
+            BadRequestApiError(errorMessages).toResult
 
-        case ForbiddenDataRetrievalError() =>
-          logger.error(toLogMessage(FORBIDDEN))
-          ForbiddenApiError.toResult
+          case ForbiddenDataRetrievalError() =>
+            logger.error(toLogMessage(FORBIDDEN))
+            ForbiddenApiError.toResult
 
-        case MethodNotAllowedDataRetrievalError(_) =>
-          logger.warn(toLogMessage(METHOD_NOT_ALLOWED))
-          MethodNotAllowedApiError.toResult
+          case MethodNotAllowedDataRetrievalError(_) =>
+            logger.warn(toLogMessage(METHOD_NOT_ALLOWED))
+            MethodNotAllowedApiError.toResult
 
-        case ValidationDataRetrievalError(errors) =>
-          logger.warn(toLogMessage(BAD_REQUEST, Some(Json.stringify(toJson(errors)))))
-          JsonValidationApiError(errors).toResult
+          case ValidationDataRetrievalError(errors) =>
+            logger.warn(toLogMessage(BAD_REQUEST, Some(Json.stringify(toJson(errors)))))
+            JsonValidationApiError(errors).toResult
 
-        case InternalServerDataRetrievalError(errorMessage) =>
-          logger.error(toLogMessage(INTERNAL_SERVER_ERROR, Some(errorMessage)))
-          InternalServerApiError.toResult
+          case InternalServerDataRetrievalError(errorMessage) =>
+            logger.error(toLogMessage(INTERNAL_SERVER_ERROR, Some(errorMessage)))
+            InternalServerApiError.toResult
 
-        case _ =>
-          logger.error(toLogMessage(INTERNAL_SERVER_ERROR))
-          InternalServerApiError.toResult
-      },
-      authorisationsResponse => Results.Status(OK)(Json.toJson(authorisationsResponse))
-    )
+          case _ =>
+            logger.error(toLogMessage(INTERNAL_SERVER_ERROR))
+            InternalServerApiError.toResult
+        },
+        authorisationsResponse => Results.Status(OK)(Json.toJson(authorisationsResponse))
+      )
   }
 
   private def toLogMessage(statusCode: Int, errorMessage: Option[String] = None)(implicit request: Request[JsValue]): String = {
