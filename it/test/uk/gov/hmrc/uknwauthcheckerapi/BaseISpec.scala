@@ -27,19 +27,13 @@ import uk.gov.hmrc.uknwauthcheckerapi.generators.{ExtensionHelpers, TestData, Te
 
 import scala.reflect.ClassTag
 
-class BaseISpec
-  extends PlaySpec
-    with GuiceOneServerPerSuite
-    with WireMockHelper
-    with TestData
-    with TestHeaders
-    with ExtensionHelpers {
+class BaseISpec extends PlaySpec with GuiceOneServerPerSuite with WireMockISpec with TestData with TestHeaders with ExtensionHelpers {
 
   @annotation.nowarn
   protected val additionalAppConfig: Map[String, Any] = Map(
     "metrics.enabled"              -> false,
     "auditing.enabled"             -> false,
-    "http-verbs.retries.intervals" -> List("1ms", "1ms", "1ms"),
+    "http-verbs.retries.intervals" -> List("1ms", "1ms", "1ms")
   ) ++ setWireMockPort(
     "auth",
     "integration-framework"
@@ -47,66 +41,80 @@ class BaseISpec
   override lazy val app: Application = GuiceApplicationBuilder()
     .configure(additionalAppConfig)
     .build()
-  protected lazy val authorisationsUrl = s"http://localhost:$port/authorisations"
+  protected lazy val authorisationsUrl        = s"http://localhost:$port/authorisations"
   protected val eisAuthorisationsEndpointPath = "/cau/validatecustomsauth/v1"
   private lazy val wsClient: WSClient = injected[WSClient]
 
-  protected def injected[T](c: Class[T]): T = app.injector.instanceOf(c)
+  protected def injected[T](c:                 Class[T]):    T = app.injector.instanceOf(c)
   protected def injected[T](implicit evidence: ClassTag[T]): T = app.injector.instanceOf[T]
 
-  protected def deleteRequest(url: String, headers: Seq[(String, String)] = defaultHeaders): WSResponse = {
-    await(wsClient.url(url)
-      .addHttpHeaders(
-        headers: _*
-      ).delete()
+  protected def deleteRequest(url: String, headers: Seq[(String, String)] = defaultHeaders): WSResponse =
+    await(
+      wsClient
+        .url(url)
+        .addHttpHeaders(
+          headers: _*
+        )
+        .delete()
     )
-  }
 
-  protected def headRequest(url: String, headers: Seq[(String, String)] = defaultHeaders): WSResponse = {
-    await(wsClient.url(url)
-      .addHttpHeaders(
-        headers: _*
-      ).head()
+  protected def headRequest(url: String, headers: Seq[(String, String)] = defaultHeaders): WSResponse =
+    await(
+      wsClient
+        .url(url)
+        .addHttpHeaders(
+          headers: _*
+        )
+        .head()
     )
-  }
 
-  protected def getRequest(url: String, headers: Seq[(String, String)] = defaultHeaders): WSResponse = {
-    await(wsClient.url(url)
-      .addHttpHeaders(
-        headers: _*
-      ).get()
+  protected def getRequest(url: String, headers: Seq[(String, String)] = defaultHeaders): WSResponse =
+    await(
+      wsClient
+        .url(url)
+        .addHttpHeaders(
+          headers: _*
+        )
+        .get()
     )
-  }
 
-  protected def optionsRequest(url: String, headers: Seq[(String, String)] = defaultHeaders): WSResponse = {
-    await(wsClient.url(url)
-      .addHttpHeaders(
-        headers: _*
-      ).options()
+  protected def optionsRequest(url: String, headers: Seq[(String, String)] = defaultHeaders): WSResponse =
+    await(
+      wsClient
+        .url(url)
+        .addHttpHeaders(
+          headers: _*
+        )
+        .options()
     )
-  }
 
-  protected def patchRequest(url: String, body: JsValue, headers: Seq[(String, String)] = defaultHeaders): WSResponse = {
-    await(wsClient.url(url)
-      .addHttpHeaders(
-        headers: _*
-      ).patch(Json.toJson(body))
+  protected def patchRequest(url: String, body: JsValue, headers: Seq[(String, String)] = defaultHeaders): WSResponse =
+    await(
+      wsClient
+        .url(url)
+        .addHttpHeaders(
+          headers: _*
+        )
+        .patch(Json.toJson(body))
     )
-  }
 
-  protected def postRequest(url: String, body: JsValue, headers: Seq[(String, String)] = defaultHeaders): WSResponse = {
-    await(wsClient.url(url)
-      .addHttpHeaders(
-        headers: _*
-      ).post(Json.toJson(body))
+  protected def postRequest(url: String, body: JsValue, headers: Seq[(String, String)] = defaultHeaders): WSResponse =
+    await(
+      wsClient
+        .url(url)
+        .addHttpHeaders(
+          headers: _*
+        )
+        .post(Json.toJson(body))
     )
-  }
 
-  protected def putRequest(url: String, body: JsValue, headers: Seq[(String, String)] = defaultHeaders): WSResponse = {
-    await(wsClient.url(url)
-      .addHttpHeaders(
-        headers: _*
-      ).put(Json.toJson(body))
+  protected def putRequest(url: String, body: JsValue, headers: Seq[(String, String)] = defaultHeaders): WSResponse =
+    await(
+      wsClient
+        .url(url)
+        .addHttpHeaders(
+          headers: _*
+        )
+        .put(Json.toJson(body))
     )
-  }
 }

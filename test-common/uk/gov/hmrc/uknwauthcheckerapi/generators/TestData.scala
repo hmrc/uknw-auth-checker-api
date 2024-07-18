@@ -28,6 +28,7 @@ import java.time.LocalDate
 trait TestData extends Generators {
 
   protected val authorisationEndpoint = "authorisation"
+  protected val bearerToken           = "Bearer PFZBTElEX1RPS0VOPg=="
   protected val emptyJson: JsValue = Json.parse("{}")
 
   protected val invalidAuthTypeEisErrorMessage: String = """Invalid authorisation type : UKNW""".stripMargin

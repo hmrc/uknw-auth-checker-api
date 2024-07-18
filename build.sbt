@@ -10,6 +10,7 @@ lazy val microservice = Project("uknw-auth-checker-api", file("."))
     libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test,
       // https://www.scala-lang.org/2021/01/12/configuring-and-suppressing-warnings.html
     // suppress warnings in generated routes files
+    scalafmtOnCompile := true,
     scalacOptions += "-Wconf:cat=lint-eta-sam:s,src=routes/.*:s",
     PlayKeys.devSettings := Seq("play.server.http.port" -> "9070"),
   )
@@ -24,6 +25,7 @@ lazy val it = project
   .enablePlugins(PlayScala)
   .dependsOn(microservice % "test->test")
   .settings(DefaultBuildSettings.itSettings())
+  .settings(scalafmtOnCompile := true)
   .settings(libraryDependencies ++= AppDependencies.it)
 
 addCommandAlias("runAllChecks", ";clean;compile;scalafmtCheckAll;coverage;test;it/test;scalastyle;coverageReport")
