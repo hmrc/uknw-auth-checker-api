@@ -16,8 +16,13 @@
 
 package uk.gov.hmrc.uknwauthcheckerapi.connectors
 
+import java.util.UUID
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
+
 import com.typesafe.config.Config
 import org.apache.pekko.actor.ActorSystem
+
 import play.api.http.{HeaderNames, MimeTypes}
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.client.HttpClientV2
@@ -26,10 +31,6 @@ import uk.gov.hmrc.uknwauthcheckerapi.config.AppConfig
 import uk.gov.hmrc.uknwauthcheckerapi.models.eis.{EisAuthorisationRequest, EisAuthorisationsResponse}
 import uk.gov.hmrc.uknwauthcheckerapi.models.{CustomHeaderNames, RFC7231DateTime}
 import uk.gov.hmrc.uknwauthcheckerapi.utils.HmrcContentTypes
-
-import java.util.UUID
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class IntegrationFrameworkConnector @Inject() (

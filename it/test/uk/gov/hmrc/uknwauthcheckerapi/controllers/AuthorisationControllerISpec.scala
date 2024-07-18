@@ -16,8 +16,11 @@
 
 package uk.gov.hmrc.uknwauthcheckerapi.controllers
 
+import java.time.LocalDate
+
 import com.github.tomakehurst.wiremock.client.WireMock._
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
+
 import play.api.http.MimeTypes
 import play.api.http.Status._
 import play.api.libs.json.Json
@@ -28,8 +31,6 @@ import uk.gov.hmrc.uknwauthcheckerapi.generators.{TestRegexes, ValidAuthorisatio
 import uk.gov.hmrc.uknwauthcheckerapi.models.eis.EisAuthorisationsResponse
 import uk.gov.hmrc.uknwauthcheckerapi.models.{AuthorisationRequest, CustomHeaderNames}
 import uk.gov.hmrc.uknwauthcheckerapi.utils.{EisAuthTypes, HmrcContentTypes}
-
-import java.time.LocalDate
 
 class AuthorisationControllerISpec extends BaseISpec {
 

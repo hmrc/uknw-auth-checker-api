@@ -2,6 +2,9 @@ import uk.gov.hmrc.DefaultBuildSettings
 
 ThisBuild / majorVersion := 0
 ThisBuild / scalaVersion := "2.13.12"
+ThisBuild / semanticdbEnabled := true
+ThisBuild / semanticdbVersion := scalafixSemanticdb.revision
+
 
 lazy val microservice = Project("uknw-auth-checker-api", file("."))
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
@@ -29,4 +32,6 @@ lazy val it = project
   .settings(libraryDependencies ++= AppDependencies.it)
 
 addCommandAlias("fmtAll", ";scalafmtAll;it/scalafmtAll")
+addCommandAlias("fixAll", ";scalafixAll;it/scalafixAll")
+addCommandAlias("preCommit", ";clean;compile;fmtAll;fixAll;coverage;test;it/test;scalastyle;coverageReport")
 addCommandAlias("runAllChecks", ";clean;compile;scalafmtCheckAll;coverage;test;it/test;scalastyle;coverageReport")
