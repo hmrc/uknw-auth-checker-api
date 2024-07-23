@@ -77,12 +77,11 @@ trait TestData extends Generators {
 
   implicit protected val arbNoEorisAuthorisationRequest: Arbitrary[NoEorisAuthorisationRequest] = Arbitrary {
     for {
-      date  <- Arbitrary.arbitrary[LocalDate]
-      eoris <- eoriGenerator(0, 0)
+      date <- Arbitrary.arbitrary[LocalDate]
     } yield NoEorisAuthorisationRequest(
       AuthorisationRequest(
         date.toLocalDateFormatted,
-        eoris
+        Seq.empty
       )
     )
   }
