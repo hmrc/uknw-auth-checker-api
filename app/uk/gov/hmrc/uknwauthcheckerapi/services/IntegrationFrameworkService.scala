@@ -40,7 +40,7 @@ class IntegrationFrameworkService @Inject() (appConfig: AppConfig, integrationFr
     authorisationRequest: AuthorisationRequest
   )(implicit hc: HeaderCarrier): EitherT[Future, DataRetrievalError, AuthorisationsResponse] = {
     val eisAuthorisationRequest = EisAuthorisationRequest(
-      Some(LocalDate.now()),
+      Some(LocalDate.parse("2024-02-08")), //TODO We need to change this according to the environment
       appConfig.authType,
       authorisationRequest.eoris
     )
