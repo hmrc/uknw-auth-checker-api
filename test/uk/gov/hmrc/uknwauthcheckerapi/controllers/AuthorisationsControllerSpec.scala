@@ -37,6 +37,7 @@ import uk.gov.hmrc.uknwauthcheckerapi.utils.JsonErrors
 class AuthorisationsControllerSpec extends BaseSpec {
 
   private lazy val controller = injected[AuthorisationsController]
+  val dummyDate: LocalDate = LocalDate.parse("2024-02-08")
 
   override def moduleOverrides: AbstractModule = new AbstractModule {
     override def configure(): Unit = {
@@ -55,7 +56,7 @@ class AuthorisationsControllerSpec extends BaseSpec {
     "return OK (200) with authorised eoris when request has valid date and eoris" in {
       forAll { authorisationRequest: AuthorisationRequest =>
         val expectedResponse = AuthorisationsResponse(
-          LocalDate.parse(authorisationRequest.date),
+          dummyDate,
           authorisationRequest.eoris.map(r => AuthorisationResponse(r, authorised = true))
         )
 

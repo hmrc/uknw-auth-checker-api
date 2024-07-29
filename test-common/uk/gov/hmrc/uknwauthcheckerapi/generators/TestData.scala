@@ -44,7 +44,6 @@ trait TestData extends Generators {
       eoris <- eoriGenerator()
     } yield ValidAuthorisationRequest(
       AuthorisationRequest(
-        date.toLocalDateFormatted,
         eoris
       )
     )
@@ -69,7 +68,6 @@ trait TestData extends Generators {
       eoris <- eoriGenerator(3001, 3005)
     } yield TooManyEorisAuthorisationRequest(
       AuthorisationRequest(
-        date.toLocalDateFormatted,
         eoris
       )
     )
@@ -80,7 +78,6 @@ trait TestData extends Generators {
       date <- Arbitrary.arbitrary[LocalDate]
     } yield NoEorisAuthorisationRequest(
       AuthorisationRequest(
-        date.toLocalDateFormatted,
         Seq.empty
       )
     )

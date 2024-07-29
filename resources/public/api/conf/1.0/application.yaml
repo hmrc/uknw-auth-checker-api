@@ -149,11 +149,6 @@ paths:
                       "errors": [
                         {
                           "code": "INVALID_FORMAT",
-                          "message": "date field missing from JSON",
-                          "path": "date"
-                        },
-                        {
-                          "code": "INVALID_FORMAT",
                           "message": "eoris field missing from JSON",
                           "path": "eoris"
                         }

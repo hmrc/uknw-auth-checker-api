@@ -60,27 +60,6 @@ class ValidationServiceSpec extends BaseSpec {
       }
     }
 
-    "return JsError when AuthorisationRequest date is invalid" in {
-      forAll { (authorisationRequest: AuthorisationRequest, invalidDate: String) =>
-        val json = Json.toJson(authorisationRequest.copy(date = invalidDate))
-
-        val expectedResponse =
-          ValidationDataRetrievalError(
-            JsError(
-              Seq("date").map { field =>
-                (JsPath \ field, Seq(JsonValidationError(s"$invalidDate is not a valid date in the format YYYY-MM-DD")))
-              }
-            )
-          )
-
-        val request = fakeRequestWithJsonBody(json)
-
-        val response = service.validateRequest(request)
-
-        response shouldBe Left(expectedResponse)
-      }
-    }
-
     "return JsError when AuthorisationRequest eoris are invalid" in {
       forAll { authorisationRequest: AuthorisationRequest =>
         val json = Json.toJson(authorisationRequest.copy(eoris = Seq("ABCD", "EFGH")))
@@ -97,32 +76,6 @@ class ValidationServiceSpec extends BaseSpec {
                   )
                 )
               }
-            )
-          )
-
-        val request = fakeRequestWithJsonBody(json)
-
-        val response = service.validateRequest(request)
-
-        response shouldBe Left(expectedResponse)
-      }
-    }
-
-    "return JsError when AuthorisationRequest eoris and date are invalid" in {
-      forAll { (invalidEori: String, invalidDate: String) =>
-        val json = Json.toJson(
-          AuthorisationRequest(invalidDate, Seq(invalidEori))
-        )
-
-        val expectedResponse =
-          ValidationDataRetrievalError(
-            JsError(
-              Seq("eoris").map { field =>
-                (JsPath \ field, Seq(JsonValidationError(s"$invalidEori is not a supported EORI number")))
-              } ++
-                Seq("date").map { field =>
-                  (JsPath \ field, Seq(JsonValidationError(s"$invalidDate is not a valid date in the format YYYY-MM-DD")))
-                }
             )
           )
 

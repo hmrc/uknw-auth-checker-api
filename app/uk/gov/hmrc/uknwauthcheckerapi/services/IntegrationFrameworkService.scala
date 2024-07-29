@@ -20,9 +20,7 @@ import java.time.LocalDate
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
-
 import cats.data.EitherT
-
 import play.api.http.Status._
 import play.api.libs.json.{JsError, JsSuccess, Json}
 import uk.gov.hmrc.http.{BadGatewayException, HeaderCarrier, UpstreamErrorResponse}
@@ -42,7 +40,7 @@ class IntegrationFrameworkService @Inject() (appConfig: AppConfig, integrationFr
     authorisationRequest: AuthorisationRequest
   )(implicit hc: HeaderCarrier): EitherT[Future, DataRetrievalError, AuthorisationsResponse] = {
     val eisAuthorisationRequest = EisAuthorisationRequest(
-      Some(LocalDate.parse(authorisationRequest.date)),
+      Some(LocalDate.now()),
       appConfig.authType,
       authorisationRequest.eoris
     )

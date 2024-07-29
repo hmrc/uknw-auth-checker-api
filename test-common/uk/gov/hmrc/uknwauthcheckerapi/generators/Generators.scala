@@ -42,7 +42,7 @@ trait Generators extends ExtensionHelpers {
     for {
       date  <- Arbitrary.arbitrary[LocalDate]
       eoris <- eoriGenerator()
-    } yield AuthorisationRequest(date.toLocalDateFormatted, eoris)
+    } yield AuthorisationRequest(eoris)
   }
 
   implicit protected val arbEisAuthorisationRequest: Arbitrary[EisAuthorisationRequest] = Arbitrary {
