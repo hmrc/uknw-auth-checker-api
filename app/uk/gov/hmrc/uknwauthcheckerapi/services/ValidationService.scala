@@ -17,13 +17,13 @@
 package uk.gov.hmrc.uknwauthcheckerapi.services
 
 import scala.collection.Seq
+
 import play.api.libs.json._
 import play.api.mvc.Request
 import uk.gov.hmrc.uknwauthcheckerapi.errors.DataRetrievalError
 import uk.gov.hmrc.uknwauthcheckerapi.errors.DataRetrievalError.ValidationDataRetrievalError
 import uk.gov.hmrc.uknwauthcheckerapi.models.AuthorisationRequest
-import uk.gov.hmrc.uknwauthcheckerapi.utils.CustomRegexes
-import uk.gov.hmrc.uknwauthcheckerapi.utils.ErrorMessages
+import uk.gov.hmrc.uknwauthcheckerapi.utils.{CustomRegexes, ErrorMessages}
 
 class ValidationService {
   def validateRequest(request: Request[JsValue]): Either[DataRetrievalError, AuthorisationRequest] =
@@ -43,7 +43,7 @@ class ValidationService {
       .filterNot(e => e matches CustomRegexes.eoriPattern)
       .map(e => JsonValidationError(s"$e is not a supported EORI number"))
 
-    (eoriErrors.nonEmpty, !isEoriSizeOk(eoris.size)) match {
+    (eoriErrors.nonEmpty, isEoriSizeInvalid(eoris.size)) match {
       case (false, false) => Right(request)
       case (_, true)      => Left(JsError(JsPath \ "eoris", ErrorMessages.invalidEoriCount))
       case (true, _) =>
@@ -57,7 +57,7 @@ class ValidationService {
     }
   }
 
-  private def isEoriSizeOk(eorisSize: Int): Boolean =
-    if (eorisSize > 3000 || eorisSize < 1) false else true
+  private def isEoriSizeInvalid(eorisSize: Int): Boolean =
+    if (eorisSize > 3000 || eorisSize < 1) true else false
 
 }

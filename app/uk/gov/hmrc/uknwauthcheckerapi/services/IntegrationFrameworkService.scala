@@ -16,11 +16,12 @@
 
 package uk.gov.hmrc.uknwauthcheckerapi.services
 
-import java.time.LocalDate
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
+
 import cats.data.EitherT
+
 import play.api.http.Status._
 import play.api.libs.json.{JsError, JsSuccess, Json}
 import uk.gov.hmrc.http.{BadGatewayException, HeaderCarrier, UpstreamErrorResponse}
@@ -32,7 +33,11 @@ import uk.gov.hmrc.uknwauthcheckerapi.models.eis.{EisAuthorisationRequest, EisAu
 import uk.gov.hmrc.uknwauthcheckerapi.models.{AuthorisationRequest, AuthorisationResponse, AuthorisationsResponse}
 import uk.gov.hmrc.uknwauthcheckerapi.utils.CustomRegexes._
 
-class IntegrationFrameworkService @Inject() (appConfig: AppConfig, integrationFrameworkConnector: IntegrationFrameworkConnector)(implicit
+class IntegrationFrameworkService @Inject() (
+  appConfig:                     AppConfig,
+  integrationFrameworkConnector: IntegrationFrameworkConnector,
+  localDateService:              LocalDateService
+)(implicit
   ec: ExecutionContext
 ) {
 
@@ -40,7 +45,7 @@ class IntegrationFrameworkService @Inject() (appConfig: AppConfig, integrationFr
     authorisationRequest: AuthorisationRequest
   )(implicit hc: HeaderCarrier): EitherT[Future, DataRetrievalError, AuthorisationsResponse] = {
     val eisAuthorisationRequest = EisAuthorisationRequest(
-      Some(LocalDate.parse("2024-02-08")), //TODO We need to change this according to the environment
+      Some(localDateService.now()),
       appConfig.authType,
       authorisationRequest.eoris
     )

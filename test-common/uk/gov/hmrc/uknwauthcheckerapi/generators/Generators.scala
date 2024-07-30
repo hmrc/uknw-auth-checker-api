@@ -40,7 +40,6 @@ trait Generators extends ExtensionHelpers {
 
   implicit protected val arbAuthorisationRequest: Arbitrary[AuthorisationRequest] = Arbitrary {
     for {
-      date  <- Arbitrary.arbitrary[LocalDate]
       eoris <- eoriGenerator()
     } yield AuthorisationRequest(eoris)
   }
