@@ -16,18 +16,12 @@
 
 package uk.gov.hmrc.uknwauthcheckerapi.utils
 
-import java.util.UUID
+import play.api.mvc.Request
 
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.uknwauthcheckerapi.models.CustomHeaderNames
-
-trait CorrelationIdGenerator {
-
-  def generateCorrelationId()(implicit hc: HeaderCarrier): String =
-    hc.headers(scala.Seq(CustomHeaderNames.xCorrelationId)) match {
-      case Seq((_, id)) =>
-        id
-      case _ =>
-        UUID.randomUUID().toString
+trait RequestExtensions {
+  implicit class RequestExtension[T](request: Request[T]) {
+    def hasHeaderValue(key: String, value: String): Boolean = {
+      request.headers.get(key).contains(value)
     }
+  }
 }
