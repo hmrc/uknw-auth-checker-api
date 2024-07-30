@@ -28,7 +28,7 @@ import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, Retries}
 import uk.gov.hmrc.uknwauthcheckerapi.config.AppConfig
 import uk.gov.hmrc.uknwauthcheckerapi.models.eis.{EisAuthorisationRequest, EisAuthorisationsResponse}
-import uk.gov.hmrc.uknwauthcheckerapi.models.{CustomHeaderNames, HmrcContentTypes, RFC7231DateTime}
+import uk.gov.hmrc.uknwauthcheckerapi.models.{CustomHeaderNames, HmrcContentTypes, Rfc7231DateTime}
 
 @Singleton
 class IntegrationFrameworkConnector @Inject() (
@@ -43,7 +43,7 @@ class IntegrationFrameworkConnector @Inject() (
   private def integrationFrameworkHeaders(bearerToken: String)(implicit hc: HeaderCarrier): Seq[(String, String)] =
     Seq(
       (CustomHeaderNames.xCorrelationId, generateCorrelationId()),
-      (HeaderNames.DATE, RFC7231DateTime.now),
+      (HeaderNames.DATE, Rfc7231DateTime.now),
       (HeaderNames.CONTENT_TYPE, HmrcContentTypes.json),
       (HeaderNames.ACCEPT, MimeTypes.JSON),
       (HeaderNames.AUTHORIZATION, s"Bearer $bearerToken")

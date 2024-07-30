@@ -19,7 +19,7 @@ package uk.gov.hmrc.uknwauthcheckerapi.models
 import java.time.format.DateTimeFormatter
 import java.time.{ZoneOffset, ZonedDateTime}
 
-object RFC7231DateTime {
+object Rfc7231DateTime {
 
   private val rfc7231DateTimeFormat: DateTimeFormatter =
     DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss O")

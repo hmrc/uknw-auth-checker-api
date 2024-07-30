@@ -17,9 +17,9 @@
 package uk.gov.hmrc.uknwauthcheckerapi.models
 
 object JsonPaths {
-  val code: String = "code"
-  val eoris: String = "eoris"
-  val errors: String = "errors"
+  val code:    String = "code"
+  val eoris:   String = "eoris"
+  val errors:  String = "errors"
   val message: String = "message"
-  val path: String = "path"
+  val path:    String = "path"
 }
