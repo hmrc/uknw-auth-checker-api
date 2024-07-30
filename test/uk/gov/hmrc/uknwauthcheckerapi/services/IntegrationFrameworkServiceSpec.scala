@@ -34,7 +34,6 @@ import uk.gov.hmrc.uknwauthcheckerapi.errors.DataRetrievalError._
 import uk.gov.hmrc.uknwauthcheckerapi.generators.ValidAuthorisationRequest
 import uk.gov.hmrc.uknwauthcheckerapi.models._
 import uk.gov.hmrc.uknwauthcheckerapi.models.eis._
-import uk.gov.hmrc.uknwauthcheckerapi.utils.JsonErrors
 
 class IntegrationFrameworkServiceSpec extends BaseSpec {
 
@@ -217,7 +216,7 @@ class IntegrationFrameworkServiceSpec extends BaseSpec {
         val request = validRequest.request
 
         val jsError = JsError(
-          Seq((JsPath \ "errorDetail", Seq(JsonValidationError(JsonErrors.pathMissing))))
+          Seq((JsPath \ "errorDetail", Seq(JsonValidationError(JsonErrorMessages.pathMissing))))
         )
 
         val expectedResponse = UpstreamErrorResponse("{}", BAD_REQUEST)

@@ -30,8 +30,8 @@ import play.api.test.Helpers.await
 import uk.gov.hmrc.http.{HttpResponse, UpstreamErrorResponse}
 import uk.gov.hmrc.uknwauthcheckerapi.controllers.BaseSpec
 import uk.gov.hmrc.uknwauthcheckerapi.generators.ValidEisAuthorisationsResponse
+import uk.gov.hmrc.uknwauthcheckerapi.models.JsonErrorMessages
 import uk.gov.hmrc.uknwauthcheckerapi.models.eis.EisAuthorisationRequest
-import uk.gov.hmrc.uknwauthcheckerapi.utils.JsonErrors
 
 class IntegrationFrameworkConnectorSpec extends BaseSpec {
 
@@ -73,7 +73,7 @@ class IntegrationFrameworkConnectorSpec extends BaseSpec {
 
           val expectedError = JsError(
             Seq("authType", "processingDate", "results").map { field =>
-              (JsPath \ field, Seq(JsonValidationError(JsonErrors.pathMissing)))
+              (JsPath \ field, Seq(JsonValidationError(JsonErrorMessages.pathMissing)))
             }
           )
 

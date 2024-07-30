@@ -14,20 +14,8 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.uknwauthcheckerapi.utils
+package uk.gov.hmrc.uknwauthcheckerapi.models.eis
 
-import java.util.UUID
-
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.uknwauthcheckerapi.models.CustomHeaderNames
-
-trait CorrelationIdGenerator {
-
-  def generateCorrelationId()(implicit hc: HeaderCarrier): String =
-    hc.headers(scala.Seq(CustomHeaderNames.xCorrelationId)) match {
-      case Seq((_, id)) =>
-        id
-      case _ =>
-        UUID.randomUUID().toString
-    }
+object EisAuthTypes {
+  val nopWaiver = "UKNW"
 }

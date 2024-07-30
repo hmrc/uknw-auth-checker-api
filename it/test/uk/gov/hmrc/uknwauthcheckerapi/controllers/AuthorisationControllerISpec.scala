@@ -28,9 +28,8 @@ import play.api.libs.ws.WSResponse
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.uknwauthcheckerapi.BaseISpec
 import uk.gov.hmrc.uknwauthcheckerapi.generators.{InvalidEorisAuthorisationRequest, TestRegexes, ValidAuthorisationRequest}
-import uk.gov.hmrc.uknwauthcheckerapi.models.eis.EisAuthorisationsResponse
-import uk.gov.hmrc.uknwauthcheckerapi.models.{AuthorisationRequest, CustomHeaderNames}
-import uk.gov.hmrc.uknwauthcheckerapi.utils.{EisAuthTypes, HmrcContentTypes}
+import uk.gov.hmrc.uknwauthcheckerapi.models._
+import uk.gov.hmrc.uknwauthcheckerapi.models.eis._
 
 class AuthorisationControllerISpec extends BaseISpec {
 

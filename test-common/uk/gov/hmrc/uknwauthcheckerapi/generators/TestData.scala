@@ -24,7 +24,6 @@ import play.api.http.Status._
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.uknwauthcheckerapi.models.AuthorisationRequest
 import uk.gov.hmrc.uknwauthcheckerapi.models.eis._
-import uk.gov.hmrc.uknwauthcheckerapi.utils.EisAuthTypes
 
 trait TestData extends Generators {
 

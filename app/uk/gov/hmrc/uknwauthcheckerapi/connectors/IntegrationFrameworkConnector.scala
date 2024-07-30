@@ -28,8 +28,7 @@ import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, Retries}
 import uk.gov.hmrc.uknwauthcheckerapi.config.AppConfig
 import uk.gov.hmrc.uknwauthcheckerapi.models.eis.{EisAuthorisationRequest, EisAuthorisationsResponse}
-import uk.gov.hmrc.uknwauthcheckerapi.models.{CustomHeaderNames, RFC7231DateTime}
-import uk.gov.hmrc.uknwauthcheckerapi.utils.HmrcContentTypes
+import uk.gov.hmrc.uknwauthcheckerapi.models.{CustomHeaderNames, HmrcContentTypes, RFC7231DateTime}
 
 @Singleton
 class IntegrationFrameworkConnector @Inject() (

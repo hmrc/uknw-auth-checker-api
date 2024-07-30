@@ -14,9 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.uknwauthcheckerapi.utils
+package uk.gov.hmrc.uknwauthcheckerapi.models
 
-object JsonErrors {
-  val expectedJsObject = "error.expected.jsobject"
-  val pathMissing      = "error.path.missing"
+import scala.util.matching.Regex
+
+object CustomRegexes {
+  val eoriPattern:                 String = "^(GB|XI)[0-9]{12}|(GB|XI)[0-9]{15}$"
+  val invalidAuthTypePattern:      String = "^.*(Invalid authorisation type).*$"
+  val invalidFormatOfEorisPattern: String = "^.*(format of EORI).*$"
+
+  val invalidAuthTypePatternRegex: Regex = invalidAuthTypePattern.r
 }

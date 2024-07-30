@@ -26,7 +26,7 @@ import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.auth.core.{InternalError, MissingBearerToken}
 import uk.gov.hmrc.uknwauthcheckerapi.controllers.actions.AuthAction
 import uk.gov.hmrc.uknwauthcheckerapi.errors.{ServiceUnavailableApiError, UnauthorizedApiError}
-import uk.gov.hmrc.uknwauthcheckerapi.utils.ErrorMessages
+import uk.gov.hmrc.uknwauthcheckerapi.models.ApiErrorMessages
 
 class AuthActionSpec extends BaseSpec {
 
@@ -58,7 +58,7 @@ class AuthActionSpec extends BaseSpec {
 
       val result = await(authAction.filter(fakePostRequest))
 
-      result shouldBe Some(UnauthorizedApiError(ErrorMessages.unauthorized).toResult)
+      result shouldBe Some(UnauthorizedApiError(ApiErrorMessages.unauthorized).toResult)
     }
 
     "return ServiceUnavailableApiError when authorised returns an unexpected exception" in {

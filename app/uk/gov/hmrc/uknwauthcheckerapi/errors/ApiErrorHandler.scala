@@ -24,9 +24,10 @@ import play.api.http.HttpErrorHandler
 import play.api.http.Status._
 import play.api.mvc.{RequestHeader, Result}
 import uk.gov.hmrc.http.NotFoundException
+import uk.gov.hmrc.uknwauthcheckerapi.config.AppConfig
 
 @Singleton
-class ApiErrorHandler @Inject() extends HttpErrorHandler with Logging {
+class ApiErrorHandler @Inject() (appConfig: AppConfig) extends HttpErrorHandler with Logging {
 
   override def onClientError(request: RequestHeader, statusCode: Int, message: String): Future[Result] = {
     logger.warn(
@@ -40,8 +41,8 @@ class ApiErrorHandler @Inject() extends HttpErrorHandler with Logging {
         case METHOD_NOT_ALLOWED => MethodNotAllowedApiError.toResult
         case NOT_FOUND =>
           request.path match {
-            case "/authorisations" => MethodNotAllowedApiError.toResult
-            case _                 => NotFoundApiError.toResult
+            case appConfig.authorisationsEndpoint => MethodNotAllowedApiError.toResult
+            case _                                => NotFoundApiError.toResult
           }
         case SERVICE_UNAVAILABLE => ServiceUnavailableApiError.toResult
         case _ =>
@@ -53,7 +54,7 @@ class ApiErrorHandler @Inject() extends HttpErrorHandler with Logging {
 
   override def onServerError(request: RequestHeader, ex: Throwable): Future[Result] = {
     logger.warn(
-      s"[ApiErrorHandler][onServerError] Internal server error for (${request.method}) [${request.uri}] -> ",
+      s"[ApiErrorHandler][onServerError] Internal server error for (${request.method}) [${request.uri}]",
       ex
     )
 

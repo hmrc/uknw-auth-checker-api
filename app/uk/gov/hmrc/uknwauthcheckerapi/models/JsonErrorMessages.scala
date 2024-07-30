@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.uknwauthcheckerapi.utils
+package uk.gov.hmrc.uknwauthcheckerapi.models
 
-import play.api.mvc.Request
-
-trait RequestExtensions {
-  implicit class RequestExtension[T](request: Request[T]) {
-    def hasHeaderValue(key: String, value: String): Boolean =
-      request.headers.get(key).contains(value)
-  }
+object JsonErrorMessages {
+  val eorisFieldMissing: String = "eoris field missing from JSON"
+  val expectedJsObject:  String = "error.expected.jsobject"
+  val jsonMalformed:     String = "JSON is malformed"
+  val pathMissing:       String = "error.path.missing"
 }

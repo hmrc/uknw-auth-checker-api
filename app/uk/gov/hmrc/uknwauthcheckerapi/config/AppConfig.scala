@@ -30,6 +30,7 @@ class AppConfig @Inject() (config: Configuration) {
       .getOptional[String](s"$rootServices.protocol")
       .getOrElse("http")
 
+  val authorisationsEndpoint = "/authorisations"
   val authType: String = config.get[String]("authType")
   val eisAuthorisationsUrl = url"${baseUrl("integration-framework")}/cau/validatecustomsauth/v1"
   val integrationFrameworkBearerToken: String =

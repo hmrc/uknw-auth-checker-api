@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.uknwauthcheckerapi.utils
+package uk.gov.hmrc.uknwauthcheckerapi.models
 
 object HmrcMimeTypes {
   val json = "application/vnd.hmrc.1.0+json"

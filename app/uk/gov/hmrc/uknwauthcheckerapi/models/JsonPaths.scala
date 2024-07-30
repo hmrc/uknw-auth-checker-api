@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.uknwauthcheckerapi.utils
+package uk.gov.hmrc.uknwauthcheckerapi.models
 
-import scala.util.matching.Regex
-
-object CustomRegexes {
-  val eoriPattern:                 String = "^(GB|XI)[0-9]{12}|(GB|XI)[0-9]{15}$"
-  val invalidAuthTypePattern:      String = "^.*(Invalid authorisation type).*$"
-  val invalidFormatOfEorisPattern: String = "^.*(format of EORI).*$"
-
-  val invalidAuthTypePatternRegex: Regex = invalidAuthTypePattern.r
+object JsonPaths {
+  val code: String = "code"
+  val eoris: String = "eoris"
+  val errors: String = "errors"
+  val message: String = "message"
+  val path: String = "path"
 }

@@ -22,10 +22,12 @@ import play.api.libs.json._
 import play.api.mvc.Request
 import uk.gov.hmrc.uknwauthcheckerapi.errors.DataRetrievalError
 import uk.gov.hmrc.uknwauthcheckerapi.errors.DataRetrievalError.ValidationDataRetrievalError
-import uk.gov.hmrc.uknwauthcheckerapi.models.AuthorisationRequest
-import uk.gov.hmrc.uknwauthcheckerapi.utils.{CustomRegexes, ErrorMessages}
+import uk.gov.hmrc.uknwauthcheckerapi.models.{ApiErrorMessages, AuthorisationRequest, CustomRegexes, JsonPaths}
 
 class ValidationService {
+  private val maxEoriCount: Int = 3000
+  private val minEoriCount: Int = 1
+
   def validateRequest(request: Request[JsValue]): Either[DataRetrievalError, AuthorisationRequest] =
     request.body.validate[AuthorisationRequest] match {
       case JsSuccess(authorisationRequest: AuthorisationRequest, _) =>
@@ -45,11 +47,11 @@ class ValidationService {
 
     (eoriErrors.nonEmpty, isEoriSizeInvalid(eoris.size)) match {
       case (false, false) => Right(request)
-      case (_, true)      => Left(JsError(JsPath \ "eoris", ErrorMessages.invalidEoriCount))
+      case (_, true)      => Left(JsError(JsPath \ JsonPaths.eoris, ApiErrorMessages.invalidEoriCount))
       case (true, _) =>
         Left(
           JsError(
-            Seq("eoris").map { field =>
+            Seq(JsonPaths.eoris).map { field =>
               (JsPath \ field, eoriErrors)
             }
           )
@@ -58,6 +60,6 @@ class ValidationService {
   }
 
   private def isEoriSizeInvalid(eorisSize: Int): Boolean =
-    if (eorisSize > 3000 || eorisSize < 1) true else false
+    eorisSize > maxEoriCount || minEoriCount < 1
 
 }
