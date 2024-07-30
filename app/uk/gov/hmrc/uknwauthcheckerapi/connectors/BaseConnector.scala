@@ -26,8 +26,9 @@ import play.api.libs.json.{JsResult, Reads}
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.client.RequestBuilder
 import uk.gov.hmrc.http.{HttpResponse, Retries, UpstreamErrorResponse}
+import uk.gov.hmrc.uknwauthcheckerapi.utils.CorrelationIdGenerator
 
-trait BaseConnector extends Retries {
+trait BaseConnector extends Retries with CorrelationIdGenerator {
 
   override def actorSystem:   ActorSystem
   override def configuration: Config
