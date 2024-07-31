@@ -31,9 +31,10 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.uknwauthcheckerapi.errors.DataRetrievalError._
 import uk.gov.hmrc.uknwauthcheckerapi.errors._
-import uk.gov.hmrc.uknwauthcheckerapi.generators._
-import uk.gov.hmrc.uknwauthcheckerapi.models._
+import uk.gov.hmrc.uknwauthcheckerapi.generators.{NoEorisAuthorisationRequest, TooManyEorisAuthorisationRequest, UtcDateTime, ValidAuthorisationRequest}
+import uk.gov.hmrc.uknwauthcheckerapi.models.{AuthorisationRequest, AuthorisationResponse, AuthorisationsResponse}
 import uk.gov.hmrc.uknwauthcheckerapi.services.{IntegrationFrameworkService, LocalDateService, ValidationService}
+import uk.gov.hmrc.uknwauthcheckerapi.utils.{ErrorMessages, JsonErrors}
 
 class AuthorisationsControllerSpec extends BaseSpec {
 
@@ -42,8 +43,6 @@ class AuthorisationsControllerSpec extends BaseSpec {
   when(mockLocalDateService.now()).thenReturn(LocalDate.now)
 
   private lazy val controller = injected[AuthorisationsController]
-
-  protected lazy val now: LocalDate = mockLocalDateService.now()
 
   override def moduleOverrides: AbstractModule = new AbstractModule {
     override def configure(): Unit = {
@@ -61,9 +60,9 @@ class AuthorisationsControllerSpec extends BaseSpec {
 
   "AuthorisationsController" should {
     "return OK (200) with authorised eoris when request has valid eoris" in {
-      forAll { authorisationRequest: AuthorisationRequest =>
+      forAll { (authorisationRequest: AuthorisationRequest, utcDateTime: UtcDateTime) =>
         val expectedResponse = AuthorisationsResponse(
-          now,
+          utcDateTime.formatted,
           authorisationRequest.eoris.map(r => AuthorisationResponse(r, authorised = true))
         )
 
@@ -89,7 +88,7 @@ class AuthorisationsControllerSpec extends BaseSpec {
 
       val jsError = JsError(
         Seq("date", "eoris").map { field =>
-          (JsPath \ field, Seq(JsonValidationError(JsonErrorMessages.pathMissing)))
+          (JsPath \ field, Seq(JsonValidationError(JsonErrors.pathMissing)))
         }
       )
 
@@ -111,7 +110,7 @@ class AuthorisationsControllerSpec extends BaseSpec {
       val request = fakeRequestWithJsonBody(emptyJson)
 
       val jsError = JsError(
-        Seq((JsPath \ "", Seq(JsonValidationError(JsonErrorMessages.expectedJsObject))))
+        Seq((JsPath \ "", Seq(JsonValidationError(JsonErrors.expectedJsObject))))
       )
 
       val expectedResponse = Json.toJson(
@@ -201,7 +200,7 @@ class AuthorisationsControllerSpec extends BaseSpec {
   "return BAD_REQUEST (400) with authorised eoris when request has valid eoris but they exceed the maximum eoris" in {
 
     forAll { authorisationRequest: TooManyEorisAuthorisationRequest =>
-      val jsError = JsError(JsPath \ "eoris", JsonValidationError(ApiErrorMessages.invalidEoriCount))
+      val jsError = JsError(JsPath \ "eoris", JsonValidationError(ErrorMessages.invalidEoriCount))
 
       val expectedResponse = Json.toJson(
         JsonValidationApiError(jsError)
@@ -223,7 +222,7 @@ class AuthorisationsControllerSpec extends BaseSpec {
   "return BAD_REQUEST (400) when request has no eoris" in {
 
     forAll { authorisationRequest: NoEorisAuthorisationRequest =>
-      val jsError = JsError(JsPath \ "eoris", JsonValidationError(ApiErrorMessages.invalidEoriCount))
+      val jsError = JsError(JsPath \ "eoris", JsonValidationError(ErrorMessages.invalidEoriCount))
 
       val expectedResponse = Json.toJson(
         JsonValidationApiError(jsError)
