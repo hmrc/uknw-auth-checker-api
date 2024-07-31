@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.uknwauthcheckerapi.controllers
 
+import java.time.ZonedDateTime
+
 import com.github.tomakehurst.wiremock.client.WireMock._
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 
@@ -55,7 +57,7 @@ class AuthorisationControllerISpec extends BaseISpec {
 
   "POST /authorisations" should {
     "return OK (200) with authorised eoris when request has valid eoris" in new Setup {
-      forAll { (validRequest: ValidAuthorisationRequest, utcDateTime: UtcDateTime) =>
+      forAll { (validRequest: ValidAuthorisationRequest, dateTime: ZonedDateTime) =>
         reset()
 
         val request = validRequest.request
@@ -63,7 +65,7 @@ class AuthorisationControllerISpec extends BaseISpec {
         val authorisationRequestJson = Json.toJson(request)
 
         val expectedResponse = Json.toJson(
-          EisAuthorisationsResponse(utcDateTime.formatted, EisAuthTypes.nopWaiver, Seq.empty)
+          EisAuthorisationsResponse(dateTime, EisAuthTypes.nopWaiver, Seq.empty)
         )
 
         stubPost(eisAuthorisationsEndpointPath, OK, expectedResponse.toString())

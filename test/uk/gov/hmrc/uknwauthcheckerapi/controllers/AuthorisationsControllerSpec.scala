@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.uknwauthcheckerapi.controllers
 
-import java.time.LocalDate
+import java.time.{LocalDate, ZonedDateTime}
 import scala.concurrent.Future
 
 import cats.data.EitherT
@@ -60,9 +60,9 @@ class AuthorisationsControllerSpec extends BaseSpec {
 
   "AuthorisationsController" should {
     "return OK (200) with authorised eoris when request has valid eoris" in {
-      forAll { (authorisationRequest: AuthorisationRequest, utcDateTime: UtcDateTime) =>
+      forAll { (authorisationRequest: AuthorisationRequest, dateTime: ZonedDateTime) =>
         val expectedResponse = AuthorisationsResponse(
-          utcDateTime.formatted,
+          dateTime,
           authorisationRequest.eoris.map(r => AuthorisationResponse(r, authorised = true))
         )
 

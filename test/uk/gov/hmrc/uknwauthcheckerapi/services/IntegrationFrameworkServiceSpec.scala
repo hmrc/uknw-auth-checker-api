@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.uknwauthcheckerapi.services
 
+import java.time.ZonedDateTime
 import scala.concurrent.Future
 
 import com.google.inject.AbstractModule
@@ -30,7 +31,7 @@ import uk.gov.hmrc.http.{BadGatewayException, UpstreamErrorResponse}
 import uk.gov.hmrc.uknwauthcheckerapi.connectors.IntegrationFrameworkConnector
 import uk.gov.hmrc.uknwauthcheckerapi.controllers.BaseSpec
 import uk.gov.hmrc.uknwauthcheckerapi.errors.DataRetrievalError._
-import uk.gov.hmrc.uknwauthcheckerapi.generators.{UtcDateTime, ValidAuthorisationRequest}
+import uk.gov.hmrc.uknwauthcheckerapi.generators._
 import uk.gov.hmrc.uknwauthcheckerapi.models._
 import uk.gov.hmrc.uknwauthcheckerapi.models.constants.JsonErrorMessages
 import uk.gov.hmrc.uknwauthcheckerapi.models.eis._
@@ -46,16 +47,16 @@ class IntegrationFrameworkServiceSpec extends BaseSpec {
 
   "getEisAuthorisations" should {
     "return EisAuthorisationsResponse when call to the integration framework succeeds" in forAll {
-      (validRequest: ValidAuthorisationRequest, utcDateTime: UtcDateTime) =>
+      (validRequest: ValidAuthorisationRequest, dateTime: ZonedDateTime) =>
         val request = validRequest.request
 
         val expectedResponse = AuthorisationsResponse(
-          utcDateTime.formatted,
+          dateTime,
           request.eoris.map(r => AuthorisationResponse(r, authorised = true))
         )
 
         val expectedEisAuthorisationsResponse = EisAuthorisationsResponse(
-          utcDateTime.formatted,
+          dateTime,
           appConfig.authType,
           request.eoris.map(r => EisAuthorisationResponse(r, valid = true, 0))
         )
