@@ -30,7 +30,7 @@ import play.api.test.Helpers.await
 import uk.gov.hmrc.http.{HttpResponse, UpstreamErrorResponse}
 import uk.gov.hmrc.uknwauthcheckerapi.controllers.BaseSpec
 import uk.gov.hmrc.uknwauthcheckerapi.generators.ValidEisAuthorisationsResponse
-import uk.gov.hmrc.uknwauthcheckerapi.models.JsonErrorMessages
+import uk.gov.hmrc.uknwauthcheckerapi.models.constants.JsonErrorMessages
 import uk.gov.hmrc.uknwauthcheckerapi.models.eis.EisAuthorisationRequest
 
 class IntegrationFrameworkConnectorSpec extends BaseSpec {

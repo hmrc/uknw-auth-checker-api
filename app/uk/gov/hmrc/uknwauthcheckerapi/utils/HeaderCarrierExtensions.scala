@@ -19,7 +19,7 @@ package uk.gov.hmrc.uknwauthcheckerapi.utils
 import java.util.UUID
 
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.uknwauthcheckerapi.models.CustomHeaderNames
+import uk.gov.hmrc.uknwauthcheckerapi.models.constants.CustomHeaderNames
 
 trait HeaderCarrierExtensions {
 

@@ -32,6 +32,7 @@ import uk.gov.hmrc.uknwauthcheckerapi.controllers.BaseSpec
 import uk.gov.hmrc.uknwauthcheckerapi.errors.DataRetrievalError._
 import uk.gov.hmrc.uknwauthcheckerapi.generators.{UtcDateTime, ValidAuthorisationRequest}
 import uk.gov.hmrc.uknwauthcheckerapi.models._
+import uk.gov.hmrc.uknwauthcheckerapi.models.constants.JsonErrorMessages
 import uk.gov.hmrc.uknwauthcheckerapi.models.eis._
 
 class IntegrationFrameworkServiceSpec extends BaseSpec {

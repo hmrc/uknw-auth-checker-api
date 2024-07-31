@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.uknwauthcheckerapi.models
+package uk.gov.hmrc.uknwauthcheckerapi.models.constants
 
-object CustomHeaderNames {
-  val xCorrelationId = "X-Correlation-Id"
+object HmrcContentTypes {
+  val json = "application/json;charset=utf-8"
 }

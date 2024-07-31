@@ -17,7 +17,7 @@
 package uk.gov.hmrc.uknwauthcheckerapi.errors.transformers
 
 import play.api.libs.json.{JsError, JsValue, Json}
-import uk.gov.hmrc.uknwauthcheckerapi.models.{ApiErrorCodes, JsonErrorMessages, JsonPaths}
+import uk.gov.hmrc.uknwauthcheckerapi.models.constants.{ApiErrorCodes, JsonErrorMessages, JsonPaths}
 
 trait JsErrorTransformer {
 

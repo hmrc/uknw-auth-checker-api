@@ -22,7 +22,8 @@ import play.api.libs.json.{JsError, JsPath, Json, JsonValidationError}
 import uk.gov.hmrc.uknwauthcheckerapi.controllers.BaseSpec
 import uk.gov.hmrc.uknwauthcheckerapi.errors.DataRetrievalError.ValidationDataRetrievalError
 import uk.gov.hmrc.uknwauthcheckerapi.generators.TooManyEorisAuthorisationRequest
-import uk.gov.hmrc.uknwauthcheckerapi.models.{ApiErrorMessages, AuthorisationRequest, JsonErrorMessages}
+import uk.gov.hmrc.uknwauthcheckerapi.models.AuthorisationRequest
+import uk.gov.hmrc.uknwauthcheckerapi.models.constants.{ApiErrorMessages, JsonErrorMessages}
 
 class ValidationServiceSpec extends BaseSpec {
 

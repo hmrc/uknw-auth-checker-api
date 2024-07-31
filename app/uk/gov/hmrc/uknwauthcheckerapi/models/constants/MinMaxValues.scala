@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.uknwauthcheckerapi.models
+package uk.gov.hmrc.uknwauthcheckerapi.models.constants
 
-object JsonErrorMessages {
-  val eorisFieldMissing: String = "eoris field missing from JSON"
-  val expectedJsObject:  String = "error.expected.jsobject"
-  val jsonMalformed:     String = "JSON is malformed"
-  val pathMissing:       String = "error.path.missing"
+object MinMaxValues {
+  val maxEoriCount: Int = 3000
+  val minEoriCount: Int = 1
 }

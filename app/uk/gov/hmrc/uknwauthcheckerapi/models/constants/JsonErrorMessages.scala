@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.uknwauthcheckerapi.models
+package uk.gov.hmrc.uknwauthcheckerapi.models.constants
 
-object JsonPaths {
-  val code:    String = "code"
-  val eoris:   String = "eoris"
-  val errors:  String = "errors"
-  val message: String = "message"
-  val path:    String = "path"
+object JsonErrorMessages {
+  val eorisFieldMissing: String = "eoris field missing from JSON"
+  val expectedJsObject:  String = "error.expected.jsobject"
+  val jsonMalformed:     String = "JSON is malformed"
+  val pathMissing:       String = "error.path.missing"
 }

@@ -27,8 +27,9 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, Retries}
 import uk.gov.hmrc.uknwauthcheckerapi.config.AppConfig
+import uk.gov.hmrc.uknwauthcheckerapi.models.Rfc7231DateTime
+import uk.gov.hmrc.uknwauthcheckerapi.models.constants.{CustomHeaderNames, HmrcContentTypes}
 import uk.gov.hmrc.uknwauthcheckerapi.models.eis.{EisAuthorisationRequest, EisAuthorisationsResponse}
-import uk.gov.hmrc.uknwauthcheckerapi.models.{CustomHeaderNames, HmrcContentTypes, Rfc7231DateTime}
 
 @Singleton
 class IntegrationFrameworkConnector @Inject() (

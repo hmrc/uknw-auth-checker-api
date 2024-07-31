@@ -26,7 +26,7 @@ import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.uknwauthcheckerapi.errors.{ServiceUnavailableApiError, UnauthorizedApiError}
-import uk.gov.hmrc.uknwauthcheckerapi.models.ApiErrorMessages
+import uk.gov.hmrc.uknwauthcheckerapi.models.constants.ApiErrorMessages
 
 @Singleton
 class AuthAction @Inject() (ac: AuthConnector)(implicit val executionContext: ExecutionContext) extends ActionFilter[Request] with Logging {

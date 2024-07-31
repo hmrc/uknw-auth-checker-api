@@ -22,12 +22,10 @@ import play.api.libs.json._
 import play.api.mvc.Request
 import uk.gov.hmrc.uknwauthcheckerapi.errors.DataRetrievalError
 import uk.gov.hmrc.uknwauthcheckerapi.errors.DataRetrievalError.ValidationDataRetrievalError
-import uk.gov.hmrc.uknwauthcheckerapi.models.{ApiErrorMessages, AuthorisationRequest, CustomRegexes, JsonPaths}
+import uk.gov.hmrc.uknwauthcheckerapi.models.AuthorisationRequest
+import uk.gov.hmrc.uknwauthcheckerapi.models.constants.{ApiErrorMessages, CustomRegexes, JsonPaths, MinMaxValues}
 
 class ValidationService {
-  private val maxEoriCount: Int = 3000
-  private val minEoriCount: Int = 1
-
   def validateRequest(request: Request[JsValue]): Either[DataRetrievalError, AuthorisationRequest] =
     request.body.validate[AuthorisationRequest] match {
       case JsSuccess(authorisationRequest: AuthorisationRequest, _) =>
@@ -60,6 +58,6 @@ class ValidationService {
   }
 
   private def isEoriSizeInvalid(eorisSize: Int): Boolean =
-    eorisSize > maxEoriCount || minEoriCount < 1
+    eorisSize > MinMaxValues.maxEoriCount || MinMaxValues.minEoriCount < 1
 
 }

@@ -18,7 +18,7 @@ package uk.gov.hmrc.uknwauthcheckerapi.generators
 
 import play.api.http.MimeTypes
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.uknwauthcheckerapi.models.HmrcMimeTypes
+import uk.gov.hmrc.uknwauthcheckerapi.models.constants.HmrcMimeTypes
 
 trait TestHeaders {
 

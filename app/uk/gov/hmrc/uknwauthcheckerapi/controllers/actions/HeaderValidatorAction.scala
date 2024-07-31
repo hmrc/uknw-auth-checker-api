@@ -21,7 +21,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import play.api.http.{HeaderNames, MimeTypes}
 import play.api.mvc._
 import uk.gov.hmrc.uknwauthcheckerapi.errors.NotAcceptableApiError
-import uk.gov.hmrc.uknwauthcheckerapi.models.HmrcMimeTypes
+import uk.gov.hmrc.uknwauthcheckerapi.models.constants.HmrcMimeTypes
 import uk.gov.hmrc.uknwauthcheckerapi.utils.RequestExtensions
 
 trait HeaderValidatorAction extends Results with RequestExtensions {

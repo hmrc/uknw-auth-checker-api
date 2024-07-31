@@ -22,8 +22,9 @@ import org.scalacheck.Gen.chooseNum
 import org.scalacheck.{Arbitrary, Gen}
 import wolfendale.scalacheck.regexp.RegexpGen
 
+import uk.gov.hmrc.uknwauthcheckerapi.models.AuthorisationRequest
+import uk.gov.hmrc.uknwauthcheckerapi.models.constants.{CustomRegexes, MinMaxValues}
 import uk.gov.hmrc.uknwauthcheckerapi.models.eis._
-import uk.gov.hmrc.uknwauthcheckerapi.models.{AuthorisationRequest, _}
 
 trait Generators extends ExtensionHelpers {
 
@@ -74,7 +75,7 @@ trait Generators extends ExtensionHelpers {
     )
   }
 
-  protected def eoriGenerator(min: Int = 1, max: Int = 3000): Gen[Seq[String]] =
+  protected def eoriGenerator(min: Int = MinMaxValues.minEoriCount, max: Int = MinMaxValues.maxEoriCount): Gen[Seq[String]] =
     Gen.chooseNum(min, max).flatMap(n => Gen.listOfN(n, eoriGen))
 
 }

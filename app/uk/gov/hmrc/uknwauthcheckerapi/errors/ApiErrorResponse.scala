@@ -21,7 +21,7 @@ import play.api.libs.json._
 import play.api.mvc.Result
 import play.api.mvc.Results.Status
 import uk.gov.hmrc.uknwauthcheckerapi.errors.transformers.{BadRequestErrorTransformer, JsErrorTransformer}
-import uk.gov.hmrc.uknwauthcheckerapi.models.{ApiErrorCodes, ApiErrorMessages, JsonPaths}
+import uk.gov.hmrc.uknwauthcheckerapi.models.constants.{ApiErrorCodes, ApiErrorMessages, JsonPaths}
 
 sealed trait ApiErrorResponse {
   def statusCode: Int

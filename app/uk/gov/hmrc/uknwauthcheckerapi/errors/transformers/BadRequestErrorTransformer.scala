@@ -17,8 +17,8 @@
 package uk.gov.hmrc.uknwauthcheckerapi.errors.transformers
 
 import play.api.libs.json.{JsObject, JsValue, Json}
-import uk.gov.hmrc.uknwauthcheckerapi.models.CustomRegexes.invalidFormatOfEorisPattern
-import uk.gov.hmrc.uknwauthcheckerapi.models.{ApiErrorCodes, JsonPaths}
+import uk.gov.hmrc.uknwauthcheckerapi.models.constants.CustomRegexes.invalidFormatOfEorisPattern
+import uk.gov.hmrc.uknwauthcheckerapi.models.constants.{ApiErrorCodes, JsonPaths}
 
 trait BadRequestErrorTransformer {
 

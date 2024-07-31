@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.uknwauthcheckerapi.models
+package uk.gov.hmrc.uknwauthcheckerapi.models.constants
 
-object HmrcMimeTypes {
-  val json = "application/vnd.hmrc.1.0+json"
+object JsonPaths {
+  val code:    String = "code"
+  val eoris:   String = "eoris"
+  val errors:  String = "errors"
+  val message: String = "message"
+  val path:    String = "path"
 }
