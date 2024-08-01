@@ -25,10 +25,6 @@ import uk.gov.hmrc.http.StringContextOps
 class AppConfig @Inject() (config: Configuration) {
 
   private lazy val rootServices = "microservice.services"
-  private lazy val defaultProtocol: String =
-    config
-      .getOptional[String](s"$rootServices.protocol")
-      .getOrElse("http")
 
   val authorisationsEndpoint = "/authorisations"
   val authType: String = config.get[String]("authType")
@@ -37,7 +33,7 @@ class AppConfig @Inject() (config: Configuration) {
     config.get[String]("microservice.services.integration-framework.bearerToken")
 
   def baseUrl(serviceName: String): String = {
-    val protocol = getConfString(s"$serviceName.protocol", defaultProtocol)
+    val protocol = getConfString(s"$serviceName.protocol", "http")
     val host     = getConfString(s"$serviceName.host", throwConfigNotFoundError(s"$serviceName.host"))
     val port     = getConfInt(s"$serviceName.port", throwConfigNotFoundError(s"$serviceName.port"))
     s"$protocol://$host:$port"
