@@ -53,9 +53,9 @@ class ValidationService {
     }
 
   private def validateEoriStructure(request: AuthorisationRequest): ValidationResult[AuthorisationRequest] = {
-    val eoriErrors: Seq[JsonValidationError] = request.eoris
-      .filterNot(e => e matches CustomRegexes.eoriPattern)
-      .map(e => JsonValidationError(s"$e is not a supported EORI number"))
+    val eoriErrors = request.eoris.collect {
+      case eori if !(eori matches CustomRegexes.eoriPattern) => JsonValidationError(s"$eori is not a supported EORI number")
+    }
 
     if (eoriErrors.nonEmpty) {
       Left(
