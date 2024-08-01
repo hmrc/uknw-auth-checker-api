@@ -17,13 +17,12 @@
 package uk.gov.hmrc.uknwauthcheckerapi.services
 
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
-
 import play.api.libs.json.{JsError, JsPath, Json, JsonValidationError}
 import uk.gov.hmrc.uknwauthcheckerapi.controllers.BaseSpec
 import uk.gov.hmrc.uknwauthcheckerapi.errors.DataRetrievalError.ValidationDataRetrievalError
 import uk.gov.hmrc.uknwauthcheckerapi.generators.TooManyEorisAuthorisationRequest
 import uk.gov.hmrc.uknwauthcheckerapi.models.AuthorisationRequest
-import uk.gov.hmrc.uknwauthcheckerapi.models.constants.{ApiErrorMessages, JsonErrorMessages}
+import uk.gov.hmrc.uknwauthcheckerapi.models.constants.{ApiErrorMessages, JsonErrorMessages, JsonPaths}
 
 class ValidationServiceSpec extends BaseSpec {
 
@@ -68,7 +67,7 @@ class ValidationServiceSpec extends BaseSpec {
         val expectedResponse =
           ValidationDataRetrievalError(
             JsError(
-              Seq("eoris").map { field =>
+              Seq(JsonPaths.eoris).map { field =>
                 (
                   JsPath \ field,
                   Seq(
@@ -95,7 +94,7 @@ class ValidationServiceSpec extends BaseSpec {
         val expectedResponse =
           ValidationDataRetrievalError(
             JsError(
-              Seq((JsPath \ "eoris", Seq(JsonValidationError(ApiErrorMessages.invalidEoriCount))))
+              Seq((JsPath \ JsonPaths.eoris, Seq(JsonValidationError(ApiErrorMessages.invalidEoriCount))))
             )
           )
 
