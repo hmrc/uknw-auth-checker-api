@@ -22,7 +22,7 @@ import uk.gov.hmrc.uknwauthcheckerapi.models.constants.HmrcMimeTypes
 
 trait TestHeaders {
 
-  protected val authorizationHeader: (String, String) = HeaderNames.AUTHORIZATION -> "Bearer PFZBTElEX1RPS0VOPg=="
+  protected val authorizationHeader: (String, String) = HeaderNames.AUTHORIZATION -> TestConstants.bearerToken
   protected val acceptHeader:        (String, String) = HeaderNames.ACCEPT        -> HmrcMimeTypes.json
   protected val contentTypeHeader:   (String, String) = HeaderNames.CONTENT_TYPE  -> MimeTypes.JSON
 

@@ -105,7 +105,7 @@ class IntegrationFrameworkServiceSpec extends BaseSpec {
           eisErrorResponse.errorDetail
             .copy(
               errorCode = BAD_REQUEST,
-              errorMessage = invalidEorisEisErrorMessage
+              errorMessage = TestConstants.invalidEorisEisErrorMessage
             )
         )
 
@@ -116,7 +116,7 @@ class IntegrationFrameworkServiceSpec extends BaseSpec {
 
         val result = await(service.getAuthorisations(request).value)
 
-        result shouldBe Left(BadRequestDataRetrievalError(invalidEorisEisErrorMessage))
+        result shouldBe Left(BadRequestDataRetrievalError(TestConstants.invalidEorisEisErrorMessage))
     }
 
     "return ForbiddenDataRetrievalError error when call to the integration framework fails with a FORBIDDEN" in forAll {
@@ -179,7 +179,7 @@ class IntegrationFrameworkServiceSpec extends BaseSpec {
           eisErrorResponse.errorDetail
             .copy(
               errorCode = BAD_REQUEST,
-              errorMessage = invalidAuthTypeEisErrorMessage
+              errorMessage = TestConstants.invalidAuthTypeEisErrorMessage
             )
         )
 

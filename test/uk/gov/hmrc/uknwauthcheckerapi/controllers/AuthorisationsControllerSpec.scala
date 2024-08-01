@@ -53,9 +53,9 @@ class AuthorisationsControllerSpec extends BaseSpec {
     }
   }
 
-  override protected def beforeEach(): Unit = {
+  override protected def beforeAll(): Unit = {
     stubAuthorization()
-    super.beforeEach()
+    super.beforeAll()
   }
 
   "AuthorisationsController" should {
@@ -152,10 +152,10 @@ class AuthorisationsControllerSpec extends BaseSpec {
   "return BAD_REQUEST (400) error when getAuthorisations call has eori errors" in forAll { (validRequest: ValidAuthorisationRequest) =>
     val authorisationRequest: AuthorisationRequest = validRequest.request
 
-    val error = BadRequestDataRetrievalError(invalidEorisEisErrorMessage)
+    val error = BadRequestDataRetrievalError(TestConstants.invalidEorisEisErrorMessage)
 
     val expectedResponse = Json.toJson(
-      BadRequestApiError(invalidEorisEisErrorMessage)
+      BadRequestApiError(TestConstants.invalidEorisEisErrorMessage)
     )(ApiErrorResponse.badRequestApiErrorWrites)
 
     when(mockValidationService.validateRequest(any()))
