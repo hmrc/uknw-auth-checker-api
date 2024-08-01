@@ -26,6 +26,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{EmptyBody, WSClient, WSRequest, WSResponse}
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
+import uk.gov.hmrc.uknwauthcheckerapi.config.AppConfig
 import uk.gov.hmrc.uknwauthcheckerapi.generators.{TestConstants, TestData, TestHeaders}
 
 class BaseISpec extends PlaySpec with GuiceOneServerPerSuite with WireMockISpec with TestData with TestHeaders {
@@ -47,7 +48,8 @@ class BaseISpec extends PlaySpec with GuiceOneServerPerSuite with WireMockISpec 
     .configure(additionalAppConfig)
     .build()
   protected lazy val authorisationsUrl = s"http://localhost:$port/authorisations"
-  private lazy val wsClient: WSClient = injected[WSClient]
+  protected lazy val appConfig: AppConfig = injected[AppConfig]
+  private lazy val wsClient:    WSClient  = injected[WSClient]
 
   protected def injected[T](implicit evidence: ClassTag[T]): T = app.injector.instanceOf[T]
 
