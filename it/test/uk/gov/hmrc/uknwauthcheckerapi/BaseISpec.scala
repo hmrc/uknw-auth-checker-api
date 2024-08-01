@@ -26,9 +26,9 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
-import uk.gov.hmrc.uknwauthcheckerapi.generators.{ExtensionHelpers, TestConstants, TestData, TestHeaders}
+import uk.gov.hmrc.uknwauthcheckerapi.generators.{TestConstants, TestData, TestHeaders}
 
-class BaseISpec extends PlaySpec with GuiceOneServerPerSuite with WireMockISpec with TestData with TestHeaders with ExtensionHelpers {
+class BaseISpec extends PlaySpec with GuiceOneServerPerSuite with WireMockISpec with TestData with TestHeaders {
 
   @annotation.nowarn
   protected val additionalAppConfig: Map[String, Any] = Map(

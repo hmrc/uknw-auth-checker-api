@@ -56,8 +56,7 @@ class BaseSpec
     with DefaultAwaitTimeout
     with HeaderNames
     with TestData
-    with TestHeaders
-    with ExtensionHelpers {
+    with TestHeaders {
 
   implicit lazy val ec:           ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
   implicit lazy val hc:           HeaderCarrier    = HeaderCarrier()
