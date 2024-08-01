@@ -45,7 +45,7 @@ import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import uk.gov.hmrc.uknwauthcheckerapi.config.AppConfig
 import uk.gov.hmrc.uknwauthcheckerapi.connectors.IntegrationFrameworkConnector
 import uk.gov.hmrc.uknwauthcheckerapi.generators._
-import uk.gov.hmrc.uknwauthcheckerapi.services.{IntegrationFrameworkService, ValidationService}
+import uk.gov.hmrc.uknwauthcheckerapi.services.{IntegrationFrameworkService, LocalDateService, ValidationService}
 
 class BaseSpec
     extends AnyWordSpec
@@ -80,9 +80,10 @@ class BaseSpec
   protected val fakePostRequest:                        FakeRequest[AnyContentAsEmpty.type] = FakeRequest(POST, "")
   protected lazy val mockAuthConnector:                 AuthConnector                       = mock[AuthConnector]
   protected lazy val mockHttpClient:                    HttpClientV2                        = mock[HttpClientV2]
-  protected lazy val mockRequestBuilder:                RequestBuilder                      = mock[RequestBuilder]
   protected lazy val mockIntegrationFrameworkConnector: IntegrationFrameworkConnector       = mock[IntegrationFrameworkConnector]
   protected lazy val mockIntegrationFrameworkService:   IntegrationFrameworkService         = mock[IntegrationFrameworkService]
+  protected lazy val mockLocalDateService:              LocalDateService                    = mock[LocalDateService]
+  protected lazy val mockRequestBuilder:                RequestBuilder                      = mock[RequestBuilder]
   protected lazy val mockValidationService:             ValidationService                   = mock[ValidationService]
 
   override def fakeApplication(): Application =

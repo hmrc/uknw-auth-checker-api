@@ -17,7 +17,7 @@
 package uk.gov.hmrc.uknwauthcheckerapi.generators
 
 object TestConstants {
-  val authorisationEndpoint:           String  = "authorisation"
+  val authorisationEndpoint:           String = "authorisation"
   val actorName:                       String = "actor"
   val bearerToken:                     String = "Bearer PFZBTElEX1RPS0VOPg=="
   val callAmountWithRetries:           Int    = 4

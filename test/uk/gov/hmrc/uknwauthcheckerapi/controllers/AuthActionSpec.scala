@@ -17,8 +17,10 @@
 package uk.gov.hmrc.uknwauthcheckerapi.controllers
 
 import scala.concurrent.Future
+
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{reset, when}
+
 import play.api.mvc.Result
 import play.api.test.Helpers.await
 import uk.gov.hmrc.auth.core.retrieve.Credentials
