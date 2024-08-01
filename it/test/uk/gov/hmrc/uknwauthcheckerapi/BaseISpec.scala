@@ -49,7 +49,6 @@ class BaseISpec extends PlaySpec with GuiceOneServerPerSuite with WireMockISpec 
   protected lazy val authorisationsUrl = s"http://localhost:$port/authorisations"
   private lazy val wsClient: WSClient = injected[WSClient]
 
-  protected def injected[T](c:                 Class[T]):    T = app.injector.instanceOf(c)
   protected def injected[T](implicit evidence: ClassTag[T]): T = app.injector.instanceOf[T]
 
   private def createRequest(url: String, headers: Seq[(String, String)] = defaultHeaders): WSRequest =
