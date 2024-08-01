@@ -267,7 +267,7 @@ class AuthorisationControllerISpec extends BaseISpec {
     "return NOT_ACCEPTABLE when Content-Type header is missing" in new TestContext {
       reset()
 
-      val headers:                  Seq[(String, String)] = defaultHeaders.filterNot(header => header == contentTypeHeader)
+      val headers: Seq[(String, String)] = defaultHeaders.filterNot(header => header == contentTypeHeader)
 
       val result: WSResponse = postEmptyRequest(authorisationsUrl, headers)
 

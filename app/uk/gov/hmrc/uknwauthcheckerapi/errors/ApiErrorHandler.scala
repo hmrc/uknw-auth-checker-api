@@ -44,7 +44,7 @@ class ApiErrorHandler @Inject() (appConfig: AppConfig) extends HttpErrorHandler 
             case appConfig.authorisationsEndpoint => MethodNotAllowedApiError.toResult
             case _                                => NotFoundApiError.toResult
           }
-        case SERVICE_UNAVAILABLE => ServiceUnavailableApiError.toResult
+        case SERVICE_UNAVAILABLE    => ServiceUnavailableApiError.toResult
         case UNSUPPORTED_MEDIA_TYPE => NotAcceptableApiError.toResult
         case _ =>
           logger.warn(s"[ApiErrorHandler][onClientError] Unexpected client error type")
