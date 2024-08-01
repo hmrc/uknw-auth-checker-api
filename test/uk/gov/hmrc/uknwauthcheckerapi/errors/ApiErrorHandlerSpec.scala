@@ -16,7 +16,10 @@
 
 package uk.gov.hmrc.uknwauthcheckerapi.errors
 
+import scala.concurrent.Future
+
 import org.scalatest.Assertion
+
 import play.api.http.Status._
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
@@ -24,8 +27,6 @@ import play.api.test.Helpers.{contentAsJson, status}
 import uk.gov.hmrc.http.{HttpVerbs, NotFoundException}
 import uk.gov.hmrc.uknwauthcheckerapi.controllers.BaseSpec
 import uk.gov.hmrc.uknwauthcheckerapi.generators.TestConstants
-
-import scala.concurrent.Future
 
 class ApiErrorHandlerSpec extends BaseSpec {
 

@@ -20,6 +20,7 @@ object JsonPaths {
   val authType:       String = "authType"
   val code:           String = "code"
   val eoris:          String = "eoris"
+  val errorDetail:    String = "errorDetail"
   val errors:         String = "errors"
   val message:        String = "message"
   val path:           String = "path"

@@ -35,6 +35,7 @@ object TestConstants {
   val errorExpectedUpstreamResponse:   String = "expected UpstreamErrorResponse when error is received"
   val emptyJson:                       String = "{}"
   val emptyString:                     String = ""
+  val invalidAuthTypeErrorMessage:     String = "Invalid auth type UKNW"
   val invalidAuthTypeEisErrorMessage:  String = "Invalid authorisation type : UKNW"
   val invalidEorisEisErrorMessage:     String = "Invalid format of EORI(s): 0000000001,0000000003"
   val serviceEndpointAuth:             String = "/auth/authorise"

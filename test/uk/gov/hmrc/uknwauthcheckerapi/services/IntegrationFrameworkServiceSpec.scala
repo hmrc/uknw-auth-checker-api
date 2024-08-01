@@ -22,6 +22,7 @@ import scala.concurrent.Future
 import com.google.inject.AbstractModule
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
+import org.scalatest.Assertion
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 
 import play.api.http.Status._
@@ -30,10 +31,11 @@ import play.api.test.Helpers.await
 import uk.gov.hmrc.http.{BadGatewayException, UpstreamErrorResponse}
 import uk.gov.hmrc.uknwauthcheckerapi.connectors.IntegrationFrameworkConnector
 import uk.gov.hmrc.uknwauthcheckerapi.controllers.BaseSpec
+import uk.gov.hmrc.uknwauthcheckerapi.errors.DataRetrievalError
 import uk.gov.hmrc.uknwauthcheckerapi.errors.DataRetrievalError._
 import uk.gov.hmrc.uknwauthcheckerapi.generators._
 import uk.gov.hmrc.uknwauthcheckerapi.models._
-import uk.gov.hmrc.uknwauthcheckerapi.models.constants.JsonErrorMessages
+import uk.gov.hmrc.uknwauthcheckerapi.models.constants.{JsonErrorMessages, JsonPaths}
 import uk.gov.hmrc.uknwauthcheckerapi.models.eis._
 
 class IntegrationFrameworkServiceSpec extends BaseSpec {
@@ -45,60 +47,79 @@ class IntegrationFrameworkServiceSpec extends BaseSpec {
       bind(classOf[IntegrationFrameworkConnector]).toInstance(mockIntegrationFrameworkConnector)
   }
 
+  trait TestContext {
+    def doTest(
+      request:     AuthorisationRequest,
+      eisResponse: Future[EisAuthorisationsResponse],
+      response:    Either[DataRetrievalError, AuthorisationsResponse]
+    ): Assertion = {
+
+      when(mockIntegrationFrameworkConnector.getEisAuthorisationsResponse(any())(any()))
+        .thenReturn(eisResponse)
+
+      val result = await(service.getAuthorisations(request).value)
+
+      result shouldBe response
+    }
+  }
+
   "getEisAuthorisations" should {
-    "return EisAuthorisationsResponse when call to the integration framework succeeds" in forAll {
-      (validRequest: ValidAuthorisationRequest, dateTime: ZonedDateTime) =>
+    "return EisAuthorisationsResponse when call to the integration framework succeeds" in new TestContext {
+      forAll { (validRequest: ValidAuthorisationRequest, dateTime: ZonedDateTime) =>
         val request = validRequest.request
+
+        val expectedEisResponse = EisAuthorisationsResponse(
+          dateTime,
+          appConfig.authType,
+          request.eoris.map(r => EisAuthorisationResponse(r, valid = true, 0))
+        )
 
         val expectedResponse = AuthorisationsResponse(
           dateTime,
           request.eoris.map(r => AuthorisationResponse(r, authorised = true))
         )
 
-        val expectedEisAuthorisationsResponse = EisAuthorisationsResponse(
-          dateTime,
-          appConfig.authType,
-          request.eoris.map(r => EisAuthorisationResponse(r, valid = true, 0))
+        doTest(
+          request = request,
+          eisResponse = Future.successful(expectedEisResponse),
+          response = Right(expectedResponse)
         )
-
-        when(mockIntegrationFrameworkConnector.getEisAuthorisationsResponse(any())(any()))
-          .thenReturn(Future.successful(expectedEisAuthorisationsResponse))
-
-        val result = await(service.getAuthorisations(request).value)
-
-        result shouldBe Right(expectedResponse)
+      }
     }
 
-    "return BadGatewayRetrievalError error when call to the integration framework fails with BAD_GATEWAY" in forAll {
-      (validRequest: ValidAuthorisationRequest, errorMessage: String) =>
+    "return BadGatewayRetrievalError error when call to the integration framework fails with BAD_GATEWAY" in new TestContext {
+      forAll { (validRequest: ValidAuthorisationRequest, errorMessage: String) =>
         val request = validRequest.request
 
-        val expectedResponse = new BadGatewayException(errorMessage)
+        val expectedEisResponse: BadGatewayException          = new BadGatewayException(errorMessage)
+        val expectedResponse:    BadGatewayDataRetrievalError = BadGatewayDataRetrievalError()
 
-        when(mockIntegrationFrameworkConnector.getEisAuthorisationsResponse(any())(any()))
-          .thenReturn(Future.failed(expectedResponse))
-
-        val result = await(service.getAuthorisations(request).value)
-
-        result shouldBe Left(BadGatewayDataRetrievalError())
+        doTest(
+          request = request,
+          eisResponse = Future.failed(expectedEisResponse),
+          response = Left(expectedResponse)
+        )
+      }
     }
 
-    "return InternalUnexpectedDataRetrievalError error when call to the integration framework fails with a non fatal error" in forAll {
-      (validRequest: ValidAuthorisationRequest, errorMessage: String) =>
+    "return InternalUnexpectedDataRetrievalError error when call to the integration framework fails with a non fatal error" in new TestContext {
+      forAll { (validRequest: ValidAuthorisationRequest, errorMessage: String) =>
         val request = validRequest.request
 
-        val expectedResponse = new Exception(errorMessage)
+        val expectedEisResponse: Exception = new Exception(errorMessage)
+        val expectedResponse: InternalUnexpectedDataRetrievalError =
+          InternalUnexpectedDataRetrievalError(expectedEisResponse.getMessage, expectedEisResponse)
 
-        when(mockIntegrationFrameworkConnector.getEisAuthorisationsResponse(any())(any()))
-          .thenReturn(Future.failed(expectedResponse))
-
-        val result = await(service.getAuthorisations(request).value)
-
-        result shouldBe Left(InternalUnexpectedDataRetrievalError(expectedResponse.getMessage, expectedResponse))
+        doTest(
+          request = request,
+          eisResponse = Future.failed(expectedEisResponse),
+          response = Left(expectedResponse)
+        )
+      }
     }
 
-    "return BadRequestDataRetrievalError error when call to the integration framework fails with a BAD_REQUEST" in forAll {
-      (validRequest: ValidAuthorisationRequest, eisErrorResponse: EisAuthorisationResponseError) =>
+    "return BadRequestDataRetrievalError error when call to the integration framework fails with a BAD_REQUEST" in new TestContext {
+      forAll { (validRequest: ValidAuthorisationRequest, eisErrorResponse: EisAuthorisationResponseError) =>
         val request = validRequest.request
 
         val eisError = eisErrorResponse.copy(errorDetail =
@@ -109,32 +130,34 @@ class IntegrationFrameworkServiceSpec extends BaseSpec {
             )
         )
 
-        val expectedResponse = UpstreamErrorResponse(Json.stringify(Json.toJson(eisError)), BAD_REQUEST)
+        val expectedEisResponse: UpstreamErrorResponse        = UpstreamErrorResponse(Json.stringify(Json.toJson(eisError)), BAD_REQUEST)
+        val expectedResponse:    BadRequestDataRetrievalError = BadRequestDataRetrievalError(TestConstants.invalidEorisEisErrorMessage)
 
-        when(mockIntegrationFrameworkConnector.getEisAuthorisationsResponse(any())(any()))
-          .thenReturn(Future.failed(expectedResponse))
-
-        val result = await(service.getAuthorisations(request).value)
-
-        result shouldBe Left(BadRequestDataRetrievalError(TestConstants.invalidEorisEisErrorMessage))
+        doTest(
+          request = request,
+          eisResponse = Future.failed(expectedEisResponse),
+          response = Left(expectedResponse)
+        )
+      }
     }
 
-    "return ForbiddenDataRetrievalError error when call to the integration framework fails with a FORBIDDEN" in forAll {
-      (validRequest: ValidAuthorisationRequest) =>
+    "return ForbiddenDataRetrievalError error when call to the integration framework fails with a FORBIDDEN" in new TestContext {
+      forAll { (validRequest: ValidAuthorisationRequest) =>
         val request = validRequest.request
 
-        val expectedResponse = UpstreamErrorResponse("{}", FORBIDDEN)
+        val expectedEisResponse: UpstreamErrorResponse       = UpstreamErrorResponse(TestConstants.emptyJson, FORBIDDEN)
+        val expectedResponse:    ForbiddenDataRetrievalError = ForbiddenDataRetrievalError()
 
-        when(mockIntegrationFrameworkConnector.getEisAuthorisationsResponse(any())(any()))
-          .thenReturn(Future.failed(expectedResponse))
-
-        val result = await(service.getAuthorisations(request).value)
-
-        result shouldBe Left(ForbiddenDataRetrievalError())
+        doTest(
+          request = request,
+          eisResponse = Future.failed(expectedEisResponse),
+          response = Left(expectedResponse)
+        )
+      }
     }
 
-    "return InternalServerDataRetrievalError error when call to the integration framework fails with a INTERNAL_SERVER_ERROR" in forAll {
-      (validRequest: ValidAuthorisationRequest, eisErrorResponse: EisAuthorisationResponseError) =>
+    "return InternalServerDataRetrievalError error when call to the integration framework fails with a INTERNAL_SERVER_ERROR" in new TestContext {
+      forAll { (validRequest: ValidAuthorisationRequest, eisErrorResponse: EisAuthorisationResponseError) =>
         val request = validRequest.request
 
         val eisError = eisErrorResponse.copy(errorDetail =
@@ -142,18 +165,19 @@ class IntegrationFrameworkServiceSpec extends BaseSpec {
             .copy(errorCode = INTERNAL_SERVER_ERROR)
         )
 
-        val expectedResponse = UpstreamErrorResponse(Json.stringify(Json.toJson(eisError)), INTERNAL_SERVER_ERROR)
+        val expectedEisResponse: UpstreamErrorResponse = UpstreamErrorResponse(Json.stringify(Json.toJson(eisError)), INTERNAL_SERVER_ERROR)
+        val expectedResponse: InternalServerDataRetrievalError = InternalServerDataRetrievalError(eisError.errorDetail.errorMessage)
 
-        when(mockIntegrationFrameworkConnector.getEisAuthorisationsResponse(any())(any()))
-          .thenReturn(Future.failed(expectedResponse))
-
-        val result = await(service.getAuthorisations(request).value)
-
-        result shouldBe Left(InternalServerDataRetrievalError(eisError.errorDetail.errorMessage))
+        doTest(
+          request = request,
+          eisResponse = Future.failed(expectedEisResponse),
+          response = Left(expectedResponse)
+        )
+      }
     }
 
-    "return MethodNotAllowedDataRetrievalError error when call to the integration framework fails with a METHOD_NOT_ALLOWED" in forAll {
-      (validRequest: ValidAuthorisationRequest, eisErrorResponse: EisAuthorisationResponseError) =>
+    "return MethodNotAllowedDataRetrievalError error when call to the integration framework fails with a METHOD_NOT_ALLOWED" in new TestContext {
+      forAll { (validRequest: ValidAuthorisationRequest, eisErrorResponse: EisAuthorisationResponseError) =>
         val request = validRequest.request
 
         val eisError = eisErrorResponse.copy(errorDetail =
@@ -161,18 +185,19 @@ class IntegrationFrameworkServiceSpec extends BaseSpec {
             .copy(errorCode = METHOD_NOT_ALLOWED)
         )
 
-        val expectedResponse = UpstreamErrorResponse(Json.stringify(Json.toJson(eisError)), METHOD_NOT_ALLOWED)
+        val expectedEisResponse: UpstreamErrorResponse              = UpstreamErrorResponse(Json.stringify(Json.toJson(eisError)), METHOD_NOT_ALLOWED)
+        val expectedResponse:    MethodNotAllowedDataRetrievalError = MethodNotAllowedDataRetrievalError(eisError.errorDetail.errorMessage)
 
-        when(mockIntegrationFrameworkConnector.getEisAuthorisationsResponse(any())(any()))
-          .thenReturn(Future.failed(expectedResponse))
-
-        val result = await(service.getAuthorisations(request).value)
-
-        result shouldBe Left(MethodNotAllowedDataRetrievalError(eisError.errorDetail.errorMessage))
+        doTest(
+          request = request,
+          eisResponse = Future.failed(expectedEisResponse),
+          response = Left(expectedResponse)
+        )
+      }
     }
 
-    "return InternalServerDataRetrievalError error when call to the integration framework fails with invalid auth type error" in forAll {
-      (validRequest: ValidAuthorisationRequest, eisErrorResponse: EisAuthorisationResponseError) =>
+    "return InternalServerDataRetrievalError error when call to the integration framework fails with invalid auth type error" in new TestContext {
+      forAll { (validRequest: ValidAuthorisationRequest, eisErrorResponse: EisAuthorisationResponseError) =>
         val request = validRequest.request
 
         val eisError = eisErrorResponse.copy(errorDetail =
@@ -183,18 +208,19 @@ class IntegrationFrameworkServiceSpec extends BaseSpec {
             )
         )
 
-        val expectedResponse = UpstreamErrorResponse(Json.stringify(Json.toJson(eisError)), BAD_REQUEST)
+        val expectedEisResponse = UpstreamErrorResponse(Json.stringify(Json.toJson(eisError)), BAD_REQUEST)
+        val expectedResponse    = InternalServerDataRetrievalError(TestConstants.invalidAuthTypeErrorMessage)
 
-        when(mockIntegrationFrameworkConnector.getEisAuthorisationsResponse(any())(any()))
-          .thenReturn(Future.failed(expectedResponse))
-
-        val result = await(service.getAuthorisations(request).value)
-
-        result shouldBe Left(InternalServerDataRetrievalError("Invalid auth type UKNW"))
+        doTest(
+          request = request,
+          eisResponse = Future.failed(expectedEisResponse),
+          response = Left(expectedResponse)
+        )
+      }
     }
 
-    "return InternalServerDataRetrievalError error when call to the integration framework fails with a unmanaged status code" in forAll {
-      (validRequest: ValidAuthorisationRequest, eisErrorResponse: EisAuthorisationResponseError) =>
+    "return InternalServerDataRetrievalError error when call to the integration framework fails with a unmanaged status code" in new TestContext {
+      forAll { (validRequest: ValidAuthorisationRequest, eisErrorResponse: EisAuthorisationResponseError) =>
         val request = validRequest.request
 
         val eisError = eisErrorResponse.copy(errorDetail =
@@ -202,32 +228,34 @@ class IntegrationFrameworkServiceSpec extends BaseSpec {
             .copy(errorCode = IM_A_TEAPOT)
         )
 
-        val expectedResponse = UpstreamErrorResponse(Json.stringify(Json.toJson(eisError)), IM_A_TEAPOT)
+        val expectedEisResponse: UpstreamErrorResponse            = UpstreamErrorResponse(Json.stringify(Json.toJson(eisError)), IM_A_TEAPOT)
+        val expectedResponse:    InternalServerDataRetrievalError = InternalServerDataRetrievalError(eisError.errorDetail.errorMessage)
 
-        when(mockIntegrationFrameworkConnector.getEisAuthorisationsResponse(any())(any()))
-          .thenReturn(Future.failed(expectedResponse))
-
-        val result = await(service.getAuthorisations(request).value)
-
-        result shouldBe Left(InternalServerDataRetrievalError(eisError.errorDetail.errorMessage))
+        doTest(
+          request = request,
+          eisResponse = Future.failed(expectedEisResponse),
+          response = Left(expectedResponse)
+        )
+      }
     }
 
-    "return UnableToDeserialiseDataRetrievalError error when call to the integration framework fails with unvalidated json" in forAll {
-      (validRequest: ValidAuthorisationRequest) =>
+    "return UnableToDeserialiseDataRetrievalError error when call to the integration framework fails with unvalidated json" in new TestContext {
+      forAll { (validRequest: ValidAuthorisationRequest) =>
         val request = validRequest.request
 
         val jsError = JsError(
-          Seq((JsPath \ "errorDetail", Seq(JsonValidationError(JsonErrorMessages.pathMissing))))
+          Seq((JsPath \ JsonPaths.errorDetail, Seq(JsonValidationError(JsonErrorMessages.pathMissing))))
         )
 
-        val expectedResponse = UpstreamErrorResponse("{}", BAD_REQUEST)
+        val expectedEisResponse: UpstreamErrorResponse                 = UpstreamErrorResponse(TestConstants.emptyJson, BAD_REQUEST)
+        val expectedResponse:    UnableToDeserialiseDataRetrievalError = UnableToDeserialiseDataRetrievalError(jsError)
 
-        when(mockIntegrationFrameworkConnector.getEisAuthorisationsResponse(any())(any()))
-          .thenReturn(Future.failed(expectedResponse))
-
-        val result = await(service.getAuthorisations(request).value)
-
-        result shouldBe Left(UnableToDeserialiseDataRetrievalError(jsError))
+        doTest(
+          request = request,
+          eisResponse = Future.failed(expectedEisResponse),
+          response = Left(expectedResponse)
+        )
+      }
     }
   }
 }
