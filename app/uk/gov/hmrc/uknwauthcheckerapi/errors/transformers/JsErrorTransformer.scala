@@ -21,18 +21,19 @@ import uk.gov.hmrc.uknwauthcheckerapi.models.constants.{ApiErrorCodes, JsonError
 
 trait JsErrorTransformer {
 
+  private val errorsMap = Map(
+    JsonErrorMessages.expectedJsObject -> JsonErrorMessages.jsonMalformed,
+    JsonErrorMessages.pathMissing      -> JsonErrorMessages.eorisFieldMissing
+  )
+
   def transformJsErrors(errors: JsError): JsValue = Json.toJson(errors.errors.flatMap { case (jsPath, pathErrors) =>
     val dropObjDot = 4
     val path       = jsPath.toJsonString.drop(dropObjDot)
     pathErrors.map(validationError =>
       Json.obj(
-        JsonPaths.code -> ApiErrorCodes.invalidFormat,
-        JsonPaths.message -> (validationError.message match {
-          case message if message == JsonErrorMessages.expectedJsObject                       => JsonErrorMessages.jsonMalformed
-          case message if message == JsonErrorMessages.pathMissing && path == JsonPaths.eoris => JsonErrorMessages.eorisFieldMissing
-          case message                                                                        => message
-        }),
-        JsonPaths.path -> path
+        JsonPaths.code    -> ApiErrorCodes.invalidFormat,
+        JsonPaths.message -> errorsMap.getOrElse(validationError.message, validationError.message).toString,
+        JsonPaths.path    -> path
       )
     )
   })
