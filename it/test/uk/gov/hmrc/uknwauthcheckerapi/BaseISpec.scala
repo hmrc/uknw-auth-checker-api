@@ -17,14 +17,13 @@
 package uk.gov.hmrc.uknwauthcheckerapi
 
 import scala.reflect.ClassTag
-
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
-
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
+import play.api.libs.ws.EmptyBody
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import uk.gov.hmrc.uknwauthcheckerapi.generators.{TestConstants, TestData, TestHeaders}
 
@@ -75,6 +74,9 @@ class BaseISpec extends PlaySpec with GuiceOneServerPerSuite with WireMockISpec 
 
   protected def postRequest(url: String, body: JsValue, headers: Seq[(String, String)] = defaultHeaders): WSResponse =
     await(createRequest(url, headers).post(Json.toJson(body)))
+
+  protected def postEmptyRequest(url: String, headers: Seq[(String, String)] = defaultHeaders): WSResponse =
+    await(createRequest(url, headers).post(EmptyBody))
 
   protected def putRequest(url: String, body: JsValue, headers: Seq[(String, String)] = defaultHeaders): WSResponse =
     await(createRequest(url, headers).put(Json.toJson(body)))

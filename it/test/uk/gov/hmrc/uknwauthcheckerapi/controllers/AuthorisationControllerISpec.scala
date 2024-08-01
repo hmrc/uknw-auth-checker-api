@@ -236,8 +236,10 @@ class AuthorisationControllerISpec extends BaseISpec {
       }
     }
 
-    "return UNAUTHORIZED when bearer token is missing" in new TestContext {
+    "return UNAUTHORIZED when Authorization header is missing" in new TestContext {
       forAll { (validRequest: ValidAuthorisationRequest) =>
+        reset()
+
         val request:                  AuthorisationRequest  = validRequest.request
         val authorisationRequestJson: JsValue               = Json.toJson(request)
         val headers:                  Seq[(String, String)] = defaultHeaders.filterNot(header => header == authorizationHeader)
@@ -246,6 +248,30 @@ class AuthorisationControllerISpec extends BaseISpec {
 
         result.status mustBe UNAUTHORIZED
       }
+    }
+
+    "return NOT_ACCEPTABLE when Accept header is missing" in new TestContext {
+      forAll { (validRequest: ValidAuthorisationRequest) =>
+        reset()
+
+        val request:                  AuthorisationRequest  = validRequest.request
+        val authorisationRequestJson: JsValue               = Json.toJson(request)
+        val headers:                  Seq[(String, String)] = defaultHeaders.filterNot(header => header == acceptHeader)
+
+        val result: WSResponse = postRequest(authorisationsUrl, authorisationRequestJson, headers)
+
+        result.status mustBe NOT_ACCEPTABLE
+      }
+    }
+
+    "return NOT_ACCEPTABLE when Content-Type header is missing" in new TestContext {
+      reset()
+
+      val headers:                  Seq[(String, String)] = defaultHeaders.filterNot(header => header == contentTypeHeader)
+
+      val result: WSResponse = postEmptyRequest(authorisationsUrl, headers)
+
+      result.status mustBe NOT_ACCEPTABLE
     }
   }
 }
