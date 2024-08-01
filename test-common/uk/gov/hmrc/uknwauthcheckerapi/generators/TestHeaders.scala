@@ -22,8 +22,8 @@ import uk.gov.hmrc.uknwauthcheckerapi.models.constants.HmrcMimeTypes
 
 trait TestHeaders {
 
-  protected val authorizationHeader: (String, String) = HeaderNames.AUTHORIZATION -> TestConstants.bearerToken
-  protected val acceptHeader:        (String, String) = HeaderNames.ACCEPT        -> HmrcMimeTypes.json
-  protected val contentTypeHeader:   (String, String) = HeaderNames.CONTENT_TYPE  -> MimeTypes.JSON
-  protected val defaultHeaders: Seq[(String, String)] = Seq(acceptHeader, contentTypeHeader, authorizationHeader)
+  protected val authorizationHeader: (String, String)      = HeaderNames.AUTHORIZATION -> TestConstants.bearerToken
+  protected val acceptHeader:        (String, String)      = HeaderNames.ACCEPT        -> HmrcMimeTypes.json
+  protected val contentTypeHeader:   (String, String)      = HeaderNames.CONTENT_TYPE  -> MimeTypes.JSON
+  protected val defaultHeaders:      Seq[(String, String)] = Seq(acceptHeader, contentTypeHeader, authorizationHeader)
 }
