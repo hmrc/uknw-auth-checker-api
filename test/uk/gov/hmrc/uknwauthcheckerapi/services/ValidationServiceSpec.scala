@@ -17,11 +17,10 @@
 package uk.gov.hmrc.uknwauthcheckerapi.services
 
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
-
 import play.api.libs.json.{JsError, JsPath, Json, JsonValidationError}
 import uk.gov.hmrc.uknwauthcheckerapi.controllers.BaseSpec
 import uk.gov.hmrc.uknwauthcheckerapi.errors.DataRetrievalError.ValidationDataRetrievalError
-import uk.gov.hmrc.uknwauthcheckerapi.generators.TooManyEorisAuthorisationRequest
+import uk.gov.hmrc.uknwauthcheckerapi.generators.{NoEorisAuthorisationRequest, TooManyEorisAuthorisationRequest}
 import uk.gov.hmrc.uknwauthcheckerapi.models.AuthorisationRequest
 import uk.gov.hmrc.uknwauthcheckerapi.models.constants.{ApiErrorMessages, JsonErrorMessages, JsonPaths}
 
@@ -91,6 +90,25 @@ class ValidationServiceSpec extends BaseSpec {
     "return JsError when AuthorisationRequest has too many Eoris" in {
       forAll { (tooManyEorisRequest: TooManyEorisAuthorisationRequest) =>
         val json = Json.toJson(tooManyEorisRequest.request)
+
+        val expectedResponse =
+          ValidationDataRetrievalError(
+            JsError(
+              Seq((JsPath \ JsonPaths.eoris, Seq(JsonValidationError(ApiErrorMessages.invalidEoriCount))))
+            )
+          )
+
+        val request = fakeRequestWithJsonBody(json)
+
+        val response = service.validateRequest(request)
+
+        response shouldBe Left(expectedResponse)
+      }
+    }
+
+    "return JsError when AuthorisationRequest has no Eoris" in {
+      forAll { (noEorisRequest: NoEorisAuthorisationRequest) =>
+        val json = Json.toJson(noEorisRequest.request)
 
         val expectedResponse =
           ValidationDataRetrievalError(

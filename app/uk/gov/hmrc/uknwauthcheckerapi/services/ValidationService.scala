@@ -71,6 +71,6 @@ class ValidationService {
   }
 
   private def isEoriSizeInvalid(eorisSize: Int): Boolean =
-    eorisSize > MinMaxValues.maxEoriCount || MinMaxValues.minEoriCount < 1
+    eorisSize > MinMaxValues.maxEoriCount || eorisSize < MinMaxValues.minEoriCount
 
 }
