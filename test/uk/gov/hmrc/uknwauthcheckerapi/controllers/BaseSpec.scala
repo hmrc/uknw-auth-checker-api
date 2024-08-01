@@ -94,7 +94,6 @@ class BaseSpec
 
   protected def configOverrides: Map[String, Any] = Map()
 
-  protected def injected[T](c:                 Class[T]):    T = app.injector.instanceOf(c)
   protected def injected[T](implicit evidence: ClassTag[T]): T = app.injector.instanceOf[T]
 
   protected def fakeRequestWithJsonBody(
