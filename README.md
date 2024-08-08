@@ -278,7 +278,7 @@ check, run a scala style check, run unit tests, run integration tests, and produ
 
 This is a sbt command alias specific to this project. It will run a scala format , run a scala fix, 
 run unit tests, run integration tests and produce a coverage report.
-> `sbt runAllChecks`
+> `sbt preCommit`
 
 #### Format all
 
