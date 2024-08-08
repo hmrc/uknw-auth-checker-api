@@ -102,11 +102,31 @@ can be found in `.bruno`. Do not change any of the .bru files, as the stub API
 returns an error `500` INTERNAL_SERVER_ERROR on any unexpected requests.
 
 Furthermore, the `Local` environment in bruno should be used, which enables a pre-script
-in the collection to run, which automatically requests a bearer token from AUTH_LOGIN_API
-and stores it in the `bearerToken` environment variable.
+in the [collection](https://github.com/hmrc/uknw-auth-checker-api/blob/main/.bruno/collection.bru)
+to run, which automatically requests a bearer token from AUTH_LOGIN_API and stores it in
+the `bearerToken` environment variable.
 
 To add a new expected request please refer to the [uknw-auth-checker-api-stub
 /README.md](https://github.com/hmrc/uknw-auth-checker-api-stub/blob/main/README.md)
+
+### Bruno files
+
+| Bruno file               | Description                                                                                   | Location                                                                                    |
+|--------------------------|-----------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------|
+| 200-1-Eori               | Valid request with 1 EORI                                                                     | https://github.com/hmrc/uknw-auth-checker-api/blob/main/.bruno/200-1-Eori.bru               |
+| 200-100-Eori             | Valid request with 100 EORI                                                                   | https://github.com/hmrc/uknw-auth-checker-api/blob/main/.bruno/200-100-Eori.bru             |
+| 200-500-Eori             | Valid request with 500 EORI                                                                   | https://github.com/hmrc/uknw-auth-checker-api/blob/main/.bruno/200-500-Eori.bru             |
+| 200-1000-Eori            | Valid request with 1000 EORI                                                                  | https://github.com/hmrc/uknw-auth-checker-api/blob/main/.bruno/200-1000-Eori.bru            |
+| 200-3000-Eori            | Valid request with 3000 EORI                                                                  | https://github.com/hmrc/uknw-auth-checker-api/blob/main/.bruno/200-3000-Eori.bru            |
+| 201-Invalid-Bearer-Token | Unauthorized request with an invalid bearer token                                             | https://github.com/hmrc/uknw-auth-checker-api/blob/main/.bruno/201-Invalid-Bearer-Token.bru |
+| 201-No-Bearer-Token      | Unauthorized request with no bearer token                                                     | https://github.com/hmrc/uknw-auth-checker-api/blob/main/.bruno/201-No-Bearer-Token.bru      |
+| 400-0-Eori               | Invalid request with zero EORI                                                                | https://github.com/hmrc/uknw-auth-checker-api/blob/main/.bruno/400-0-Eori.bru               |
+| 400-3001-Eori            | Invalid request with greater than 3000 EORI                                                   | https://github.com/hmrc/uknw-auth-checker-api/blob/main/.bruno/400-3001-Eori.bru            |
+| 400-Invalid-Eori         | Invalid request with 1 EORI not matching `^(GB&#124;XI)[0-9]{12}&#124;(GB&#124;XI)[0-9]{15}$` | https://github.com/hmrc/uknw-auth-checker-api/blob/main/.bruno/400-Invalid-Eori.bru         |
+| 400-Invalid-Json-Empty   | Invalid request with an empty JSON object                                                     | https://github.com/hmrc/uknw-auth-checker-api/blob/main/.bruno/400-Invalid-Json-Empty.bru   |
+| 400-Invalid-Json-Format  | Invalid request with invalid JSON                                                             | https://github.com/hmrc/uknw-auth-checker-api/blob/main/.bruno/400-Invalid-Json-Format.bru  |
+| 406-No-Accept-Header     | Invalid request with no `application/vnd.hmrc.1.0+json` Accept header set                     | https://github.com/hmrc/uknw-auth-checker-api/blob/main/.bruno/406-No-Accept-Header.bru     |
+| 406-No-Body.bru          | Invalid request with no JSON body                                                             | https://github.com/hmrc/uknw-auth-checker-api/blob/main/.bruno/406-No-Body.bru              |
 
 ### License
 
