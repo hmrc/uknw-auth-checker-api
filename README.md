@@ -28,6 +28,45 @@ Internally the service consists of several types of components:
 |--------|-----------------|-----------------------------------------|
 | POST   | /authorisations | Check authorisations status for EORI(s) |
 
+### POST authorisations request
+
+A POST request to `/authorisations` should have the following example `application/json` body:
+
+```json
+{
+  "eoris": [
+    "GB000000000200"
+  ]
+}
+```
+
+Each EORI must match the following pattern:
+
+```regexp
+^(GB|XI)[0-9]{12}|(GB|XI)[0-9]{15}$
+```
+
+You also must include an Accept header of `application/vnd.hmrc.1.0+json` as it is validated by 
+the API. Not including it will result in a 406 `NOT_ACCEPTABLE` response.
+
+#### Curl sample
+
+```shell
+curl --request POST \
+  --url http://localhost:9070/authorisations \
+  --header 'Accept: application/vnd.hmrc.1.0+json' \
+  --header 'Authorization: Bearer PFZBTElEX1RPS0VOPg==' \
+  --data '{
+  "eoris": [
+    "GB000000000200"
+  ]
+}'
+```
+
+The fake bearer token (base64 decoded as `<VALID_TOKEN>`) is stored in the [application.conf](https://github.com/hmrc/uknw-auth-checker-api-stub/blob/main/conf/application.conf) file under `microservices.services.integration-framework.bearerToken`.
+
+The stub [uknw-auth-checker-api-stub](https://github.com/hmrc/uknw-auth-checker-api-stub) has been set up to validate that token fake token in each request, so not included will respond with 401 `UNAUTHORIZED`.
+
 ## External APIs
 
 The service calls the following external APIs:
