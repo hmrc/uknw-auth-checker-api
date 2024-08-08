@@ -28,6 +28,12 @@ Internally the service consists of several types of components:
 |--------|-----------------|-----------------------------------------|
 | POST   | /authorisations | Check authorisations status for EORI(s) |
 
+## Open API specification
+
+There is a OpenAPI 3.0.3 specification file available for the API, located in the [application.yaml](https://github.com/hmrc/uknw-auth-checker-api/blob/main/resources/public/api/conf/1.0/application.yaml) file.
+
+## Requests
+
 ### POST authorisations request
 
 A POST request to `/authorisations` should have the following example `application/json` body:
@@ -58,14 +64,166 @@ curl --request POST \
   --header 'Authorization: Bearer PFZBTElEX1RPS0VOPg==' \
   --data '{
   "eoris": [
-    "GB000000000200"
+    "GB000000000200",
+    "XI000000000200",
   ]
 }'
 ```
 
-The fake bearer token (base64 decoded as `<VALID_TOKEN>`) is stored in the [application.conf](https://github.com/hmrc/uknw-auth-checker-api-stub/blob/main/conf/application.conf) file under `microservices.services.integration-framework.bearerToken`.
+The fake bearer token (base64 decoded as `<VALID_TOKEN>`) is stored in the
+[application.conf](https://github.com/hmrc/uknw-auth-checker-api-stub/blob/main/conf/application.conf)
+file under `microservices.services.integration-framework.bearerToken`.
 
-The stub [uknw-auth-checker-api-stub](https://github.com/hmrc/uknw-auth-checker-api-stub) has been set up to validate that token fake token in each request, so not included will respond with 401 `UNAUTHORIZED`.
+The stub [uknw-auth-checker-api-stub](https://github.com/hmrc/uknw-auth-checker-api-stub)
+has been set up to validate the fake token in each request, so not including it will respond with 401 `UNAUTHORIZED`.
+
+## Responses
+
+| Status code | Name                  | Description                                           |
+|-------------|-----------------------|-------------------------------------------------------|
+| 200         | OK                    |                                                       |
+| 400         | BAD_REQUEST           | Malformed json                                        |
+| 400         | BAD_REQUEST           | Invalid EORI format                                   |
+| 400         | BAD_REQUEST           | EORI path missing                                     |
+| 401         | UNAUTHORIZED          | Unauthorized                                          |
+| 403         | FORBIDDEN             | Forbidden                                             |
+| 405         | METHOD_NOT_ALLOWED    | HTTP verb is not POST                                 |
+| 406         | NOT_ACCEPTABLE        | Accept or Content Type headers are missing or invalid |
+| 429         | TOO_MANY_REQUESTS     | Rate limit violation                                  |
+| 500         | INTERNAL_SERVER_ERROR | Unexpected internal server error                      |
+| 503         | SERVICE_UNAVAILABLE   | Server is unable to handle requests                   |
+
+### 200 OK json response
+
+```json
+{
+  "date": "2024-02-01T14:15:22Z",
+  "eoris": [
+    {
+      "eori": "GB000000000200",
+      "authorised": true
+    },
+    {
+      "eori": "XI000000000200",
+      "authorised": false
+    }
+  ]
+}
+```
+
+### 400 BAD_REQUEST malformed json response
+
+```json
+{
+  "code": "BAD_REQUEST",
+  "message": "Bad request",
+  "errors": [
+    {
+      "code": "INVALID_FORMAT",
+      "message": "JSON is malformed",
+      "path": ""
+    }
+  ]
+}
+```
+
+### 400 BAD REQUEST invalid EORI format response
+
+```json
+{
+  "code": "BAD_REQUEST",
+  "message": "Bad request",
+  "errors": [
+    {
+      "code": "INVALID_FORMAT",
+      "message": "ABCDEFGHIJK is not a supported EORI number",
+      "path": "eoris"
+    },
+    {
+      "code": "INVALID_FORMAT",
+      "message": "LMNOPQRSTUV is not a supported EORI number",
+      "path": "eoris"
+    }
+  ]
+}
+```
+### 400 BAD_REQUEST EORI path missing response
+
+```json
+{
+  "code": "BAD_REQUEST",
+  "message": "Bad request",
+  "errors": [
+    {
+      "code": "INVALID_FORMAT",
+      "message": "eoris field missing from JSON",
+      "path": "eoris"
+    }
+  ]
+}
+```
+
+### 401 UNAUTHORIZED response
+
+```json
+{
+  "code": "UNAUTHORIZED",
+  "message": "The bearer token is invalid, missing, or expired"
+}
+```
+
+### 403 FORBIDDEN response
+
+```json
+{
+  "code": "FORBIDDEN",
+  "message": "You are not allowed to access this resource"
+}
+```
+
+### 405 METHOD_NOT_ALLOWED resposne
+
+```json
+{
+  "code": "METHOD_NOT_ALLOWED",
+  "message": "This method is not supported"
+}
+```
+
+### 406 NOT_ACCEPTABLE response
+
+```json
+{
+  "code": "NOT_ACCEPTABLE",
+  "message": "Cannot produce an acceptable response. The Accept or Content-Type header is missing or invalid"
+}
+```
+
+### 429 TOO_MANY_REQUESTS response
+
+```json
+{
+  "code": "RATE_LIMIT_VIOLATION",
+  "message": "Request count from application in excess of rate limit"
+}
+```
+
+### 500 INTERNAL_SERVER_ERROR response
+
+```json
+{
+  "code": "INTERNAL_SERVER_ERROR",
+  "message": "Unexpected internal server error"
+}
+```
+
+### 503 SERVICE_UNAVAILABLE response
+```json
+{
+  "code": "SERVICE_UNAVAILABLE",
+  "message": "Server is currently unable to handle the incoming requests"
+}
+```
 
 ## External APIs
 
