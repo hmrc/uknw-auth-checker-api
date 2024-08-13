@@ -195,7 +195,7 @@ class AuthorisationsControllerSpec extends BaseSpec {
     forAll { (authorisationRequest: AuthorisationRequest) =>
       val expectedResponse = Json.toJson(
         ServiceUnavailableApiError
-      )(ApiErrorResponse.writes.writes)
+      )(ApiErrorResponse.writes)
 
       doTest(
         validateResponse = Some(Right(authorisationRequest)),
@@ -247,7 +247,7 @@ class AuthorisationsControllerSpec extends BaseSpec {
     forAll { (authorisationRequest: AuthorisationRequest) =>
       val expectedResponse = Json.toJson(
         ForbiddenApiError
-      )(ApiErrorResponse.writes.writes)
+      )(ApiErrorResponse.writes)
 
       doTest(
         validateResponse = Some(Right(authorisationRequest)),
@@ -263,7 +263,7 @@ class AuthorisationsControllerSpec extends BaseSpec {
     forAll { (authorisationRequest: AuthorisationRequest, errorMessage: String) =>
       val expectedResponse = Json.toJson(
         MethodNotAllowedApiError
-      )(ApiErrorResponse.writes.writes)
+      )(ApiErrorResponse.writes)
 
       doTest(
         validateResponse = Some(Right(authorisationRequest)),
@@ -279,7 +279,7 @@ class AuthorisationsControllerSpec extends BaseSpec {
     forAll { (authorisationRequest: AuthorisationRequest, errorMessage: String) =>
       val expectedResponse = Json.toJson(
         InternalServerApiError
-      )(ApiErrorResponse.writes.writes)
+      )(ApiErrorResponse.writes)
 
       doTest(
         validateResponse = Some(Right(authorisationRequest)),
@@ -295,7 +295,7 @@ class AuthorisationsControllerSpec extends BaseSpec {
     forAll { (authorisationRequest: AuthorisationRequest, errorMessage: String) =>
       val expectedResponse = Json.toJson(
         InternalServerApiError
-      )(ApiErrorResponse.writes.writes)
+      )(ApiErrorResponse.writes)
 
       doTest(
         validateResponse = Some(Right(authorisationRequest)),
@@ -311,7 +311,7 @@ class AuthorisationsControllerSpec extends BaseSpec {
     forAll { (authorisationRequest: AuthorisationRequest) =>
       val expectedResponse = Json.toJson(
         NotAcceptableApiError
-      )(ApiErrorResponse.writes.writes)
+      )(ApiErrorResponse.writes)
 
       val headers = defaultHeaders.filterNot(_._1.equals(acceptHeader._1))
 
@@ -328,7 +328,7 @@ class AuthorisationsControllerSpec extends BaseSpec {
     forAll { (authorisationRequest: AuthorisationRequest) =>
       val expectedResponse = Json.toJson(
         NotAcceptableApiError
-      )(ApiErrorResponse.writes.writes)
+      )(ApiErrorResponse.writes)
 
       val headers = defaultHeaders.filterNot(_._1.equals(contentTypeHeader._1))
 
