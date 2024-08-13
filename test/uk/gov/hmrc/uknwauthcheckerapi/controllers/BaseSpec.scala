@@ -63,7 +63,6 @@ class BaseSpec
   implicit lazy val system:       ActorSystem      = ActorSystem()
   implicit lazy val materializer: Materializer     = Materializer(system)
 
-  @annotation.nowarn
   protected val additionalAppConfig: Map[String, Any] = Map(
     TestConstants.configMetricsKey  -> false,
     TestConstants.configAuditingKey -> false,

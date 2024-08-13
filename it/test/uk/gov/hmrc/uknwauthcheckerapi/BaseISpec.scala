@@ -33,7 +33,6 @@ import play.api.libs.ws.writeableOf_WsBody
 
 class BaseISpec extends PlaySpec with GuiceOneServerPerSuite with WireMockISpec with TestData with TestHeaders {
 
-  @annotation.nowarn
   protected val additionalAppConfig: Map[String, Any] = Map(
     TestConstants.configMetricsKey  -> false,
     TestConstants.configAuditingKey -> false,
