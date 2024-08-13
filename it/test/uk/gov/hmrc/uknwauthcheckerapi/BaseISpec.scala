@@ -28,6 +28,8 @@ import play.api.libs.ws.{EmptyBody, WSClient, WSRequest, WSResponse}
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import uk.gov.hmrc.uknwauthcheckerapi.config.AppConfig
 import uk.gov.hmrc.uknwauthcheckerapi.generators.{TestConstants, TestData, TestHeaders}
+import play.api.libs.ws.writeableOf_JsValue
+import play.api.libs.ws.writeableOf_WsBody
 
 class BaseISpec extends PlaySpec with GuiceOneServerPerSuite with WireMockISpec with TestData with TestHeaders {
 

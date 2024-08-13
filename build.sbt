@@ -1,7 +1,7 @@
 import uk.gov.hmrc.DefaultBuildSettings
 
 ThisBuild / majorVersion := 0
-ThisBuild / scalaVersion := "2.13.12"
+ThisBuild / scalaVersion := "3.3.3"
 ThisBuild / semanticdbEnabled := true
 ThisBuild / semanticdbVersion := scalafixSemanticdb.revision
 
@@ -21,6 +21,8 @@ lazy val microservice = Project("uknw-auth-checker-api", file("."))
     Compile / unmanagedResourceDirectories += baseDirectory.value / "resources",
     Test / unmanagedSourceDirectories := (Test / baseDirectory)(base => Seq(base / "test", base / "test-common")).value
   )
+
+Test / javaOptions += "-Dlogger.resource=logback-test.xml"
 
 lazy val it = project
   .enablePlugins(PlayScala)

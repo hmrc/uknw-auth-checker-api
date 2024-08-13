@@ -30,6 +30,7 @@ import uk.gov.hmrc.uknwauthcheckerapi.config.AppConfig
 import uk.gov.hmrc.uknwauthcheckerapi.models.Rfc7231DateTime
 import uk.gov.hmrc.uknwauthcheckerapi.models.constants.{CustomHeaderNames, HmrcContentTypes}
 import uk.gov.hmrc.uknwauthcheckerapi.models.eis.{EisAuthorisationRequest, EisAuthorisationsResponse}
+import play.api.libs.ws.writeableOf_JsValue
 
 @Singleton
 class IntegrationFrameworkConnector @Inject() (

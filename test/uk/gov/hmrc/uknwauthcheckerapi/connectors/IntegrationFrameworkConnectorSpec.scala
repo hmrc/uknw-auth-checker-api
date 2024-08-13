@@ -77,7 +77,7 @@ class IntegrationFrameworkConnectorSpec extends BaseSpec {
         whenever(eisAuthorisationRequest.validityDate.isDefined) {
 
           val expectedError = JsError(
-            Seq(JsonPaths.authType, JsonPaths.processingDate, JsonPaths.results).map { field =>
+            Seq(JsonPaths.results, JsonPaths.authType, JsonPaths.processingDate).map { field =>
               (JsPath \ field, Seq(JsonValidationError(JsonErrorMessages.pathMissing)))
             }
           )

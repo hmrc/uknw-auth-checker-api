@@ -209,7 +209,7 @@ class AuthorisationsControllerSpec extends BaseSpec {
 
   "return BAD_REQUEST (400) with authorised eoris when request has valid eoris but they exceed the maximum eoris" in new TestContext {
 
-    forAll { authorisationRequest: TooManyEorisAuthorisationRequest =>
+    forAll { (authorisationRequest: TooManyEorisAuthorisationRequest) =>
       val jsError = JsError(JsPath \ "eoris", JsonValidationError(ApiErrorMessages.invalidEoriCount))
 
       val expectedResponse = Json.toJson(
@@ -227,7 +227,7 @@ class AuthorisationsControllerSpec extends BaseSpec {
 
   "return BAD_REQUEST (400) when request has no eoris" in new TestContext {
 
-    forAll { authorisationRequest: NoEorisAuthorisationRequest =>
+    forAll { (authorisationRequest: NoEorisAuthorisationRequest) =>
       val jsError = JsError(JsPath \ "eoris", JsonValidationError(ApiErrorMessages.invalidEoriCount))
 
       val expectedResponse = Json.toJson(
@@ -308,7 +308,7 @@ class AuthorisationsControllerSpec extends BaseSpec {
   }
 
   "return NOT_ACCEPTABLE (406) error when accept header is not present" in new TestContext {
-    forAll { authorisationRequest: AuthorisationRequest =>
+    forAll { (authorisationRequest: AuthorisationRequest) =>
       val expectedResponse = Json.toJson(
         NotAcceptableApiError
       )(ApiErrorResponse.writes.writes)
@@ -325,7 +325,7 @@ class AuthorisationsControllerSpec extends BaseSpec {
   }
 
   "return NOT_ACCEPTABLE (406) error when content type header is not present" in new TestContext {
-    forAll { authorisationRequest: AuthorisationRequest =>
+    forAll { (authorisationRequest: AuthorisationRequest) =>
       val expectedResponse = Json.toJson(
         NotAcceptableApiError
       )(ApiErrorResponse.writes.writes)
