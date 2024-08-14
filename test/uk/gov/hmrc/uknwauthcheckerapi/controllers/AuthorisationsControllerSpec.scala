@@ -209,8 +209,8 @@ class AuthorisationsControllerSpec extends BaseSpec {
 
   "return BAD_REQUEST (400) with authorised eoris when request has valid eoris but they exceed the maximum eoris" in new TestContext {
 
-    forAll { (authorisationRequest: TooManyEorisAuthorisationRequest) =>
-      val jsError = JsError(JsPath \ "eoris", JsonValidationError(ApiErrorMessages.invalidEoriCount))
+    forAll { authorisationRequest: TooManyEorisAuthorisationRequest =>
+      val jsError = JsError(JsPath \ "eoris", JsonValidationError(ApiErrorMessages.invalidEoriCount(minMaxValues.maxEoriCount)))
 
       val expectedResponse = Json.toJson(
         JsonValidationApiError(jsError)
@@ -227,8 +227,8 @@ class AuthorisationsControllerSpec extends BaseSpec {
 
   "return BAD_REQUEST (400) when request has no eoris" in new TestContext {
 
-    forAll { (authorisationRequest: NoEorisAuthorisationRequest) =>
-      val jsError = JsError(JsPath \ "eoris", JsonValidationError(ApiErrorMessages.invalidEoriCount))
+    forAll { authorisationRequest: NoEorisAuthorisationRequest =>
+      val jsError = JsError(JsPath \ "eoris", JsonValidationError(ApiErrorMessages.invalidEoriCount(minMaxValues.maxEoriCount)))
 
       val expectedResponse = Json.toJson(
         JsonValidationApiError(jsError)
