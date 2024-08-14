@@ -16,7 +16,7 @@ lazy val microservice = Project("uknw-auth-checker-api", file("."))
     PlayKeys.devSettings := Seq("play.server.http.port" -> "9070")
   )
   .settings(resolvers += Resolver.jcenterRepo)
-  .settings(CodeCoverageSettings.settings *)
+  .settings(CodeCoverageSettings.settings*)
   .settings(
     Compile / unmanagedResourceDirectories += baseDirectory.value / "resources",
     Test / unmanagedSourceDirectories := (Test / baseDirectory)(base => Seq(base / "test", base / "test-common")).value

@@ -24,12 +24,10 @@ import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Json}
-import play.api.libs.ws.{EmptyBody, WSClient, WSRequest, WSResponse}
+import play.api.libs.ws._
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import uk.gov.hmrc.uknwauthcheckerapi.config.AppConfig
 import uk.gov.hmrc.uknwauthcheckerapi.generators.{TestConstants, TestData, TestHeaders}
-import play.api.libs.ws.writeableOf_JsValue
-import play.api.libs.ws.writeableOf_WsBody
 import uk.gov.hmrc.uknwauthcheckerapi.models.constants.MinMaxValues
 
 class BaseISpec extends PlaySpec with GuiceOneServerPerSuite with WireMockISpec with TestData with TestHeaders {

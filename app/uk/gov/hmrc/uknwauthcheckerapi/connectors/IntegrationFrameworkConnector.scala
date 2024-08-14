@@ -24,13 +24,13 @@ import org.apache.pekko.actor.ActorSystem
 
 import play.api.http.{HeaderNames, MimeTypes}
 import play.api.libs.json.Json
+import play.api.libs.ws.writeableOf_JsValue
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, Retries}
 import uk.gov.hmrc.uknwauthcheckerapi.config.AppConfig
 import uk.gov.hmrc.uknwauthcheckerapi.models.Rfc7231DateTime
 import uk.gov.hmrc.uknwauthcheckerapi.models.constants.{CustomHeaderNames, HmrcContentTypes}
 import uk.gov.hmrc.uknwauthcheckerapi.models.eis.{EisAuthorisationRequest, EisAuthorisationsResponse}
-import play.api.libs.ws.writeableOf_JsValue
 
 @Singleton
 class IntegrationFrameworkConnector @Inject() (
