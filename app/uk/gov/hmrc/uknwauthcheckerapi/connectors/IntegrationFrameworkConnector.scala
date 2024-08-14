@@ -55,7 +55,7 @@ class IntegrationFrameworkConnector @Inject() (
     retryFor[EisAuthorisationsResponse]("Integration Framework Response")(retryCondition) {
       httpClient
         .post(appConfig.eisAuthorisationsUrl)
-        .setHeader(integrationFrameworkHeaders(appConfig.integrationFrameworkBearerToken): _*)
+        .setHeader(integrationFrameworkHeaders(appConfig.integrationFrameworkBearerToken)*)
         .withBody(Json.toJson(eisAuthorisationRequest))
         .executeAndDeserialise[EisAuthorisationsResponse]
     }

@@ -1,7 +1,7 @@
 import uk.gov.hmrc.DefaultBuildSettings
 
 ThisBuild / majorVersion := 0
-ThisBuild / scalaVersion := "3.3.3"
+ThisBuild / scalaVersion := "3.4.2"
 ThisBuild / semanticdbEnabled := true
 ThisBuild / semanticdbVersion := scalafixSemanticdb.revision
 
@@ -32,5 +32,5 @@ lazy val it = project
 
 addCommandAlias("fmtAll", ";scalafmtAll;it/scalafmtAll")
 addCommandAlias("fixAll", ";scalafixAll;it/scalafixAll")
-addCommandAlias("preCommit", ";clean;compile;scalafmtSbt;fixAll;fmtAll;coverage;test;it/test;scalastyle;coverageReport")
-addCommandAlias("runAllChecks", ";clean;compile;scalafmtCheckAll;coverage;test;it/test;scalastyle;coverageReport")
+addCommandAlias("preCommit", ";clean;compile;scalafmtSbt;fixAll;fmtAll;coverage;test;it/test;coverageReport")
+addCommandAlias("runAllChecks", ";clean;compile;scalafmtCheckAll;coverage;test;it/test;coverageReport")

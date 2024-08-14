@@ -11,11 +11,12 @@ object CodeCoverageSettings {
     "prod.*",
     ".*Routes.*",
     ".*config.*",
-    ".*DocumentationController.*"
+    ".*DocumentationController.*",
+    ".*\\$anon.*"
   )
 
-  val settings: Seq[Setting[_]] = Seq(
-    ScoverageKeys.coverageExcludedPackages := excludedPackages.mkString(";"),
+  val settings: Seq[Setting[?]] = Seq(
+    ScoverageKeys.coverageExcludedPackages := excludedPackages.mkString(","),
     ScoverageKeys.coverageMinimumStmtTotal := 90,
     ScoverageKeys.coverageFailOnMinimum := true,
     ScoverageKeys.coverageHighlighting := true
