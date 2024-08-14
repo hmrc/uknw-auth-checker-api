@@ -78,7 +78,7 @@ class BaseSpec
   protected lazy val appConfig:                         AppConfig                           = injected[AppConfig]
   protected lazy val config:                            Config                              = injected[Config]
   protected val fakePostRequest:                        FakeRequest[AnyContentAsEmpty.type] = FakeRequest(POST, "")
-  protected lazy val minMaxValues:                      MinMaxValues                        = injected[MinMaxValues]
+  protected val minMaxValues:                           MinMaxValues                        = injected[MinMaxValues]
   protected lazy val mockAuthConnector:                 AuthConnector                       = mock[AuthConnector]
   protected lazy val mockHttpClient:                    HttpClientV2                        = mock[HttpClientV2]
   protected lazy val mockIntegrationFrameworkConnector: IntegrationFrameworkConnector       = mock[IntegrationFrameworkConnector]
