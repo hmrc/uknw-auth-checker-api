@@ -22,7 +22,7 @@ import uk.gov.hmrc.http.{HttpResponse, UpstreamErrorResponse}
 import scala.concurrent.Future
 
 trait HttpResponseExtensions {
-  
+
   implicit class HttpResponseExtensions(response: HttpResponse) {
 
     def error[A]: Future[A] =

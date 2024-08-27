@@ -25,7 +25,7 @@ import uk.gov.hmrc.http.client.RequestBuilder
 import scala.concurrent.{ExecutionContext, Future}
 
 trait RequestBuilderExtensions extends HttpResponseExtensions {
-  
+
   implicit class RequestBuilderExtension(requestBuilder: RequestBuilder) {
     def executeAndDeserialise[T](implicit ec: ExecutionContext, reads: Reads[T]): Future[T] =
       requestBuilder
