@@ -1,7 +1,7 @@
 meta {
-  name: 201-Invalid-Bearer-Token
+  name: 401-No-Bearer-Token
   type: http
-  seq: 3
+  seq: 7
 }
 
 post {
@@ -12,7 +12,6 @@ post {
 
 headers {
   Accept: application/vnd.hmrc.1.0+json
-  Authorization: Bearer INVALID_TOKEN
 }
 
 body:json {
