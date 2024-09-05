@@ -14,24 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.uknwauthcheckerapi.utils
+package uk.gov.hmrc.uknwauthcheckerapi.services
 
-import scala.concurrent.Future
+import java.time.{ZoneId, ZonedDateTime}
+import javax.inject.Singleton
 
-import play.api.libs.json.{JsResult, Reads}
-import uk.gov.hmrc.http.{HttpResponse, UpstreamErrorResponse}
+import uk.gov.hmrc.uknwauthcheckerapi.models.Iso8601DateTimeFormatter
 
-trait HttpResponseExtensions {
-
-  implicit class HttpResponseExtensions(response: HttpResponse) {
-
-    def error[A]: Future[A] =
-      Future.failed(UpstreamErrorResponse(response.body, response.status))
-
-    def as[A](using reads: Reads[A]): Future[A] =
-      response.json
-        .validate[A]
-        .map(result => Future.successful(result))
-        .recoverTotal(error => Future.failed(JsResult.Exception(error)))
-  }
+@Singleton
+class ZonedDateTimeService {
+  def nowUtc(): ZonedDateTime = ZonedDateTime.now(ZoneId.of("UTC"))
+  
+  def nowAsIsoUtc8601String(): String = Iso8601DateTimeFormatter.format(nowUtc())
 }

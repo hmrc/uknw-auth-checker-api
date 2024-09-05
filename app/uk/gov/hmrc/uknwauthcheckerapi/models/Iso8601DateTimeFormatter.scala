@@ -14,24 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.uknwauthcheckerapi.utils
+package uk.gov.hmrc.uknwauthcheckerapi.models
 
-import scala.concurrent.Future
+import java.time.format.DateTimeFormatter
+import java.time.temporal.TemporalAccessor
 
-import play.api.libs.json.{JsResult, Reads}
-import uk.gov.hmrc.http.{HttpResponse, UpstreamErrorResponse}
+object Iso8601DateTimeFormatter {
+  private val format: String            = "yyyy-MM-dd'T'HH:mm:ss.SS'Z'"
+  val formatter:      DateTimeFormatter = DateTimeFormatter.ofPattern(format)
 
-trait HttpResponseExtensions {
-
-  implicit class HttpResponseExtensions(response: HttpResponse) {
-
-    def error[A]: Future[A] =
-      Future.failed(UpstreamErrorResponse(response.body, response.status))
-
-    def as[A](using reads: Reads[A]): Future[A] =
-      response.json
-        .validate[A]
-        .map(result => Future.successful(result))
-        .recoverTotal(error => Future.failed(JsResult.Exception(error)))
-  }
+  def format(temporal: TemporalAccessor): String = formatter.format(temporal)
 }
