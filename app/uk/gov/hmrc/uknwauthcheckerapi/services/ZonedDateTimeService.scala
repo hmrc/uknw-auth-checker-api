@@ -24,6 +24,6 @@ import uk.gov.hmrc.uknwauthcheckerapi.models.Iso8601DateTimeFormatter
 @Singleton
 class ZonedDateTimeService {
   def nowUtc(): ZonedDateTime = ZonedDateTime.now(ZoneId.of("UTC"))
-  
+
   def nowAsIsoUtc8601String(): String = Iso8601DateTimeFormatter.format(nowUtc())
 }
