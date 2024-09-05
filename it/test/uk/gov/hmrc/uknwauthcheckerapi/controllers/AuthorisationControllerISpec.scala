@@ -56,7 +56,7 @@ class AuthorisationControllerISpec extends BaseISpec {
 
     def verifyTimestampHeader(response: WSResponse): Unit =
       response.header(CustomHeaderNames.xTimestamp) match
-        case Some(header) => header must fullyMatch regex TestRegexes.iso8601DateTimeFormat
+        case Some(header) => header must fullyMatch regex TestRegexes.iso8601DateTimeFormatPattern
         case None         => fail("Timestamp header not present")
   }
 
