@@ -343,12 +343,12 @@ Located in either `.bruno/local` or `./bruno/dev-staging`
 | 400-Invalid-Json-Empty                        |                                | Invalid request with an empty JSON object                                       |
 | 400-Invalid-Json-Format                       |                                | Invalid request with invalid JSON                                               |
 | 400-Invalid-JsArray                           |                                | Invalid request with a JsObject instead of a JsArray                            |
-| 403-1-Eori                                    |                                | Mock data to artificially trigger a 403 error in the Stub given a specific Eori |
+| 403-1-Eori                                    |                                | Mock data to artificially trigger a 403 error in the Stub given a specific EORI |
 | 406-No-Accept-Header                          |                                | Invalid request with no `application/vnd.hmrc.1.0+json` Accept header set       |
 | 406-No-Body.bru                               |                                | Invalid request with no JSON body                                               |
 | 413-Entity-Too-Large.bru                      |                                | Invalid request with which has a size over 100 KB                               |
-| 500-1-Eori                                    |                                | Mock data to artificially trigger a 500 error in the Stub given a specific Eori |
-| 503-1-Eori                                    |                                | Mock data to artificially trigger a 503 error in the Stub given a specific Eori |
+| 500-1-Eori                                    |                                | Mock data to artificially trigger a 500 error in the Stub given a specific EORI |
+| 503-1-Eori                                    |                                | Mock data to artificially trigger a 503 error in the Stub given a specific EORI |
 
 ### QA Bruno files
 
