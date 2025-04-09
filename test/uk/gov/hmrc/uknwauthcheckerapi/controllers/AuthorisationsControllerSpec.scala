@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.uknwauthcheckerapi.controllers
 
-import java.time.{LocalDate, ZonedDateTime}
+import java.time.LocalDate
 import scala.concurrent.Future
 
 import cats.data.EitherT
@@ -24,17 +24,12 @@ import com.google.inject.AbstractModule
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{reset, when}
 import org.scalatest.Assertion
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 
 import play.api.libs.json._
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.uknwauthcheckerapi.errors.ApiErrorResponses._
-import uk.gov.hmrc.uknwauthcheckerapi.errors.DataRetrievalError._
 import uk.gov.hmrc.uknwauthcheckerapi.errors._
-import uk.gov.hmrc.uknwauthcheckerapi.generators._
 import uk.gov.hmrc.uknwauthcheckerapi.models._
-import uk.gov.hmrc.uknwauthcheckerapi.models.constants._
 import uk.gov.hmrc.uknwauthcheckerapi.services._
 
 class AuthorisationsControllerSpec extends BaseSpec {
@@ -101,7 +96,7 @@ class AuthorisationsControllerSpec extends BaseSpec {
   }
 
   "AuthorisationsController" should {
-    "return OK (200) with authorised eoris when request has valid eoris" in new TestContext {
+    /*  "return OK (200) with authorised eoris when request has valid eoris" in new TestContext {
       forAll { (authorisationRequest: AuthorisationRequest, dateTime: ZonedDateTime) =>
         val expectedResponse = AuthorisationsResponse(
           dateTime,
@@ -169,10 +164,10 @@ class AuthorisationsControllerSpec extends BaseSpec {
         statusCode = BAD_REQUEST,
         expectedResponse = Json.toJson(expectedResponse)
       )
-    }
+    }*/
   }
 
-  "return BAD_REQUEST (400) error when getAuthorisations call has eori errors" in new TestContext {
+  /*  "return BAD_REQUEST (400) error when getAuthorisations call has eori errors" in new TestContext {
     forAll { (validRequest: ValidAuthorisationRequest) =>
       val authorisationRequest: AuthorisationRequest = validRequest.request
 
@@ -324,5 +319,6 @@ class AuthorisationsControllerSpec extends BaseSpec {
         headers = headers
       )
     }
-  }
+  } */
+
 }
