@@ -16,14 +16,20 @@
 
 package uk.gov.hmrc.uknwauthcheckerapi.controllers
 
+import java.time.ZonedDateTime
+
 import com.github.tomakehurst.wiremock.client.WireMock._
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 
 import play.api.http.MimeTypes
+import play.api.http.Status._
+import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.WSResponse
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.uknwauthcheckerapi.generators._
 import uk.gov.hmrc.uknwauthcheckerapi.models._
 import uk.gov.hmrc.uknwauthcheckerapi.models.constants.{CustomHeaderNames, HmrcContentTypes}
+import uk.gov.hmrc.uknwauthcheckerapi.models.eis._
 import uk.gov.hmrc.uknwauthcheckerapi.{BaseISpec, generators}
 
 class AuthorisationControllerISpec extends BaseISpec {
@@ -53,7 +59,7 @@ class AuthorisationControllerISpec extends BaseISpec {
         case Some(header) => header must fullyMatch regex TestRegexes.iso8601DateTimeFormatPattern
         case None         => fail("Timestamp header not present")
   }
-  /*
+
   "POST /authorisations" should {
     "return OK (200) with authorised eoris when request has valid eoris" in new TestContext {
       forAll { (validRequest: ValidAuthorisationRequest, dateTime: ZonedDateTime) =>
@@ -269,5 +275,5 @@ class AuthorisationControllerISpec extends BaseISpec {
       verifyTimestampHeader(result)
     }
   }
-   */
+
 }
