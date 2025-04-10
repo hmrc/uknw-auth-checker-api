@@ -46,13 +46,13 @@ class AuthActionSpec extends BaseSpec {
   }
 
   "AuthAction" should {
-//    "allow a request through if authorized" in {
-//      stubAuthorization()
-//
-//      val result: Option[Result] = await(authAction.filter(fakePostRequest))
-//
-//      result shouldBe None
-//    }
+    "allow a request through if authorized" in {
+      stubAuthorization()
+
+      val result: Option[Result] = await(authAction.filter(fakePostRequest))
+
+      result shouldBe None
+    }
 
     "return ServiceUnavailableApiError when authorised returns an InternalError" in new TestContext {
 

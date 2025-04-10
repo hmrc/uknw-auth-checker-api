@@ -16,10 +16,15 @@
 
 package uk.gov.hmrc.uknwauthcheckerapi.utils
 
+import java.util.UUID
+
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.uknwauthcheckerapi.controllers.BaseSpec
+import uk.gov.hmrc.uknwauthcheckerapi.generators.TestRegexes
+import uk.gov.hmrc.uknwauthcheckerapi.models.constants.CustomHeaderNames
 
 class HeaderCarrierExtensionsSpec extends BaseSpec, HeaderCarrierExtensions {
-  /*
+
   "generateCorrelationId" should {
     "reuse the existing X-Correlation-Id header when present in HeaderCarrier" in {
       val uuid = UUID.randomUUID()
@@ -41,5 +46,5 @@ class HeaderCarrierExtensionsSpec extends BaseSpec, HeaderCarrierExtensions {
 
       correlationId should fullyMatch regex TestRegexes.uuidPattern
     }
-  }*/
+  }
 }
