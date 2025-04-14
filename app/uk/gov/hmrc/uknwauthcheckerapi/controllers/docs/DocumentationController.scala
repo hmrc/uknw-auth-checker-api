@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.uknwauthcheckerapi.controllers
-
-import javax.inject.{Inject, Singleton}
+package uk.gov.hmrc.uknwauthcheckerapi.controllers.docs
 
 import controllers.Assets
-
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+
+import javax.inject.{Inject, Singleton}
 
 @Singleton
 class DocumentationController @Inject() (assets: Assets, cc: ControllerComponents) extends BackendController(cc) {
