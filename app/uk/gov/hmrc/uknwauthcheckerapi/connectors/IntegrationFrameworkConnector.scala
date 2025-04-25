@@ -18,15 +18,15 @@ package uk.gov.hmrc.uknwauthcheckerapi.connectors
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-
 import com.typesafe.config.Config
 import org.apache.pekko.actor.ActorSystem
-
+import play.api.Logging
 import play.api.http.{HeaderNames, MimeTypes}
 import play.api.libs.json.Json
 import play.api.libs.ws.writeableOf_JsValue
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, Retries, UpstreamErrorResponse}
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.uknwauthcheckerapi.config.AppConfig
 import uk.gov.hmrc.uknwauthcheckerapi.models.Rfc7231DateTime
 import uk.gov.hmrc.uknwauthcheckerapi.models.constants.{CustomHeaderNames, HmrcContentTypes}
@@ -41,19 +41,24 @@ class IntegrationFrameworkConnector @Inject() (
   override val actorSystem:   ActorSystem
 )(using ec: ExecutionContext)
     extends Retries,
-      HeaderCarrierExtensions {
+      HeaderCarrierExtensions, Logging {
 
   def getEisAuthorisationsResponse(eisAuthorisationRequest: EisAuthorisationRequest)(implicit hc: HeaderCarrier): Future[EisAuthorisationsResponse] =
     retryFor[EisAuthorisationsResponse]("Integration Framework Response")(retryCondition) {
+      val headers= integrationFrameworkHeaders(appConfig.integrationFrameworkBearerToken)
+     // logger.info(s" $headers headers here")
       httpClient
         .post(appConfig.eisAuthorisationsUrl)
-        .setHeader(integrationFrameworkHeaders(appConfig.integrationFrameworkBearerToken)*)
+        .setHeader(headers: _*)
         .withBody(Json.toJson(eisAuthorisationRequest))
         .executeAndDeserialise[EisAuthorisationsResponse]
+
+
     }
 
   private def integrationFrameworkHeaders(bearerToken: String)(implicit hc: HeaderCarrier): Seq[(String, String)] =
     Seq(
+     //(HeaderNames.X_FORWARDED_HOST, appConfig.appName),
       (CustomHeaderNames.xCorrelationId, generateCorrelationId()),
       (HeaderNames.DATE, Rfc7231DateTime.now),
       (HeaderNames.CONTENT_TYPE, HmrcContentTypes.json),
