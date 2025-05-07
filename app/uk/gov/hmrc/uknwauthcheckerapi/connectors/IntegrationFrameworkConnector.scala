@@ -46,7 +46,7 @@ class IntegrationFrameworkConnector @Inject() (
       val headers = integrationFrameworkHeaders(appConfig.integrationFrameworkBearerToken)
       httpClient
         .post(appConfig.eisAuthorisationsUrl)
-        .setHeader(headers: _*)
+        .setHeader(headers*)
         .withBody(Json.toJson(eisAuthorisationRequest))
         .executeAndDeserialise[EisAuthorisationsResponse]
 
