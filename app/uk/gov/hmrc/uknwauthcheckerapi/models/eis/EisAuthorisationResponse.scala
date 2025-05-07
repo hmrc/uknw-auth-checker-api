@@ -20,7 +20,7 @@ import java.time.ZonedDateTime
 
 import play.api.libs.json.{Json, OFormat}
 
-case class EisAuthorisationsResponse(processingDate: ZonedDateTime, authType: String, results: Seq[EisAuthorisationResponse])
+case class EisAuthorisationsResponse(processingDate: Option[ZonedDateTime], authType: Option[String], results: Option[Seq[EisAuthorisationResponse]])
 
 object EisAuthorisationsResponse {
   implicit val format: OFormat[EisAuthorisationsResponse] = Json.format[EisAuthorisationsResponse]

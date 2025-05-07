@@ -93,6 +93,8 @@ class BaseSpec
 
   when(mockZonedDateTimeService.nowAsIsoUtc8601String())
     .thenReturn(Iso8601DateTimeFormatter.format(ZonedDateTime.of(LocalDate.now.atTime(LocalTime.MIDNIGHT), ZoneId.of("UTC"))))
+  when(mockZonedDateTimeService.nowUtc())
+    .thenReturn(ZonedDateTime.of(LocalDate.now.atTime(LocalTime.MIDNIGHT), ZoneId.of("UTC")))
 
   protected def configOverrides: Map[String, Any] = Map()
 

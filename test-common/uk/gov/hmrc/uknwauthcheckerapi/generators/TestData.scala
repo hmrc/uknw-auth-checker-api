@@ -142,9 +142,19 @@ trait TestData extends Generators {
       eoris    <- eoriGenerator()
     } yield ValidEisAuthorisationsResponse(
       EisAuthorisationsResponse(
-        dateTime,
-        EisAuthTypes.nopWaiver,
-        eoris.map(e => EisAuthorisationResponse(e, valid = true, 0))
+        Some(dateTime),
+        Some(EisAuthTypes.nopWaiver),
+        Some(eoris.map(e => EisAuthorisationResponse(e, valid = true, 0)))
+      )
+    )
+  }
+
+  implicit protected val arbValidOptionalEisAuthorisationsResponse: Arbitrary[ValidOptionalEisAuthorisationsResponse] = Arbitrary {
+    ValidOptionalEisAuthorisationsResponse(
+      EisAuthorisationsResponse(
+        None,
+        None,
+        None
       )
     )
   }
@@ -189,3 +199,4 @@ final case class TooLargeAuthorisationRequest(request: AuthorisationRequest)
 final case class TooManyEorisAuthorisationRequest(request: AuthorisationRequest)
 final case class ValidAuthorisationRequest(request: AuthorisationRequest)
 final case class ValidEisAuthorisationsResponse(response: EisAuthorisationsResponse)
+final case class ValidOptionalEisAuthorisationsResponse(response: EisAuthorisationsResponse)

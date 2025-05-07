@@ -1,0 +1,24 @@
+meta {
+  name: Empty Eis Response Eori
+  type: http
+  seq: 17
+}
+
+post {
+  url: {{apiEndpoint}}
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/vnd.hmrc.1.0+json
+  Authorization: {{bearerToken}}
+}
+
+body:json {
+  {
+    "eoris": [
+      "GB999999999999503"
+      ]
+  }
+}

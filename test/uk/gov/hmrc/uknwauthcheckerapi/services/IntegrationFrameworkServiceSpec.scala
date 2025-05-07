@@ -69,9 +69,9 @@ class IntegrationFrameworkServiceSpec extends BaseSpec {
         val request = validRequest.request
 
         val expectedEisResponse = EisAuthorisationsResponse(
-          dateTime,
-          appConfig.authType,
-          request.eoris.map(r => EisAuthorisationResponse(r, valid = true, 0))
+          Some(dateTime),
+          Some(appConfig.authType),
+          Some(request.eoris.map(r => EisAuthorisationResponse(r, valid = true, 0)))
         )
 
         val expectedResponse = AuthorisationsResponse(
@@ -84,6 +84,28 @@ class IntegrationFrameworkServiceSpec extends BaseSpec {
           eisResponse = Future.successful(expectedEisResponse),
           response = Right(expectedResponse)
         )
+      }
+    }
+
+    "return EisAuthorisationsResponse when call to the integration framework succeeds and it returns None on optional fields" in new TestContext {
+      forAll {
+        (
+          validRequest:                           ValidAuthorisationRequest,
+          dateTime:                               ZonedDateTime,
+          validOptionalEisAuthorisationsResponse: ValidOptionalEisAuthorisationsResponse
+        ) =>
+          val request = validRequest.request
+
+          val expectedResponse = AuthorisationsResponse(
+            dateTime,
+            request.eoris.map(r => AuthorisationResponse(r, authorised = false))
+          )
+
+          doTest(
+            request = request,
+            eisResponse = Future.successful(validOptionalEisAuthorisationsResponse.response),
+            response = Right(expectedResponse)
+          )
       }
     }
 

@@ -30,13 +30,14 @@ import uk.gov.hmrc.uknwauthcheckerapi.connectors.IntegrationFrameworkConnector
 import uk.gov.hmrc.uknwauthcheckerapi.errors.DataRetrievalError
 import uk.gov.hmrc.uknwauthcheckerapi.errors.DataRetrievalError._
 import uk.gov.hmrc.uknwauthcheckerapi.models.constants.CustomRegexes._
-import uk.gov.hmrc.uknwauthcheckerapi.models.eis.{EisAuthorisationRequest, EisAuthorisationResponseError}
+import uk.gov.hmrc.uknwauthcheckerapi.models.eis.{EisAuthorisationRequest, EisAuthorisationResponse, EisAuthorisationResponseError}
 import uk.gov.hmrc.uknwauthcheckerapi.models.{AuthorisationRequest, AuthorisationResponse, AuthorisationsResponse}
 
 class IntegrationFrameworkService @Inject() (
   appConfig:                     AppConfig,
   integrationFrameworkConnector: IntegrationFrameworkConnector,
-  localDateService:              LocalDateService
+  localDateService:              LocalDateService,
+  zonedDateTimeService:          ZonedDateTimeService
 )(using ec: ExecutionContext) {
 
   def getAuthorisations(
@@ -54,8 +55,9 @@ class IntegrationFrameworkService @Inject() (
         .map { authorisationsResponse =>
           Right(
             AuthorisationsResponse(
-              authorisationsResponse.processingDate,
+              authorisationsResponse.processingDate.getOrElse(zonedDateTimeService.nowUtc()),
               authorisationsResponse.results
+                .getOrElse(handleEmptyResponseFromEIS(authorisationRequest.eoris))
                 .map(authorisationResponse =>
                   AuthorisationResponse(
                     authorisationResponse.eori,
@@ -103,4 +105,7 @@ class IntegrationFrameworkService @Inject() (
       case invalidAuthTypePatternRegex(_) => InternalServerDataRetrievalError(s"Invalid auth type ${appConfig.authType}")
       case message                        => BadRequestDataRetrievalError(message)
     }
+
+  private def handleEmptyResponseFromEIS(eoris: Seq[String]): Seq[EisAuthorisationResponse] =
+    eoris.map(eori => EisAuthorisationResponse(eori = eori, code = 1, valid = false))
 }
