@@ -53,9 +53,10 @@ class IntegrationFrameworkService @Inject() (
       integrationFrameworkConnector
         .getEisAuthorisationsResponse(eisAuthorisationRequest)
         .map { authorisationsResponse =>
+          val date = authorisationsResponse.processingDate.getOrElse(zonedDateTimeService.nowUtc())
           Right(
             AuthorisationsResponse(
-              authorisationsResponse.processingDate.getOrElse(zonedDateTimeService.nowUtc()),
+              date,
               authorisationsResponse.results
                 .getOrElse(handleEmptyResponseFromEIS(authorisationRequest.eoris))
                 .map(authorisationResponse =>
