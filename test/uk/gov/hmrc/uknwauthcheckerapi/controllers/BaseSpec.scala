@@ -101,7 +101,7 @@ class BaseSpec
   override def fakeApplication(): Application =
     GuiceApplicationBuilder()
       .configure(additionalAppConfig)
-      .overrides(moduleOverrides)
+      .overrides(defaultModuleOverrides, moduleOverrides)
       .build()
 
   protected def injected[T](using evidence: ClassTag[T]): T = app.injector.instanceOf[T]
@@ -113,7 +113,7 @@ class BaseSpec
   ): FakeRequest[JsValue] =
     FakeRequest(verb, TestConstants.authorisationEndpoint, FakeHeaders(headers), json)
 
-  def moduleOverrides: AbstractModule = new AbstractModule {
+  private def defaultModuleOverrides: AbstractModule = new AbstractModule {
     override def configure(): Unit = {
       bind(classOf[ActorSystem]).toInstance(actorSystem)
       bind(classOf[AuthConnector]).toInstance(mockAuthConnector)
@@ -124,6 +124,8 @@ class BaseSpec
       bind(classOf[ZonedDateTimeService]).toInstance(mockZonedDateTimeService)
     }
   }
+
+  def moduleOverrides: AbstractModule = new AbstractModule {}
 
   protected def stubAuthorization(): Unit = {
     val retrievalResult = Future.successful(Credentials(TestConstants.credentialProviderId, TestConstants.credentialProviderType))

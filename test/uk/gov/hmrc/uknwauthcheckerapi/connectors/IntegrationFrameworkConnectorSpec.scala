@@ -17,7 +17,7 @@
 package uk.gov.hmrc.uknwauthcheckerapi.connectors
 
 import scala.concurrent.Future
-import scala.util.{Failure, Success, Try}
+import scala.util.{Failure, Try}
 
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
@@ -30,7 +30,7 @@ import play.api.test.Helpers.await
 import uk.gov.hmrc.http.{HttpResponse, UpstreamErrorResponse}
 import uk.gov.hmrc.uknwauthcheckerapi.controllers.BaseSpec
 import uk.gov.hmrc.uknwauthcheckerapi.generators.{TestConstants, ValidEisAuthorisationsResponse}
-import uk.gov.hmrc.uknwauthcheckerapi.models.constants.{ApiErrorCodes, JsonErrorMessages, JsonPaths}
+import uk.gov.hmrc.uknwauthcheckerapi.models.constants.ApiErrorCodes
 import uk.gov.hmrc.uknwauthcheckerapi.models.eis.{EisAuthorisationRequest, EisAuthorisationsResponse}
 
 class IntegrationFrameworkConnectorSpec extends BaseSpec {

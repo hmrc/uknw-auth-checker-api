@@ -91,13 +91,12 @@ class IntegrationFrameworkServiceSpec extends BaseSpec {
       forAll {
         (
           validRequest:                           ValidAuthorisationRequest,
-          dateTime:                               ZonedDateTime,
           validOptionalEisAuthorisationsResponse: ValidOptionalEisAuthorisationsResponse
         ) =>
           val request = validRequest.request
 
           val expectedResponse = AuthorisationsResponse(
-            dateTime,
+            mockZonedDateTimeService.nowUtc(),
             request.eoris.map(r => AuthorisationResponse(r, authorised = false))
           )
 
