@@ -43,13 +43,11 @@ class IntegrationFrameworkConnector @Inject() (
 
   def getEisAuthorisationsResponse(eisAuthorisationRequest: EisAuthorisationRequest)(implicit hc: HeaderCarrier): Future[EisAuthorisationsResponse] =
     retryFor[EisAuthorisationsResponse]("Integration Framework Response")(retryCondition) {
-      val headers = integrationFrameworkHeaders(appConfig.integrationFrameworkBearerToken)
       httpClient
         .post(appConfig.eisAuthorisationsUrl)
-        .setHeader(headers*)
+        .setHeader(integrationFrameworkHeaders(appConfig.integrationFrameworkBearerToken)*)
         .withBody(Json.toJson(eisAuthorisationRequest))
         .executeAndDeserialise[EisAuthorisationsResponse]
-
     }
 
   private def integrationFrameworkHeaders(bearerToken: String)(implicit hc: HeaderCarrier): Seq[(String, String)] =
