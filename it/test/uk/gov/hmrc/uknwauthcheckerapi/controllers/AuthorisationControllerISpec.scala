@@ -62,13 +62,13 @@ class AuthorisationControllerISpec extends BaseISpec {
 
   "POST /authorisations" should {
     "return OK (200) with authorised eoris when request has valid eoris" in new TestContext {
-      forAll { (validRequest: ValidAuthorisationRequest, dateTime: ZonedDateTime) =>
+      forAll { (validRequest: ValidAuthorisationRequest, processingDate: ZonedDateTime) =>
         reset()
 
         val request:                  AuthorisationRequest = validRequest.request
         val authorisationRequestJson: JsValue              = Json.toJson(request)
         val expectedResponse: JsValue = Json.toJson(
-          EisAuthorisationsResponse(Some(dateTime), Some(appConfig.authType), None)
+          EisAuthorisationsResponse(Some(processingDate), Some(appConfig.authType), None)
         )
         stubPost(TestConstants.eisAuthorisationsEndpointPath, OK, expectedResponse.toString())
 

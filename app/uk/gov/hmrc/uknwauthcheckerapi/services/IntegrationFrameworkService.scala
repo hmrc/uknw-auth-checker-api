@@ -53,12 +53,11 @@ class IntegrationFrameworkService @Inject() (
       integrationFrameworkConnector
         .getEisAuthorisationsResponse(eisAuthorisationRequest)
         .map { authorisationsResponse =>
-          val date = authorisationsResponse.processingDate.getOrElse(zonedDateTimeService.nowUtc())
           Right(
             AuthorisationsResponse(
-              date,
+              authorisationsResponse.processingDate.getOrElse(zonedDateTimeService.nowUtc()),
               authorisationsResponse.results
-                .getOrElse(handleEmptyResponseFromEIS(authorisationRequest.eoris))
+                .getOrElse(handleEmptyResponseFromEis(authorisationRequest.eoris))
                 .map(authorisationResponse =>
                   AuthorisationResponse(
                     authorisationResponse.eori,
@@ -107,6 +106,6 @@ class IntegrationFrameworkService @Inject() (
       case message                        => BadRequestDataRetrievalError(message)
     }
 
-  private def handleEmptyResponseFromEIS(eoris: Seq[String]): Seq[EisAuthorisationResponse] =
+  private def handleEmptyResponseFromEis(eoris: Seq[String]): Seq[EisAuthorisationResponse] =
     eoris.map(eori => EisAuthorisationResponse(eori = eori, code = 1, valid = false))
 }

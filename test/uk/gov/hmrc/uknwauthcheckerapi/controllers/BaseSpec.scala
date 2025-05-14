@@ -96,15 +96,13 @@ class BaseSpec
   when(mockZonedDateTimeService.nowUtc())
     .thenReturn(ZonedDateTime.of(LocalDate.now.atTime(LocalTime.MIDNIGHT), ZoneId.of("UTC")))
 
-  protected def configOverrides: Map[String, Any] = Map()
-
   override def fakeApplication(): Application =
     GuiceApplicationBuilder()
       .configure(additionalAppConfig)
       .overrides(defaultModuleOverrides, moduleOverrides)
       .build()
 
-  protected def injected[T](using evidence: ClassTag[T]): T = app.injector.instanceOf[T]
+  protected def configOverrides: Map[String, Any] = Map()
 
   protected def fakeRequestWithJsonBody(
     json:    JsValue,
@@ -112,6 +110,20 @@ class BaseSpec
     headers: Seq[(String, String)] = defaultHeaders
   ): FakeRequest[JsValue] =
     FakeRequest(verb, TestConstants.authorisationEndpoint, FakeHeaders(headers), json)
+
+  protected def injected[T](using evidence: ClassTag[T]): T = app.injector.instanceOf[T]
+
+  protected def moduleOverrides: AbstractModule = new AbstractModule {}
+
+  protected def stubAuthorization(): Unit = {
+    val retrievalResult = Future.successful(Credentials(TestConstants.credentialProviderId, TestConstants.credentialProviderType))
+
+    when(mockAuthConnector.authorise[Credentials](any(), any())(any(), any()))
+      .thenReturn(retrievalResult)
+
+    when(mockAuthConnector.authorise[Unit](any(), matching(EmptyRetrieval))(any(), any()))
+      .thenReturn(Future.successful(()))
+  }
 
   private def defaultModuleOverrides: AbstractModule = new AbstractModule {
     override def configure(): Unit = {
@@ -123,17 +135,5 @@ class BaseSpec
       bind(classOf[RequestBuilder]).toInstance(mockRequestBuilder)
       bind(classOf[ZonedDateTimeService]).toInstance(mockZonedDateTimeService)
     }
-  }
-
-  def moduleOverrides: AbstractModule = new AbstractModule {}
-
-  protected def stubAuthorization(): Unit = {
-    val retrievalResult = Future.successful(Credentials(TestConstants.credentialProviderId, TestConstants.credentialProviderType))
-
-    when(mockAuthConnector.authorise[Credentials](any(), any())(any(), any()))
-      .thenReturn(retrievalResult)
-
-    when(mockAuthConnector.authorise[Unit](any(), matching(EmptyRetrieval))(any(), any()))
-      .thenReturn(Future.successful(()))
   }
 }
