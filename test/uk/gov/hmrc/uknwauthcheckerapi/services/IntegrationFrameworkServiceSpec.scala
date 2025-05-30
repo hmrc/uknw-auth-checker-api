@@ -54,7 +54,7 @@ class IntegrationFrameworkServiceSpec extends BaseSpec {
       response:    Either[DataRetrievalError, AuthorisationsResponse]
     ): Assertion = {
 
-      when(mockIntegrationFrameworkConnector.getEisAuthorisationsResponse(any())(any()))
+      when(mockIntegrationFrameworkConnector.getEisAuthorisationsResponse(any())(using any()))
         .thenReturn(eisResponse)
 
       val result = await(service.getAuthorisations(request).value)
@@ -124,7 +124,7 @@ class IntegrationFrameworkServiceSpec extends BaseSpec {
     }
 
     "return BadGatewayRetrievalError error when call to the integration framework fails with BAD_GATEWAY via UpstreamErrorResponse" in new TestContext {
-      forAll { (validRequest: ValidAuthorisationRequest, errorMessage: String) =>
+      forAll { (validRequest: ValidAuthorisationRequest) =>
         val request = validRequest.request
 
         val expectedEisResponse: UpstreamErrorResponse        = UpstreamErrorResponse(TestConstants.emptyJson, BAD_GATEWAY)
@@ -271,7 +271,7 @@ class IntegrationFrameworkServiceSpec extends BaseSpec {
     }
 
     "return ServiceUnavailableRetrievalError error when call to the integration framework fails with SERVICE_UNAVAILABLE via UpstreamErrorResponse" in new TestContext {
-      forAll { (validRequest: ValidAuthorisationRequest, errorMessage: String) =>
+      forAll { (validRequest: ValidAuthorisationRequest) =>
         val request = validRequest.request
 
         val expectedEisResponse: UpstreamErrorResponse                = UpstreamErrorResponse(TestConstants.emptyJson, SERVICE_UNAVAILABLE)

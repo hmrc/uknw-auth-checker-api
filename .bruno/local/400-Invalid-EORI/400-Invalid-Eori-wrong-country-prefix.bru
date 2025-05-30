@@ -1,7 +1,7 @@
 meta {
-  name: 400-Invalid-JsArray
+  name: 400-Invalid-Eori-wrong-country-prefix
   type: http
-  seq: 7
+  seq: 5
 }
 
 post {
@@ -17,7 +17,8 @@ headers {
 
 body:json {
   {
-    "eoris":"GB837826880909874"
+    "eoris": [
+      "DK837826880909874"]
   }
 }
 
@@ -28,11 +29,11 @@ assert {
 }
 
 tests {
-  
   const error_code = 'INVALID_FORMAT';
-  const error_message ="JSON structure is incorrect";
+  const invalidEoris ='DK837826880909874';
+  const error_message = invalidEoris +" is not a supported EORI number";
   const error_path = "eoris";
-  const data = res.getBody();
+    const data = res.getBody();
   
   test(`res.body.errors.code: eq ${error_code}`, function() {
       expect(data.errors[0].code).to.equal(error_code);
@@ -45,5 +46,9 @@ tests {
   
   test(`res.body.errors.path: eq ${error_path}`, function() {
       expect(data.errors[0].path).to.equal(error_path);
+  });
+  test(`should have only 1 error result`, function() {
+   
+     expect(data.errors).to.be.an('array').that.has.lengthOf(1);
   });
 }
