@@ -16,14 +16,15 @@
 
 package uk.gov.hmrc.uknwauthcheckerapi.services
 
-import java.time.{ZoneId, ZonedDateTime}
+import java.time.{LocalDate, LocalTime, ZoneId, ZonedDateTime}
 import javax.inject.Singleton
-
 import uk.gov.hmrc.uknwauthcheckerapi.models.Iso8601DateTimeFormatter
 
 @Singleton
 class ZonedDateTimeService {
   def nowUtc(): ZonedDateTime = ZonedDateTime.now(ZoneId.of("UTC"))
+
+  def nowUtcMidnight(): ZonedDateTime = ZonedDateTime.of(LocalDate.now.atTime(LocalTime.MIDNIGHT), ZoneId.of("UTC"))
 
   def nowAsIsoUtc8601String(): String = Iso8601DateTimeFormatter.format(nowUtc())
 }

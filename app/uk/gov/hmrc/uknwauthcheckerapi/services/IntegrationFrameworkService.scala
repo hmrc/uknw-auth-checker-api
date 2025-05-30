@@ -55,7 +55,7 @@ class IntegrationFrameworkService @Inject() (
         .map { authorisationsResponse =>
           Right(
             AuthorisationsResponse(
-              authorisationsResponse.processingDate.getOrElse(zonedDateTimeService.nowUtc()),
+              authorisationsResponse.processingDate.getOrElse(zonedDateTimeService.nowUtcMidnight()),
               authorisationsResponse.results
                 .getOrElse(handleEmptyResponseFromEis(authorisationRequest.eoris))
                 .map(authorisationResponse =>

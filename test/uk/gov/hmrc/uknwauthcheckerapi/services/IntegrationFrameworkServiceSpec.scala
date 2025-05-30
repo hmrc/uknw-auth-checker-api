@@ -96,7 +96,7 @@ class IntegrationFrameworkServiceSpec extends BaseSpec {
           val request = validRequest.request
 
           val expectedResponse = AuthorisationsResponse(
-            mockZonedDateTimeService.nowUtc(),
+            mockZonedDateTimeService.nowUtcMidnight(),
             request.eoris.map(r => AuthorisationResponse(r, authorised = false))
           )
 
