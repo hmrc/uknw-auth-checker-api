@@ -18,6 +18,7 @@ package uk.gov.hmrc.uknwauthcheckerapi.services
 
 import java.time.{LocalDate, LocalTime, ZoneId, ZonedDateTime}
 import javax.inject.Singleton
+
 import uk.gov.hmrc.uknwauthcheckerapi.models.Iso8601DateTimeFormatter
 
 @Singleton
