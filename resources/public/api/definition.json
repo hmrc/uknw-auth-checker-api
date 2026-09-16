@@ -6,9 +6,7 @@
     "categories": ["CUSTOMS"],
     "versions": [
       {
-        "access": {
-          "type": "PUBLIC"
-        },
+        "access":  "PUBLIC",
         "version": "1.0",
         "status": "STABLE",
         "endpointsEnabled": true
