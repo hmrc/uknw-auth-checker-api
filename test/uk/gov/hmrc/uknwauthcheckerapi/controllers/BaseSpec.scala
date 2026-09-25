@@ -92,7 +92,7 @@ class BaseSpec
   protected lazy val mockZonedDateTimeService:          ZonedDateTimeService                = mock[ZonedDateTimeService]
 
   when(mockZonedDateTimeService.nowAsIsoUtc8601String())
-    .thenReturn(Iso8601DateTimeFormatter.format(ZonedDateTime.of(LocalDate.now.atTime(LocalTime.MIDNIGHT), ZoneId.of("UTC"))))
+    .thenReturn(Iso8601DateTimeFormatter.format(ZonedDateTime.of(LocalDate.now.atTime(LocalTime.now), ZoneId.of("UTC"))))
 
   protected def configOverrides: Map[String, Any] = Map()
 
